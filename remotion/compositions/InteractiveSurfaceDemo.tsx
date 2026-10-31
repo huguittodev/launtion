@@ -797,7 +797,7 @@ export const SceneNodeRenderer: React.FC<SceneNodeRendererProps> = ({
     }
 
     default: {
-      const _exhaustiveCheck: never = node;
+      void node;
       return null;
     }
   }

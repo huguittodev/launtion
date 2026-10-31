@@ -8,8 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "npx tsx --test tests/*.test.ts",
     "remotion": "remotion studio remotion/index.ts",
-    "render": "remotion render remotion/index.ts StudioShowcase out/StudioShowcase.mp4",
+    "render": "remotion render remotion/index.ts InteractiveSurfaceDemo out/InteractionDemo.mp4",
+    "render:showcase": "remotion render remotion/index.ts StudioShowcase out/StudioShowcase.mp4",
     "render:legacy": "remotion render remotion/index.ts LaunchDemo out/LaunchDemo.mp4"
   },
   "dependencies": {
