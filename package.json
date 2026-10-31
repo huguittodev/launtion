@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@remotion/cli": "4.0.539",
+    "@remotion/player": "4.0.539",
     "next": "16.4.3",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -33,4 +34,3 @@
     "typescript": "^5"
   }
 }
-

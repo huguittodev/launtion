@@ -101,6 +101,13 @@ export interface ProductInteraction3DPayload {
   eventsCount?: number;
   cameraRig?: Record<string, unknown>;
   cursor?: Record<string, unknown>;
+  textToType?: string;
+  promptText?: string;
+  buttonText?: string;
+  productName?: string;
+  tagline?: string;
+  title?: string;
+  headline?: string;
 }
 
 export interface IconGridMorphPayload {

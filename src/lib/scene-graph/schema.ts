@@ -99,6 +99,13 @@ export const ProductInteraction3DPayloadSchema = z.object({
   eventsCount: z.number().int().nonnegative().optional(),
   cameraRig: z.record(z.string(), z.unknown()).optional(),
   cursor: z.record(z.string(), z.unknown()).optional(),
+  textToType: z.string().max(200).optional(),
+  promptText: z.string().max(200).optional(),
+  buttonText: z.string().max(30).optional(),
+  productName: z.string().max(50).optional(),
+  tagline: z.string().max(100).optional(),
+  title: z.string().max(50).optional(),
+  headline: z.string().max(60).optional(),
 });
 
 export const IconGridMorphPayloadSchema = z.object({

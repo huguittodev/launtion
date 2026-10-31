@@ -1,5 +1,9 @@
 # Original User Request
 
+## Parameters
+[skip-interview]
+How this run was launched; not part of the task.
+
 ## Approved Task Prompt — 2026-10-31T17:38:24Z
 
 Actúa como un equipo de ingeniería de software de élite especializado en motores de motion design deterministas, React, Remotion, física matemática, TypeScript estricto y diseño sonoro publicitario para SaaS. Consolidar el núcleo técnico atómico del motor gráfico y acústico de Launtion y demostrar mediante un showcase que una composición publicitaria de nivel estudio puede ser 100% dirigida por datos de un InteractionMap simulado a través de un SceneGraph, sin animaciones cableadas manualmente en React.
@@ -62,3 +66,50 @@ Todo cálculo de animación y audio depende exclusivamente del frame actual (sin
 - [ ] Contratos TypeScript y esquemas Zod para `InteractionMap` y `SceneGraph` están formalmente tipados y validados.
 - [ ] Cada evento en `demoInteractionMap.json` especifica explícitamente su campo `provenance` (`observed`, `inferred` o `simulated`).
 - [ ] Informe final de QA documenta componentes 100% funcionales, elementos simulados y tareas pendientes para Fase 3.
+
+
+## Follow-up — 2026-10-31T22:02:50Z
+
+# LAUNTION — EJECUCIÓN AUTÓNOMA CONTINUA MULTI-FASE
+
+## MISIÓN
+El usuario ha otorgado autonomía total para ejecutar y completar progresivamente las fases pendientes del roadmap de Launtion definidas en `PROJECT_SPEC.md` y `AGENTS.md`, comenzando de inmediato por la **Fase 3** y continuando de forma ininterrumpida por las siguientes fases hasta el producto final.
+
+## REGLAS DE EJECUCIÓN AUTÓNOMA
+1. **Sin pausas de confirmación:** No detenerse a preguntar al usuario entre fases ni tras completar hitos. Al completar un hito, auditarlo, corregir cualquier fallo y avanzar automáticamente al siguiente.
+2. **Fuente de verdad:** `PROJECT_SPEC.md` y `AGENTS.md` gobiernan las especificaciones, arquitectura y restricciones.
+3. **Distribución por roles Teamwork:** Arquitecto (contratos, interfaces, coordinación), Desarrolladores (código atómico, modular, tipado estricto), Investigadores y Auditores/QA (auditoría forense, pruebas de estrés y regresión).
+4. **Resolución autónoma de problemas:** Investigar, decidir e implementar la mejor alternativa técnica sin bloquearse. Solo detenerse si hay un bloqueo externo insalvable o una acción destructiva irreversible.
+5. **Calidad inviolable:** Cero errores de TypeScript, cero errores de ESLint, tests unitarios automatizados pasando al 100%, Next.js build exitoso y renderizado MP4 verificado en cada fase.
+
+## ROADMAP DE FASES A EJECUTAR
+
+### FASE 3: PREVIEW INTERACTIVO Y PERSONALIZACIÓN VISUAL (@remotion/player)
+- Instalar y coordinar `@remotion/player` en la versión exacta `4.0.539` (coordinada con `remotion`).
+- Construir en Next.js (`src/app/editor/` o interfaz interactiva) el reproductor web de `InteractiveSurfaceDemo` / `SceneGraph`.
+- Panel de personalización reactivo en vivo:
+  - Edición en tiempo real de textos (titulares, subtítulos, botones).
+  - Selector de temas y colores (`artDirection`: primario, acento, fondo).
+  - Control de cámara y puntos focales `(x, y)` interactivos sobre el preview.
+  - Visualización del timeline y estado de reproducción.
+- Validación de que cualquier cambio en la UI actualiza el `SceneGraph` de forma determinista y segura sin recargar la página ni romper el reproductor.
+
+### FASE 4: CREATIVE DIRECTOR AGENT (GEMINI)
+- Adapter de Gemini en el servidor Next.js (`src/lib/ai/` o ruta de API segura `POST /api/creative-director`).
+- Prompting de sistema con Structured Outputs forzado mediante el esquema Zod de `SceneGraph`.
+- Transforma datos del SaaS (nombre, descripción, objetivo, tono, lista de recursos) en un `SceneGraph` rico y variado (con narrativa, micro-escenas sintéticas, keyframes de cámara 3D y audio sincronizado).
+- Fallback determinista y validación estricta Zod en el servidor.
+
+### FASE 5: INPUT INTELLIGENCE (ANÁLISIS MULTIMODAL)
+- Endpoint seguro para análisis multimodal con Gemini de capturas de pantalla y clips de vídeo MP4 subidos.
+- Extracción inteligente de coordenadas de botones, áreas de acción y sugerencia inicial del `InteractionMap`.
+
+### FASE 6: GRABADOR PROPIO INTEGRADO
+- Módulo web en el navegador con `getDisplayMedia` para capturar vídeo de pantalla y registrar eventos del ratón (coordenadas x, y normalizadas, clics, tiempos t).
+- Generación directa del `InteractionMap` con procedencia `observed`.
+
+### FASE 7 & 8: WORKER DE RENDERIZADO AISLADO & CAPA SAAS
+- Infraestructura de cola de renderizado asíncrono con `@remotion/renderer`.
+- Persistencia, esquemas Supabase y autenticación con RLS.
+
+Comenzar inmediatamente por la Fase 3, verificar todos los criterios de aceptación y continuar sin interrupción.

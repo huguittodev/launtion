@@ -1,3 +1,5 @@
+import React from 'react';
+import Link from 'next/link';
 import { Header } from '@/components/Header';
 
 export default function HomePage() {
@@ -6,7 +8,7 @@ export default function HomePage() {
       <Header />
       <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-14 flex flex-col justify-center">
         <div className="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-white border border-[#E5E2DC] text-[#FF5C35] mb-6 shadow-xs">
-          Fase 1 Completada • Motion Kit v2
+          Fase 3 • Preview Interactivo & Personalización Visual (@remotion/player)
         </div>
 
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#181716] leading-tight mb-4">
@@ -17,6 +19,20 @@ export default function HomePage() {
           Motor de motion design publicitario de nivel estudio para SaaS, inspirado en las técnicas
           cinemáticas de Base44: Cámara 3D, cursor inteligente, UI sintética, tipografía cinética y audio sincronizado al frame.
         </p>
+
+        {/* Hero Call-to-Action to Open Studio Editor */}
+        <div className="flex flex-wrap items-center gap-3 mb-10">
+          <Link
+            href="/editor"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#181716] hover:bg-[#2A2927] text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all active:scale-95 group"
+          >
+            <span>Abrir Editor Interactivo en Vivo</span>
+            <span className="text-[#FF5C35] group-hover:translate-x-1 transition-transform">→</span>
+          </Link>
+          <code className="text-xs bg-white border border-[#E5E2DC] px-3.5 py-3 rounded-xl text-[#706C64] font-mono shadow-2xs">
+            npm run dev • /editor
+          </code>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="p-4 rounded-xl bg-white border border-[#ECE8E1] shadow-xs">
@@ -62,7 +78,7 @@ export default function HomePage() {
               Renderizado MP4 de Estudio
             </h2>
             <p className="text-xs text-[#706C64] mb-3">
-              Exporta el vídeo completo de 16 segundos con audio sincronizado a `out/StudioShowcase.mp4`.
+              Exporta el vídeo completo de 16 segundos con audio sincronizado a `out/InteractionDemo.mp4`.
             </p>
             <code className="text-xs bg-[#F5F3EF] px-2.5 py-1 rounded text-[#2A2927] font-mono">
               npm run render

@@ -16,6 +16,7 @@ import { interactionToSceneGraphAdapter } from '../../src/lib/scene-graph/adapte
 import type {
   ArtDirection,
   CanvasConfig,
+  ProductInteraction3DPayload,
   SceneGraph,
   SceneNode,
 } from '../../src/lib/scene-graph/types';
@@ -80,6 +81,22 @@ export const InteractiveProductSurface: React.FC<{
   const accent = sceneGraph.artDirection.primaryAccent;
   const isDark = sceneGraph.artDirection.surfaceTheme === 'dark';
 
+  // Extract dynamic copy payload from the active product_interaction_3d scene node
+  const activePayload = (sceneGraph.scenes.find((s) => s.type === 'product_interaction_3d')?.payload ??
+    sceneGraph.scenes[0]?.payload) as (ProductInteraction3DPayload & Record<string, unknown>) | undefined;
+
+  const defaultPrompt =
+    'I want to build a bike renting app with real-time terrain tracking';
+  const promptText =
+    activePayload?.textToType ?? activePayload?.promptText ?? defaultPrompt;
+  const buttonText = activePayload?.buttonText ?? 'Publish';
+  const brandTitle = activePayload?.productName ? `${activePayload.productName} Studio` : 'Base44 Studio';
+  const headerHeadline = activePayload?.headline ?? 'Fleet Operations & Dynamic Surface';
+  const codeTitle = activePayload?.title ?? 'Service Integrations & Routing';
+  const footerCrest = activePayload?.tagline
+    ? `${activePayload.productName ?? 'Base44'} • ${activePayload.tagline}`
+    : 'Base44 Motion Engine • Deterministic SceneGraph';
+
   // Determine dynamic element states purely from cursorTrack / cameraTrack events
   const clickKeyframes = sceneGraph.cursorTrack.filter((kf) => kf.click);
 
@@ -118,8 +135,6 @@ export const InteractiveProductSurface: React.FC<{
   const isDeployed = frame >= successFrame;
 
   // Typing cadence for prompt input
-  const promptText =
-    'I want to build a bike renting app with real-time terrain tracking';
   const typingStart = promptClickKf ? promptClickKf.frame + 5 : 70;
   const charsTyped = Math.max(
     0,
@@ -172,7 +187,7 @@ export const InteractiveProductSurface: React.FC<{
               color: '#FFFFFF',
             }}
           >
-            Base44 Studio
+            {brandTitle}
           </span>
         </div>
 
@@ -233,7 +248,7 @@ export const InteractiveProductSurface: React.FC<{
                 letterSpacing: '-0.03em',
               }}
             >
-              Fleet Operations & Dynamic Surface
+              {headerHeadline}
             </h2>
             <span style={{ fontSize: 13, color: '#8A867E' }}>
               Real-time telemetry • January 2026 • Base44 Engine v2.0
@@ -323,7 +338,7 @@ export const InteractiveProductSurface: React.FC<{
                 </span>
               </div>
             ) : (
-              <span>Publish</span>
+              <span>{buttonText}</span>
             )}
           </div>
         </div>
@@ -352,7 +367,7 @@ export const InteractiveProductSurface: React.FC<{
                 color: isDark ? '#FFFFFF' : '#181716',
               }}
             >
-              Service Integrations & Routing
+              {codeTitle}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -477,7 +492,7 @@ export const InteractiveProductSurface: React.FC<{
           }}
         >
           <div id="brand-hero-card" style={{ display: 'flex', gap: 8 }}>
-            <span>Base44 Motion Engine • Deterministic SceneGraph</span>
+            <span>{footerCrest}</span>
           </div>
           <span>Normalized Coordinate Telemetry • (x, y, t)</span>
         </div>

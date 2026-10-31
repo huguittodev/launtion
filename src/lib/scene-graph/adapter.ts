@@ -575,6 +575,12 @@ export function interactionToSceneGraphAdapter(
         durationInFrames: duration,
         payload: {
           windowTitle: 'Base44 SaaS Studio — Dynamic Surface',
+          textToType: 'I want to build a bike renting app with real-time terrain tracking',
+          buttonText: 'Publish',
+          productName: 'Base44',
+          tagline: 'Build it your way',
+          title: 'Base44 Architecture • Fleet Engine',
+          headline: 'Fleet Operations & Dynamic Surface',
           eventsCount: sortedEvents.length,
         },
       },
