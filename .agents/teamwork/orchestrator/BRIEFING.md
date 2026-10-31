@@ -1,4 +1,4 @@
-# BRIEFING — 2026-10-31T18:08:45Z
+# BRIEFING — 2026-10-31T18:16:45Z
 
 ## Mission
 Orchestrate atomic motion & audio engine consolidation and showcase composition for Launtion (Phase 1-2 v2 core) 100% data-driven via InteractionMap and SceneGraph.
@@ -20,12 +20,12 @@ Orchestrate atomic motion & audio engine consolidation and showcase composition 
 4. **Succession**: At 16 spawns, write handoff.md, spawn successor.
 - **Work items**:
   1. Survey & Pre-audit of codebase and specs [DONE]
-  2. Milestone 1: Contracts, Foundations & SFX Rights [in-progress: Verification active]
-  3. Milestone 2: Atomic Engines Implementation (Camera, Cursor, Audio) [pending]
+  2. Milestone 1: Contracts, Foundations & SFX Rights [DONE - GATE PASSED]
+  3. Milestone 2: Atomic Engines Implementation (Camera, Cursor, Audio) [in-progress: Explorers active]
   4. Milestone 3: Showcase Composition (InteractiveSurfaceDemo) & Integration [pending]
   5. Milestone 4: E2E Tests, Quality Gates, Builds & Remotion Render [pending]
-- **Current phase**: Milestone 1 Verification (Reviewers, Challengers, Auditor)
-- **Current focus**: Milestone 1 Gate Evaluation
+- **Current phase**: Milestone 2 Exploration
+- **Current focus**: Camera, Cursor, and Audio Engine Blueprints
 
 ## 🔒 Key Constraints
 - NEVER write, modify, or create source code files directly.
@@ -42,8 +42,11 @@ Orchestrate atomic motion & audio engine consolidation and showcase composition 
 
 ## Key Decisions Made
 - Project pattern selected with survey phase.
-- M1 Worker completed full implementation of contracts, mapper, adapter, demo data, and SFX manifest.
-- Dispatched 2 Reviewers, 2 Challengers, and 1 Forensic Auditor in parallel.
+- Milestone 1 GATE PASSED cleanly.
+- Dispatched 3 parallel Explorers for Milestone 2:
+  1. m2_explorer_camera (874cf039)
+  2. m2_explorer_cursor (ee038ab4)
+  3. m2_explorer_audio (56af2aab)
 
 ## Team Roster
 | Agent | Type | Work Item | Status | Conv ID |
@@ -55,22 +58,25 @@ Orchestrate atomic motion & audio engine consolidation and showcase composition 
 | m1_explorer_adapter | teamwork_explorer | M1 Adapter & Mapper Design | completed | 13d00dce-8d03-481e-9f48-53602b224c70 |
 | m1_explorer_demo | teamwork_explorer | M1 Demo & Licensing Design | completed | 4599f2fb-0f6c-444b-9a79-c213e87d8f04 |
 | m1_worker | teamwork_worker | M1 Contracts & Foundations Implementation | completed | eac4e22c-d7b9-4f63-827f-a58412a24d17 |
-| m1_reviewer_1 | teamwork_reviewer | Review InteractionMap & Mapper | in-progress | 06ab0ddf-8528-4e5b-8cc3-84d2b7fb4787 |
-| m1_reviewer_2 | teamwork_reviewer | Review SceneGraph, Adapter & SFX | in-progress | 724948b1-de2c-4eb7-8989-1aa2c5bfc1a0 |
-| m1_challenger_1 | teamwork_challenger | Challenge InteractionMap Schemas | in-progress | 3494117e-f885-4d20-bdec-2f3db57a3165 |
-| m1_challenger_2 | teamwork_challenger | Challenge Adapter & Mapper Math | in-progress | 7931b85b-f0cc-4ade-9e4b-197fb932294d |
-| m1_auditor_1 | teamwork_auditor | Forensic Integrity Audit | in-progress | 9eec460b-bdb5-4910-859c-4d2e0084fbe3 |
+| m1_reviewer_1 | teamwork_reviewer | Review InteractionMap & Mapper | completed | 06ab0ddf-8528-4e5b-8cc3-84d2b7fb4787 |
+| m1_reviewer_2 | teamwork_reviewer | Review SceneGraph, Adapter & SFX | completed | 724948b1-de2c-4eb7-8989-1aa2c5bfc1a0 |
+| m1_challenger_1 | teamwork_challenger | Challenge InteractionMap Schemas | completed | 3494117e-f885-4d20-bdec-2f3db57a3165 |
+| m1_challenger_2 | teamwork_challenger | Challenge Adapter & Mapper Math | completed | 7931b85b-f0cc-4ade-9e4b-197fb932294d |
+| m1_auditor_1 | teamwork_auditor | Forensic Integrity Audit | completed | 9eec460b-bdb5-4910-859c-4d2e0084fbe3 |
+| m2_explorer_camera | teamwork_explorer | M2 Camera Engine Blueprints | in-progress | 874cf039-3806-48b8-ba30-032fc6a12f9c |
+| m2_explorer_cursor | teamwork_explorer | M2 Cursor & Motion Blueprints | in-progress | ee038ab4-4857-4ef9-9d1b-8f83629a5427 |
+| m2_explorer_audio | teamwork_explorer | M2 Audio Engine Blueprints | in-progress | 56af2aab-ef5e-4a9a-a6fd-08856ad5e662 |
 
 ## Succession Status
 - Succession required: no
-- Spawn count: 12 / 16
-- Pending subagents: 06ab0ddf-8528-4e5b-8cc3-84d2b7fb4787, 724948b1-de2c-4eb7-8989-1aa2c5bfc1a0, 3494117e-f885-4d20-bdec-2f3db57a3165, 7931b85b-f0cc-4ade-9e4b-197fb932294d, 9eec460b-bdb5-4910-859c-4d2e0084fbe3
+- Spawn count: 15 / 16
+- Pending subagents: 874cf039-3806-48b8-ba30-032fc6a12f9c, ee038ab4-4857-4ef9-9d1b-8f83629a5427, 56af2aab-ef5e-4a9a-a6fd-08856ad5e662
 - Predecessor: none
 - Successor: not yet spawned
 
 ## Active Timers
 - Heartbeat cron: e050f1ce-2de9-448e-9c52-f601bd890052/task-22
-- Safety timer: e050f1ce-2de9-448e-9c52-f601bd890052/task-165
+- Safety timer: e050f1ce-2de9-448e-9c52-f601bd890052/task-238
 - On succession: kill all timers before spawning successor
 - On context truncation: handle timers as step 4 of the State Recovery section of your prompt says
 

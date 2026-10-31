@@ -1,4 +1,4 @@
-# BRIEFING — 2026-10-31T18:08:29Z
+# BRIEFING — 2026-10-31T18:13:00Z
 
 ## Mission
 Forensic integrity audit of Milestone 1 deliverables: InteractionMap schema, CoordinateMapper, SceneGraph schema & adapter, demo data, and SFX licensing.
@@ -22,7 +22,7 @@ Forensic integrity audit of Milestone 1 deliverables: InteractionMap schema, Coo
 
 ## Current Parent
 - Conversation ID: e050f1ce-2de9-448e-9c52-f601bd890052
-- Updated: 2026-10-31T18:08:29Z
+- Updated: 2026-10-31T18:13:00Z
 
 ## Audit Scope
 - **Work product**:
@@ -38,32 +38,35 @@ Forensic integrity audit of Milestone 1 deliverables: InteractionMap schema, Coo
 - **Audit type**: forensic integrity check
 
 ## Audit Progress
-- **Phase**: investigating
-- **Checks completed**: none
-- **Checks remaining**:
+- **Phase**: reporting (complete)
+- **Checks completed**:
   - Read ORIGINAL_REQUEST.md, PROJECT_SPEC.md, AGENTS.md, PROJECT.md, handoff.md, changes.md
-  - Static code analysis (facades, hardcoded outputs, forbidden dependencies)
-  - Non-deterministic calls detection (Math.random, Date.now, global state)
-  - Provenance validation in demoInteractionMap.json
-  - SFX license verification against public/sfx/*
-  - Independent build and test execution
-  - Adversarial stress testing of CoordinateMapper and adapter
-- **Findings so far**: Investigating
+  - Static code analysis (facades, hardcoded outputs, forbidden dependencies) — PASS
+  - Non-deterministic calls detection (Math.random, Date.now, global state) — PASS (0 occurrences)
+  - Provenance validation in demoInteractionMap.json — PASS (24 events: 10 observed, 7 inferred, 7 simulated)
+  - SFX license verification against public/sfx/* — PASS (6 files matched SHA256 and audio specs)
+  - Independent build and test execution — PASS (typecheck, lint, build, verify_m1.ts all 100%)
+  - Adversarial stress testing of CoordinateMapper and adapter — PASS
+- **Checks remaining**: None
+- **Findings so far**: CLEAN — 0 integrity violations
 
 ## Key Decisions Made
-- Independent audit started.
+- Independent audit completed with binary verdict: CLEAN.
+- Generated comprehensive test script `verify_m1.ts` covering 14 test conditions.
+- Documented findings in `audit_report.md` and `handoff.md`.
 
 ## Artifact Index
 - DISPATCH.md — Task dispatch record
 - BRIEFING.md — Situational awareness
 - progress.md — Liveness heartbeat and step tracking
+- verify_m1.ts — Independent forensic test suite
 - audit_report.md — Detailed forensic findings
 - handoff.md — 5-component handoff report with binary verdict
 
 ## Attack Surface
-- **Hypotheses tested**: [TBD]
-- **Vulnerabilities found**: [TBD]
-- **Untested angles**: [TBD]
+- **Hypotheses tested**: Hardcoded bypasses, dummy stubs, unseeded Math.random/Date.now, corrupt provenance, missing SFX licenses, aspect ratio distortion, out-of-bounds frames.
+- **Vulnerabilities found**: None.
+- **Untested angles**: Remotion render runtime (part of M3/M4).
 
 ## Loaded Skills
 - None
