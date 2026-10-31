@@ -1,3 +1,6 @@
+export * from './camera';
+export * from './cursor';
+export * from './audio';
 export * from './CameraRig3D';
 export * from './SmartCursor';
 export * from './KineticTypography';
@@ -9,4 +12,3 @@ export * from './SyntheticUI/SyntheticPromptBox';
 export * from './SyntheticUI/SyntheticHeroButton';
 export * from './SyntheticUI/SyntheticConnectPills';
 export * from './SyntheticUI/SyntheticCodeTree';
-

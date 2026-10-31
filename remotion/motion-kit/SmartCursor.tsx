@@ -1,30 +1,47 @@
+/**
+ * SmartCursor.tsx
+ * Studio-grade cursor component consuming multi-keyframe Bezier cursor tracks
+ * with natural human movement arcs, physical click scale compression ([1, 0.92, 1]),
+ * and dynamic shockwave ripple, delegating vector rendering to CursorPointer.
+ *
+ * Fully backwards-compatible with legacy two-point props (start, target, startFrame, endFrame, clickFrame).
+ */
+
 import React from 'react';
 import { Easing, interpolate } from 'remotion';
+import { interpolateCursorTrack, type Point2D } from './cursor/BezierPath';
+import { CursorPointer } from './cursor/CursorPointer';
+import type { CursorKeyframe } from '../../src/lib/scene-graph/types';
 
-export interface Point2D {
-  x: number; // Porcentaje 0 - 100
-  y: number; // Porcentaje 0 - 100
-}
+export * from './cursor/BezierPath';
+export * from './cursor/CursorPointer';
+export type { Point2D };
 
 export interface SmartCursorProps {
   frame: number;
-  start: Point2D;
-  target: Point2D;
+
+  // SceneGraph Track-Driven Mode (Milestone 2 & 3)
+  cursorTrack?: CursorKeyframe[];
+  track?: CursorKeyframe[]; // Convenience alias
+
+  // Legacy Two-Point Mode (Backwards Compatibility)
+  start?: Point2D;
+  target?: Point2D;
   startFrame?: number;
   endFrame?: number;
   clickFrame?: number;
+
+  // Presentation & Styling
   size?: number;
   color?: string;
+  accentColor?: string;
   showRipple?: boolean;
 }
 
-/**
- * SmartCursor:
- * Cursor vectorial de alta definición SVG con micro-animación física de clic,
- * sombra difusa y onda de choque (ripple) sincronizada al fotograma exacto.
- */
 export const SmartCursor: React.FC<SmartCursorProps> = ({
   frame,
+  cursorTrack,
+  track,
   start,
   target,
   startFrame = 0,
@@ -32,43 +49,83 @@ export const SmartCursor: React.FC<SmartCursorProps> = ({
   clickFrame,
   size = 32,
   color = '#181716',
+  accentColor = '#FF5C35',
   showRipple = true,
 }) => {
-  // Progresión del cursor hacia el objetivo con curva Bezier fluida
-  const progress = interpolate(frame, [startFrame, endFrame], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.22, 1, 0.36, 1),
-  });
+  // Resolve keyframe track
+  const effectiveTrack: CursorKeyframe[] = React.useMemo(() => {
+    if (cursorTrack && cursorTrack.length > 0) return cursorTrack;
+    if (track && track.length > 0) return track;
 
-  const posX = start.x + (target.x - start.x) * progress;
-  const posY = start.y + (target.y - start.y) * progress;
+    // Build synthetic track from legacy props
+    if (start && target) {
+      // If coordinates are given in 0-100 percentage range, normalize to 0-1
+      const isStartPct = start.x > 1.0 || start.y > 1.0;
+      const normStart = isStartPct
+        ? { x: start.x / 100, y: start.y / 100 }
+        : { x: start.x, y: start.y };
 
-  // Animación física del clic (presión y rebote)
-  let clickScale = 1;
+      const isTargetPct = target.x > 1.0 || target.y > 1.0;
+      const normTarget = isTargetPct
+        ? { x: target.x / 100, y: target.y / 100 }
+        : { x: target.x, y: target.y };
+
+      const mx = (normStart.x + normTarget.x) / 2;
+      const my = (normStart.y + normTarget.y) / 2;
+      const dx = normTarget.x - normStart.x;
+      const dy = normTarget.y - normStart.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Biomechanical upward curve
+      const nx = -dy / (dist || 1);
+      const ny = dx / (dist || 1);
+      const offset = 0.18 * dist;
+      const c1 = { x: mx + nx * offset, y: my + ny * offset };
+      const c2 = { x: mx - nx * offset, y: my - ny * offset };
+      const chosen = c1.y <= c2.y ? c1 : c2;
+
+      return [
+        { frame: startFrame, x: normStart.x, y: normStart.y },
+        {
+          frame: endFrame,
+          x: normTarget.x,
+          y: normTarget.y,
+          controlX: chosen.x,
+          controlY: chosen.y,
+          click: clickFrame !== undefined,
+        },
+      ];
+    }
+
+    return [{ frame: 0, x: 0.5, y: 0.5 }];
+  }, [cursorTrack, track, start, target, startFrame, endFrame, clickFrame]);
+
+  // Interpolate state along Bezier path
+  const state = interpolateCursorTrack(effectiveTrack, frame);
+
+  // Click physics: scale compression [1, 0.92, 1]
+  let clickScale = 1.0;
   let rippleRadius = 0;
   let rippleOpacity = 0;
 
-  if (clickFrame !== undefined && frame >= clickFrame) {
-    const clickElapsed = frame - clickFrame;
+  if (state.isClickActive && state.clickElapsed >= 0) {
+    const elapsed = state.clickElapsed;
 
-    // Presión: se encoge hasta 0.84 y luego recupera el tamaño normal
-    clickScale = interpolate(
-      clickElapsed,
-      [0, 2, 7],
-      [1, 0.82, 1],
-      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-    );
+    // Physical compression: [1, 0.92, 1] over 6 frames
+    clickScale = interpolate(elapsed, [0, 2, 6], [1.0, 0.92, 1.0], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+    });
 
-    // Onda de choque / ripple
     if (showRipple) {
-      rippleRadius = interpolate(clickElapsed, [0, 16], [4, 46], {
+      // Dynamic expanding ripple
+      rippleRadius = interpolate(elapsed, [0, 16], [4, 46], {
         extrapolateLeft: 'clamp',
         extrapolateRight: 'clamp',
         easing: Easing.out(Easing.cubic),
       });
 
-      rippleOpacity = interpolate(clickElapsed, [0, 14], [0.65, 0], {
+      rippleOpacity = interpolate(elapsed, [0, 14], [0.70, 0.0], {
         extrapolateLeft: 'clamp',
         extrapolateRight: 'clamp',
       });
@@ -76,66 +133,17 @@ export const SmartCursor: React.FC<SmartCursorProps> = ({
   }
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex: 999,
-      }}
-    >
-      {/* Onda de choque (Ripple) del clic */}
-      {showRipple && rippleOpacity > 0 && (
-        <div
-          style={{
-            position: 'absolute',
-            left: `${posX}%`,
-            top: `${posY}%`,
-            width: rippleRadius * 2,
-            height: rippleRadius * 2,
-            borderRadius: '50%',
-            transform: 'translate(-50%, -50%)',
-            border: '2px solid rgba(255, 92, 53, 0.9)',
-            backgroundColor: 'rgba(255, 92, 53, 0.18)',
-            opacity: rippleOpacity,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-
-      {/* Cursor Vectorial SVG */}
-      <div
-        style={{
-          position: 'absolute',
-          left: `${posX}%`,
-          top: `${posY}%`,
-          transform: `scale(${clickScale}) translate(0, 0)`,
-          transformOrigin: 'top left',
-          willChange: 'transform, left, top',
-          filter:
-            'drop-shadow(0 6px 12px rgba(0,0,0,0.32)) drop-shadow(0 1px 3px rgba(0,0,0,0.2))',
-        }}
-      >
-        <svg
-          width={size}
-          height={size}
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Puntero de alta precisión estilo macOS moderno */}
-          <path
-            d="M3 2L10.5 21L13.8 13.8L21 10.5L3 2Z"
-            fill={color}
-            stroke="#FFFFFF"
-            strokeWidth="1.8"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
+    <CursorPointer
+      x={state.x}
+      y={state.y}
+      isNormalized={true}
+      clickScale={clickScale}
+      rippleRadius={rippleRadius}
+      rippleOpacity={rippleOpacity}
+      size={size}
+      color={color}
+      accentColor={accentColor}
+      showRipple={showRipple}
+    />
   );
 };
