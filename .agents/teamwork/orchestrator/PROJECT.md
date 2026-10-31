@@ -57,7 +57,7 @@
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
 | M1 | Contracts, Foundations & SFX Rights | InteractionMap schema/mapper/demo, SceneGraph schema/adapter, SFX_LICENSES.md | none | DONE (Verified: types.ts, schema.ts, CoordinateMapper.ts, demoInteractionMap.json, scene-graph schema/types/adapter.ts, SFX_LICENSES.md) |
-| M2 | Atomic Engines Implementation | Camera Engine (CameraTransform, FocalTracker, CameraPath, CameraRig), Cursor Engine (BezierPath, CursorPointer, SmartCursor), Audio Engine (FadeController, AudioMixer, AudioTimeline, AudioEngine) | M1 | PLANNED |
+| M2 | Atomic Engines Implementation | Camera Engine (CameraTransform, FocalTracker, CameraPath, CameraRig), Cursor Engine (BezierPath, CursorPointer, SmartCursor), Audio Engine (FadeController, AudioMixer, AudioTimeline, AudioEngine) | M1 | DONE (Verified: drift <= 0.0918 px << 0.5 px, Bezier curves, audio limiter <= 0.95, 93 tests pass) |
 | M3 | Showcase Composition & Integration | InteractiveSurfaceDemo composition driven by SceneGraph, Root.tsx registration | M1, M2 | PLANNED |
 | M4 | E2E Testing, Quality Gates & Render | Native Node 24 tests (math, drift, schemas, audio), typecheck, lint, build, Remotion MP4 render, forensic audit | M3 | PLANNED |
 
