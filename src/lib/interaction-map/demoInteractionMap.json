@@ -1,0 +1,377 @@
+{
+  "version": "2.0",
+  "baseResolution": {
+    "width": 1920,
+    "height": 1080
+  },
+  "fps": 30,
+  "durationInFrames": 480,
+  "events": [
+    {
+      "id": "evt-01-overview",
+      "type": "focus",
+      "frame": 0,
+      "duration": 60,
+      "x": 0.5,
+      "y": 0.5,
+      "targetId": "canvas-overview",
+      "provenance": "simulated",
+      "metadata": {
+        "description": "Wide establishing canvas overview",
+        "zoomTarget": 1.0,
+        "easing": "ease-in-out"
+      }
+    },
+    {
+      "id": "evt-02-cursor-entry",
+      "type": "hover",
+      "frame": 15,
+      "duration": 25,
+      "x": 0.82,
+      "y": 0.22,
+      "targetId": "viewport-entry",
+      "provenance": "observed",
+      "metadata": {
+        "velocity": 0.75,
+        "angleDeg": 215,
+        "intent": "enter_canvas"
+      }
+    },
+    {
+      "id": "evt-03-prompt-approach",
+      "type": "hover",
+      "frame": 40,
+      "duration": 25,
+      "x": 0.5,
+      "y": 0.62,
+      "targetId": "prompt-input-container",
+      "provenance": "observed",
+      "metadata": {
+        "targetElement": "SyntheticPromptBox",
+        "hoverState": "active"
+      }
+    },
+    {
+      "id": "evt-04-prompt-click",
+      "type": "click",
+      "frame": 65,
+      "duration": 5,
+      "x": 0.5,
+      "y": 0.62,
+      "targetId": "prompt-input-field",
+      "provenance": "observed",
+      "metadata": {
+        "button": "primary",
+        "clickRipple": true,
+        "cursorScale": 0.88,
+        "audioCue": "mouse-click"
+      }
+    },
+    {
+      "id": "evt-05-prompt-typing-focus",
+      "type": "focus",
+      "frame": 70,
+      "duration": 50,
+      "x": 0.5,
+      "y": 0.62,
+      "targetId": "prompt-input-field",
+      "provenance": "simulated",
+      "metadata": {
+        "textToType": "I want to build a bike renting app with real-time terrain tracking",
+        "charsPerSec": 16.5,
+        "zoomTarget": 1.35
+      }
+    },
+    {
+      "id": "evt-06-prompt-typing-cadence-1",
+      "type": "hover",
+      "frame": 85,
+      "duration": 15,
+      "x": 0.52,
+      "y": 0.62,
+      "targetId": "prompt-caret-position",
+      "provenance": "inferred",
+      "metadata": {
+        "caretIndex": 14,
+        "audioCue": "keyboard-tap",
+        "character": "b"
+      }
+    },
+    {
+      "id": "evt-07-prompt-typing-cadence-2",
+      "type": "hover",
+      "frame": 105,
+      "duration": 15,
+      "x": 0.55,
+      "y": 0.62,
+      "targetId": "prompt-caret-position",
+      "provenance": "inferred",
+      "metadata": {
+        "caretIndex": 32,
+        "audioCue": "keyboard-tap",
+        "character": "t"
+      }
+    },
+    {
+      "id": "evt-08-architecture-focus",
+      "type": "focus",
+      "frame": 125,
+      "duration": 55,
+      "x": 0.35,
+      "y": 0.45,
+      "targetId": "architecture-code-tree",
+      "provenance": "inferred",
+      "metadata": {
+        "zoomTarget": 2.1,
+        "rotateX": 3.5,
+        "rotateY": -2.0,
+        "transitionType": "smooth-dolly",
+        "audioCue": "camera-whoosh"
+      }
+    },
+    {
+      "id": "evt-09-cursor-transit-arch",
+      "type": "hover",
+      "frame": 140,
+      "duration": 25,
+      "x": 0.42,
+      "y": 0.52,
+      "targetId": "canvas-transit-bezier-1",
+      "provenance": "observed",
+      "metadata": {
+        "curveControlX": 0.48,
+        "curveControlY": 0.58,
+        "curvature": 0.22
+      }
+    },
+    {
+      "id": "evt-10-pill-hover",
+      "type": "hover",
+      "frame": 165,
+      "duration": 30,
+      "x": 0.35,
+      "y": 0.45,
+      "targetId": "connect-pill-calendar",
+      "provenance": "observed",
+      "metadata": {
+        "targetPill": "Calendar • Sync Engine",
+        "audioCue": "soft-pop",
+        "glowIntensity": 0.85
+      }
+    },
+    {
+      "id": "evt-11-pill-click-inspect",
+      "type": "click",
+      "frame": 195,
+      "duration": 5,
+      "x": 0.35,
+      "y": 0.45,
+      "targetId": "connect-pill-calendar",
+      "provenance": "observed",
+      "metadata": {
+        "button": "primary",
+        "state": "expanded",
+        "audioCue": "mouse-click"
+      }
+    },
+    {
+      "id": "evt-12-code-tree-scroll",
+      "type": "scroll",
+      "frame": 205,
+      "duration": 20,
+      "x": 0.35,
+      "y": 0.47,
+      "targetId": "code-tree-file-list",
+      "provenance": "observed",
+      "metadata": {
+        "deltaY": 140,
+        "direction": "down",
+        "scrollInertia": "subtle"
+      }
+    },
+    {
+      "id": "evt-13-node-select-hover",
+      "type": "hover",
+      "frame": 228,
+      "duration": 12,
+      "x": 0.38,
+      "y": 0.48,
+      "targetId": "code-tree-leaf-routes",
+      "provenance": "inferred",
+      "metadata": {
+        "targetLeaf": "routes/fleet.ts",
+        "confidence": 0.94
+      }
+    },
+    {
+      "id": "evt-14-hero-action-focus",
+      "type": "focus",
+      "frame": 245,
+      "duration": 65,
+      "x": 0.72,
+      "y": 0.34,
+      "targetId": "hero-action-section",
+      "provenance": "inferred",
+      "metadata": {
+        "zoomTarget": 2.35,
+        "rotateX": 1.5,
+        "rotateY": 1.0,
+        "transitionType": "pan-zoom",
+        "audioCue": "camera-whoosh"
+      }
+    },
+    {
+      "id": "evt-15-cursor-transit-hero",
+      "type": "hover",
+      "frame": 255,
+      "duration": 30,
+      "x": 0.54,
+      "y": 0.38,
+      "targetId": "canvas-transit-bezier-2",
+      "provenance": "observed",
+      "metadata": {
+        "curveControlX": 0.48,
+        "curveControlY": 0.32,
+        "curvature": -0.18
+      }
+    },
+    {
+      "id": "evt-16-hero-button-hover",
+      "type": "hover",
+      "frame": 285,
+      "duration": 25,
+      "x": 0.72,
+      "y": 0.34,
+      "targetId": "hero-publish-button",
+      "provenance": "observed",
+      "metadata": {
+        "buttonText": "Publish",
+        "hoverScale": 1.04,
+        "audioCue": "soft-pop"
+      }
+    },
+    {
+      "id": "evt-17-hero-button-click",
+      "type": "click",
+      "frame": 310,
+      "duration": 6,
+      "x": 0.72,
+      "y": 0.34,
+      "targetId": "hero-publish-button",
+      "provenance": "observed",
+      "metadata": {
+        "button": "primary",
+        "clickRipple": true,
+        "cursorScale": 0.85,
+        "audioCue": "mouse-click"
+      }
+    },
+    {
+      "id": "evt-18-focal-punch-impact",
+      "type": "focus",
+      "frame": 312,
+      "duration": 28,
+      "x": 0.72,
+      "y": 0.34,
+      "targetId": "hero-publish-button",
+      "provenance": "simulated",
+      "metadata": {
+        "focalPunch": true,
+        "impulseFactor": 1.12,
+        "zoomTarget": 2.62,
+        "springDamping": 18,
+        "springStiffness": 140
+      }
+    },
+    {
+      "id": "evt-19-deploy-processing-state",
+      "type": "hover",
+      "frame": 340,
+      "duration": 20,
+      "x": 0.72,
+      "y": 0.34,
+      "targetId": "hero-button-spinner",
+      "provenance": "inferred",
+      "metadata": {
+        "state": "building",
+        "progress": 0.78,
+        "cursorStyle": "progress"
+      }
+    },
+    {
+      "id": "evt-20-camera-pullback-wide",
+      "type": "focus",
+      "frame": 365,
+      "duration": 60,
+      "x": 0.5,
+      "y": 0.5,
+      "targetId": "canvas-overview",
+      "provenance": "simulated",
+      "metadata": {
+        "zoomTarget": 1.0,
+        "rotateX": 0.0,
+        "rotateY": 0.0,
+        "transitionType": "wide-pullback",
+        "audioCue": "camera-whoosh"
+      }
+    },
+    {
+      "id": "evt-21-success-notification-focus",
+      "type": "focus",
+      "frame": 382,
+      "duration": 45,
+      "x": 0.5,
+      "y": 0.22,
+      "targetId": "success-confirmation-toast",
+      "provenance": "inferred",
+      "metadata": {
+        "toastTitle": "Deployment Successful",
+        "environment": "Production",
+        "audioCue": "chime"
+      }
+    },
+    {
+      "id": "evt-22-cursor-park-transit",
+      "type": "hover",
+      "frame": 405,
+      "duration": 25,
+      "x": 0.58,
+      "y": 0.62,
+      "targetId": "canvas-transit-bezier-3",
+      "provenance": "simulated",
+      "metadata": {
+        "curveControlX": 0.65,
+        "curveControlY": 0.48
+      }
+    },
+    {
+      "id": "evt-23-cursor-park-rest",
+      "type": "hover",
+      "frame": 430,
+      "duration": 50,
+      "x": 0.5,
+      "y": 0.82,
+      "targetId": "footer-brand-crest",
+      "provenance": "simulated",
+      "metadata": {
+        "cursorState": "idle",
+        "opacity": 0.4
+      }
+    },
+    {
+      "id": "evt-24-concluding-brand-hold",
+      "type": "focus",
+      "frame": 445,
+      "duration": 35,
+      "x": 0.5,
+      "y": 0.5,
+      "targetId": "brand-hero-card",
+      "provenance": "simulated",
+      "metadata": {
+        "brandName": "Base44",
+        "tagline": "Build it your way",
+        "holdFinal": true
+      }
+    }
+  ]
+}
