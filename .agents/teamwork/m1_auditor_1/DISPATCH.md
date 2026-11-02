@@ -1,34 +1,30 @@
-## 2026-10-31T18:08:29Z
-Your identity: m1_auditor_1 (Forensic Integrity Auditor)
-Your working directory: /home/huguittodev/launtion/.agents/teamwork/m1_auditor_1/
+## 2026-11-02T13:58:51Z
+You are teamwork_auditor assigned to conduct a Forensic Integrity Audit on Milestone 1 (Brand Rebranding & Audio Bank Foundations).
+Your working directory is: /home/huguittodev/launtion/.agents/teamwork/m1_auditor_1/
 
-You MUST read the following files before starting your audit:
-1. /home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
-2. /home/huguittodev/launtion/PROJECT_SPEC.md
-3. /home/huguittodev/launtion/AGENTS.md
-4. /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
-5. /home/huguittodev/launtion/.agents/teamwork/m1_worker/handoff.md
-6. /home/huguittodev/launtion/.agents/teamwork/m1_worker/changes.md
+MANDATORY FIRST STEP: Read ORIGINAL_REQUEST.md at:
+/home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
 
-Audit Targets:
-- `src/lib/interaction-map/types.ts`
-- `src/lib/interaction-map/schema.ts`
-- `src/lib/interaction-map/CoordinateMapper.ts`
-- `src/lib/interaction-map/demoInteractionMap.json`
-- `src/lib/scene-graph/types.ts`
-- `src/lib/scene-graph/schema.ts`
-- `src/lib/scene-graph/adapter.ts`
-- `public/sfx/SFX_LICENSES.md`
+Also read:
+- Scope: /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
+- Worker handoff: /home/huguittodev/launtion/.agents/teamwork/m1_worker/handoff.md
 
-Forensic Integrity Mandate:
-Perform deep static analysis, code provenance inspection, and runtime tracing:
-1. Check for genuine implementations vs. dummy facades or hardcoded shortcuts.
-2. Check for unauthorized external dependencies or scripts.
-3. Check for non-deterministic behavior: unseeded `Math.random()`, `Date.now()`, global mutable state.
-4. Verify that each event in `demoInteractionMap.json` has an authentic, verified `provenance` value.
-5. Verify that `SFX_LICENSES.md` accurately documents the real files present in `public/sfx/`.
-6. State your binary verdict clearly in `handoff.md`: `CLEAN` or `INTEGRITY VIOLATION`.
+Your Forensic Audit checks (matched to SWE/Project integrity):
+1. Cheating / Dummy / Facade Verification:
+   - Check if any test in tests/ has hardcoded results, mocked assertions that bypass genuine logic, or skipped tests (`test.skip`, `it.skip`).
+   - Check if any files have `// @ts-ignore` or `// @ts-nocheck` to hide type errors.
+   - Verify that scripts/generate-sfx.ts genuinely computes PCM samples from DSP math and does not download or copy external files.
+2. Licensing & Commercial Export Rights (AGENTS.md Rule 14):
+   - Verify public/sfx/SFX_LICENSES.md records all 18 audio assets with CC0 public domain provenance.
+   - Verify no copyrighted, non-commercial, or attribution-restricted audio files were introduced.
+3. Secret Leaks & Hygiene:
+   - Verify no API keys, service role keys, or secrets are exposed in client bundles or public assets.
+4. Independent Command Verification:
+   - Independently execute `npm test`, `npm run typecheck`, and `npm run lint`.
+5. Audit Verdict:
+   - You possess a MANDATORY BINARY VETO.
+   - Report an explicit verdict: **CLEAN** or **INTEGRITY VIOLATION** (with evidence).
 
-Deliverables:
-- Write `/home/huguittodev/launtion/.agents/teamwork/m1_auditor_1/audit_report.md` and `handoff.md`.
-- Send message upon completion with your forensic verdict.
+Update progress in /home/huguittodev/launtion/.agents/teamwork/m1_auditor_1/progress.md.
+Deliver your forensic report in /home/huguittodev/launtion/.agents/teamwork/m1_auditor_1/handoff.md.
+When finished, send a completion message to the caller.

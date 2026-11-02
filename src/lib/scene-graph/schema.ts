@@ -14,6 +14,14 @@ export const BackdropVariantSchema = z.enum([
   'solid',
 ]);
 
+export const MotionArchetypeSchema = z.enum([
+  'base44-studio',
+  'linear-dark',
+  'bento-grid',
+  'kinetic-hook',
+]);
+export type MotionArchetypeParsed = z.infer<typeof MotionArchetypeSchema>;
+
 export const SurfaceThemeSchema = z.enum(['light', 'dark']);
 
 export const ArtDirectionSchema = z.object({
@@ -22,6 +30,7 @@ export const ArtDirectionSchema = z.object({
   primaryAccent: z
     .string()
     .regex(HexColorRegex, { message: 'primaryAccent must be a valid hex color code (#RGB or #RRGGBB)' }),
+  archetype: MotionArchetypeSchema.optional(),
 });
 
 export const CanvasConfigSchema = z.object({
@@ -61,6 +70,18 @@ export const AudioAssetSchema = z.enum([
   'chime',
   'soft-pop',
   'ambient-beat',
+  'transition-whoosh-heavy',
+  'transition-whoosh-fast',
+  'sound-riser',
+  'sub-bass-drop',
+  'click-switch',
+  'click-soft',
+  'mechanical-tap-1',
+  'mechanical-tap-2',
+  'mechanical-tap-3',
+  'mechanical-tap-4',
+  'pop-clean',
+  'success-chime',
 ]);
 
 export const AudioCueSchema = z.object({

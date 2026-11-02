@@ -151,10 +151,16 @@ export const RemotionPlayerPreview: React.FC<RemotionPlayerPreviewProps> = ({
   const focalX = kf?.x ?? 0.5;
   const focalY = kf?.y ?? 0.5;
 
+  const isVertical = sceneGraph.canvas.width < sceneGraph.canvas.height;
+
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-video rounded-2xl overflow-hidden bg-[#121211] shadow-2xl border border-neutral-800/80 flex items-center justify-center select-none group"
+      className={`relative rounded-2xl overflow-hidden bg-[#121211] shadow-2xl border border-neutral-800/80 flex items-center justify-center select-none group transition-all duration-300 ${
+        isVertical
+          ? 'aspect-[9/16] max-h-[78vh] mx-auto'
+          : 'w-full aspect-[16/9]'
+      }`}
       onPointerMove={showFocalOverlay ? handlePointerMove : undefined}
       onPointerUp={showFocalOverlay ? handlePointerUp : undefined}
       onPointerLeave={showFocalOverlay ? handlePointerUp : undefined}

@@ -21,7 +21,7 @@ import type {
 import { type ProductBrief, type ProductBriefInput, ProductBriefSchema } from './brief-schema';
 import { generateDeterministicSceneGraph } from './deterministic-fallback';
 
-export const CREATIVE_DIRECTOR_SYSTEM_PROMPT = `You are the Executive Creative Director of Launtion, an automated video motion graphics studio.
+export const CREATIVE_DIRECTOR_SYSTEM_PROMPT = `You are the Executive Creative Director of Vidiaura, an automated video motion graphics studio.
 Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-quality SceneGraph JSON (v2.0) for Remotion.
 
 ### INVIOLABLE RULES:

@@ -1,96 +1,122 @@
-# Handoff Report — Milestone 2: Atomic Engines Implementation
-
-**Agent:** `m2_worker` (Atomic Engines Engineer)  
-**Recipient:** `e050f1ce-2de9-448e-9c52-f601bd890052` (Orchestrator)  
-**Date:** 2026-10-31  
-**Handoff Type:** Hard (Task Complete)  
-
----
+# Milestone 2 Handoff Report: Motion Kit, 4 Archetypes & Dual Aspect Ratio
 
 ## 1. Observation
 
-1. **Camera Engine Physics**:
-   - In legacy `remotion/motion-kit/CameraRig3D.tsx` (lines 97–107), `transformOrigin: ${currentX}% ${currentY}%` caused stationary anchor locking (failing to center the focal point in the viewport) and severe gimbal wobble during simultaneous zoom and rotation.
-   - We implemented `remotion/motion-kit/camera/CameraTransform.ts` with permanent optical center anchor `50% 50%` and rotation-compensated translation $D = S \cdot R \cdot (C - P_f)$.
-   - In `tests/atomic-engines.test.ts` (test 1.1), across 1,000 randomized camera parameter combinations (zoom $0.8$ to $3.5$, normalized coordinates $0.05$ to $0.95$, pitch/yaw $[-15^\circ, 15^\circ]$, roll $[-10^\circ, 10^\circ]$), measured focal drift was $< 10^{-6}$ px, well below the required threshold of $e \le 0.5$ px.
+### 1.1 Schema & Contracts
+- Added `MotionArchetypeSchema` in `src/lib/scene-graph/schema.ts` (lines 17-23):
+  ```typescript
+  export const MotionArchetypeSchema = z.enum([
+    'base44-studio',
+    'linear-dark',
+    'bento-grid',
+    'kinetic-hook',
+  ]);
+  export type MotionArchetypeParsed = z.infer<typeof MotionArchetypeSchema>;
+  ```
+  and `archetype: MotionArchetypeSchema.optional()` in `ArtDirectionSchema`.
+- Added `MotionArchetype` type definition in `src/lib/scene-graph/types.ts` (lines 9-14) and `archetype?: MotionArchetype` in interface `ArtDirection`.
 
-2. **Motion & Cursor Engine Kinematics**:
-   - In legacy `remotion/motion-kit/SmartCursor.tsx`, cursor movements were straight Euclidean chords using `M3 2` in SVG, causing off-center tip drift during click scale compression.
-   - We implemented `remotion/motion-kit/cursor/BezierPath.ts` with pure parametric $B_2(s)$ and $B_3(s)$ Bezier formulas, biomechanic velocity curve `biomechanicCursor(t)`, and `interpolateCursorTrack()`.
-   - We implemented `remotion/motion-kit/cursor/CursorPointer.tsx` with tip vertex aligned at $(0, 0)$, physical scale compression `[1, 0.92, 1]`, and dynamic expanding ripples.
-   - In `tests/atomic-engines.test.ts` (tests 2.1–2.7), collinear midpoint invariance ($P_c = (P_0 + P_1)/2 \implies B_2(s) = (1-s)P_0 + sP_1$), derivative precision, and track click windowing (16 frames) all passed with zero errors.
+### 1.2 Real Media 3D Surface Embedding
+- Updated `remotion/motion-kit/RealCaptureSurface.tsx`:
+  - Added pure oracle function `resolveMediaType(url?: string | null): MediaType ('video' | 'image' | null)` supporting:
+    - Videos: `.mp4`, `.webm`, `.mov`, `.m4v`, `data:video/mp4`, `data:video/webm`, `blob:...video...`
+    - Images: `.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`, `.gif`, `data:image/`, `blob:...image...`
+    - Robustness against URL queries, anchors, uppercase extensions, empty strings, and synthetic identifiers.
+  - Dynamically renders Remotion's `<OffthreadVideo>` with `volume={0}` (preventing audio bleed so Vidiaura's frame-synchronized procedural `AudioEngine` maintains exclusive mix control) and `objectFit: 'cover'`.
+  - Dynamically renders Remotion's `<Img>` with `objectFit: 'cover'`.
+  - Seamlessly falls back to `{children}` (`<InteractiveProductSurface>`) when mock or synthetic state is present.
+  - Added archetype styling: for `linear-dark`, renders obsidian surface (`#121215`), subtle neon glow `boxShadow` (`0 0 0 1px ${glowColor}4D, 0 0 35px ${glowColor}2E, 0 32px 85px rgba(0,0,0,0.85)`), and dark header (`#141418`).
 
-3. **Audio & SFX Engine Limiting & Ducking**:
-   - In legacy `remotion/motion-kit/AudioEngine.tsx` (lines 44–49), `interpolate(frame, [0, fadeIn, durationInFrames - fadeOut, durationInFrames], ...)` crashed with unhandled exceptions whenever `fadeIn + fadeOut > durationInFrames` or when `fadeIn === 0`.
-   - We implemented `remotion/motion-kit/audio/FadeController.ts` with proportional clamping `clampFadeDurations()` guaranteeing $F'_{in} + F'_{out} \le D$ for all inputs.
-   - We implemented `remotion/motion-kit/audio/AudioMixer.ts` with dynamic sidechain ducking (reducing background music to $0.55$ during high-energy SFX) and a $C^1$-smooth soft-knee limiter strictly bounding polyphonic master volume to $L(S) \le 0.95$ (-0.45 dBFS).
-   - In `tests/atomic-engines.test.ts` (test 3.3), simulating 100 simultaneous voices at volume 1.0 (raw sum = 100.0) produced $limitedGain = 0.950000 \le 0.95$, with bit-perfect transparency ($L(S) = S$) below the $0.75$ threshold.
+### 1.3 4 Motion Graphics Archetypes
+- **Base44 Studio**:
+  - `DynamicBackdrop.tsx`: warm cream background `#F5F2EB`, radial ambient warm vignette (`radial-gradient(circle at 50% 45%, rgba(255,255,255,0.4) 0%, rgba(245,242,235,0) 70%)`).
+  - `InteractiveSurfaceDemo.tsx`: `FloatingParallaxFragments` rendered inside `CameraRig` at `Z = 80px` (code snippet card), `Z = 100px` (edge CDN status badge), and `Z = 60px` (latency metric pill) with continuous harmonic sinusoidal floating oscillation.
+- **Linear Dark**:
+  - `DynamicBackdrop.tsx`: obsidian background `#0D0D10` with subtle neon radial illumination (`radial-gradient(circle at 50% 38%, ${glow} 0%, rgba(13,13,16,0) 65%)`).
+  - `RealCaptureSurface.tsx`: dark precision surface `#121215` with neon glow borders and dark controls.
+- **Bento Grid Reel**:
+  - `InteractiveSurfaceDemo.tsx`: `BentoGridReelSurface` with 4 staggered quadrant cards converging into center via Remotion's elastic springs (`damping: 12, stiffness: 100`), embedding live interactive UI in hero card.
+- **Kinetic Hook**:
+  - `KineticTypography.tsx`: `mode="kinetic-hook"` with per-word optical blur (`filter: blur(${wordBlur}px)`) interpolating from 18px to 0px, dynamic letter tracking snap (`letterSpacing` interpolating from 0.08em to -0.045em), 850 font weight, and exit reveal transition (`containerScale: 1 -> 1.25, containerOpacity: 1 -> 0, containerBlur: 0 -> 16px`) smoothly revealing the 3D app surface.
 
-4. **Backward Compatibility & Video Rendering**:
-   - `remotion/motion-kit/CameraRig3D.tsx`, `remotion/motion-kit/SmartCursor.tsx`, and `remotion/motion-kit/AudioEngine.tsx` were refactored to support legacy props and auto-normalize legacy percentage coordinates.
-   - Running `npm run render` executed `remotion render remotion/index.ts StudioShowcase out/StudioShowcase.mp4`, generating the 480-frame Base44 advertising composition with exit code 0.
+### 1.4 Dual Aspect Ratio (16:9 ↔ 9:16) & Dynamic Resolution
+- `remotion/Root.tsx`:
+  - Implemented `calculateMetadata` on `InteractiveSurfaceDemo` dynamically inheriting width, height, fps, and duration from `props.sceneGraph.canvas`.
+  - Registered dedicated `InteractiveSurfaceDemo-Vertical` composition with explicit dimensions `width: 1080, height: 1920, fps: 30, durationInFrames: 480` and `defaultVerticalSceneGraph`.
+- `remotion/compositions/InteractiveSurfaceDemo.tsx`:
+  - Evaluates `isVertical = canvas.width < canvas.height`.
+  - Dynamically reframes `RealCaptureSurface` to `960x560` (providing 60px horizontal safe margin $(1080 - 960)/2$) and `KineticTypography` to `fontSize: 58` and `maxWidth: 920` (80px side margin), preventing clipping or wrapping anomalies.
+- `src/components/editor/RemotionPlayerPreview.tsx`:
+  - Dynamically switches container aspect class: `isVertical ? 'aspect-[9/16] max-h-[78vh] mx-auto' : 'w-full aspect-[16/9]'`, eliminating black pillarbox bars and restoring 1:1 focal overlay mapping.
 
-5. **Build and Quality Checks**:
-   - `npm run typecheck` finished with code 0 (0 TypeScript errors).
-   - `npm run lint` finished with code 0 (0 ESLint errors, 0 warnings).
-   - `npm run build` compiled Next.js in 230ms with 3/3 static pages.
-   - `node --import jiti/register --test tests/*.test.ts` executed 59 tests across 9 test suites with 59 passing and 0 failing.
+### 1.5 Quality Gates
+- `npm test`: 523 tests pass (100% success rate, 0 failures across 151 suites).
+- `npm run typecheck`: 0 TypeScript errors.
+- `npm run lint`: 0 ESLint errors, 0 warnings.
+- `npm run build`: Next.js production build succeeded with Turbopack.
+- `npm run render`: Exported `out/InteractionDemo.mp4` (1.7 MB, 480 frames, H.264).
+- `npx remotion still`: Exported `out/test-vertical.png` (PNG 1080x1920) and `out/test-base44.png` (PNG 1920x1080).
 
 ---
 
 ## 2. Logic Chain
 
-1. **From Observation 1**: Because the rotation-compensated displacement $D = S \cdot R \cdot (C - P_f)$ maps the focal point $P_f$ onto the optical center $C = (W/2, H/2, 0)$ in world space, and the perspective vanishing point is centered at $(W/2, H/2)$, the projected screen coordinates satisfy $X_{\text{screen}} = W/2$ and $Y_{\text{screen}} = H/2$ for all pitch, yaw, roll, and zoom values. Therefore, the analytical focal drift is identically zero and numerical drift is bounded by floating-point precision ($e < 10^{-6}$ px $\ll 0.5$ px).
-2. **From Observation 2**: Decoupling spatial geometry ($B_2(s)$) from temporal kinematics ($s = E(\tau)$) allows human biomechanical motion arcs to be calculated deterministically without React state. Normalizing the cursor vector tip to $(0, 0)$ with `transformOrigin: '0 0'` ensures that physical scale compression (`scale: 0.92`) compresses the arrow towards its pinned tip, keeping the cursor tip locked on the target pixel throughout the click animation.
-3. **From Observation 3**: Enforcing $F'_{in} + F'_{out} \le D$ via proportional duration scaling eliminates non-monotonic and duplicate keys in `calculateFadeGain()`, preventing Remotion interpolation crashes. Furthermore, the limiter transfer function $L(S) = T_{\text{knee}} + (H - T) \tanh(\frac{S - T}{H - T})$ has first derivative $L'(T_{\text{knee}}) = 1.0$ at the threshold and asymptotic bound $H = 0.95$ as $S \to \infty$, proving that output audio is both $C^1$-smooth and immune to digital clipping across arbitrary polyphony.
-4. **From Observation 4**: Because the refactored wrapper components maintain their exact original prop types (`CameraRig3DProps`, `SmartCursorProps`, `AudioEngineProps`, `SoundCue`) and auto-convert percentage coordinates $[0, 100]$ to normalized $[0.0, 1.0]$, existing compositions like `StudioShowcase.tsx` render without any manual changes or regressions.
-5. **From Observation 5**: With all TypeScript checks, ESLint rules, Next.js build steps, unit test suites, and Remotion video exports passing cleanly with zero errors, Milestone 2 fulfills all product specifications and acceptance criteria.
+1. **Schema Non-Breaking Extensibility**: Adding `archetype: MotionArchetypeSchema.optional()` to `ArtDirectionSchema` preserves 100% backward compatibility with all existing SceneGraphs from Milestone 1 and earlier phases, while providing strict type safety for the 4 curated archetypes.
+2. **Audio Isolation Invariant**: Rendering `<OffthreadVideo>` inside `RealCaptureSurface` with `volume={0}` is essential because Vidiaura employs an autonomous procedural `AudioEngine` with soft-knee limiting and sidechain ducking. Unmanaged audio from user video recordings would bypass the limiter and degrade output quality.
+3. **Analytical Parallax Kinematics**: By locating `FloatingParallaxFragments` inside `CameraRig` with nonzero Z offsets ($Z \in \{60, 80, 100\}$px), any pitch, yaw, or zoom from `cameraTrack` inherently generates optical depth parallax relative to the window surface at $Z = 0$, replicating Base44 motion design deterministically without manual keyframing.
+4. **Resolution-Invariant Camera Transform**: Because `CameraTransform.ts` projects focal displacement normalized to the optical center, analytical focal drift is proven to remain $\le 0.5$px across all aspect ratios. Empirical testing in `tests/motion-kit-archetypes.test.ts` confirmed max drift $= 0$px under 1080x1920 across 168 combinatorial configs.
+5. **Responsive Player Preview**: Dynamically toggling between 16:9 and 9:16 container styling in `RemotionPlayerPreview.tsx` ensures the Remotion `<Player>` scales responsively while keeping normalized coordinate click calculations synchronized 1:1 with video canvas boundaries.
 
 ---
 
 ## 3. Caveats
 
-- **SFX Assets in Test Environment**: In non-browser Node environments, unit tests evaluate audio math, scheduling, gain staging, ducking envelopes, and limiter algorithms; physical AAC audio decoding is performed during Remotion video rendering (`npm run render`), which was fully verified.
-- **No Additional Dependencies Added**: All tests and math routines rely strictly on native Node 24 capabilities and pre-existing repository dependencies (`jiti`, `zod`, `remotion`). No new packages were installed.
+1. **Blob URIs in Node.js Headless Renders**: For headless render worker execution, user video/image assets should be passed as reachable HTTP/HTTPS URLs or base64 data URIs (`data:video/...`, `data:image/...`), as browser blob URIs are scoped to browser memory.
+2. **Audio Cues for Transitions**: Transition whooshes align with `transition-whoosh-fast.wav` and `transition-whoosh-heavy.wav` which were provisioned in Milestone 1 and validated in `SFX_CATALOG`.
 
 ---
 
 ## 4. Conclusion
 
-Milestone 2 (Atomic Engines Implementation) is **100% complete, fully verified, and ready for Milestone 3 (Showcase Composition & Integration)**. All deliverables strictly adhere to `PROJECT_SPEC.md`, `AGENTS.md`, and the architectural blueprints provided by the Milestone 2 exploration agents.
+Milestone 2 implementation is 100% complete. The Motion Kit supports real media embedding (`<OffthreadVideo>` and `<Img>`), renders the 4 visual archetypes with studio-grade motion physics (Base44 Studio, Linear Dark, Bento Grid, Kinetic Hook), and executes dual aspect ratio auto-reframing across 16:9 and 9:16 viewports with zero focal drift. All 5 quality gates are clean and passing.
 
 ---
 
 ## 5. Verification Method
 
-To independently verify the implementation, execute the following commands in the workspace root (`/home/huguittodev/launtion`):
+### 5.1 Unit and Integration Tests
+```bash
+npm test
+```
+*Result*: 523 passing tests, 0 failures across 151 test suites.
 
-1. **Static Typecheck**:
-   ```bash
-   npm run typecheck
-   ```
-   *Expected:* Exit code 0, 0 errors.
+### 5.2 TypeScript Compilation
+```bash
+npm run typecheck
+```
+*Result*: 0 type errors.
 
-2. **Linter**:
-   ```bash
-   npm run lint
-   ```
-   *Expected:* Exit code 0, 0 errors, 0 warnings.
+### 5.3 ESLint
+```bash
+npm run lint
+```
+*Result*: 0 errors, 0 warnings.
 
-3. **Production Build**:
-   ```bash
-   npm run build
-   ```
-   *Expected:* Exit code 0, Next.js builds successfully.
+### 5.4 Production Build
+```bash
+npm run build
+```
+*Result*: Clean Next.js Turbopack build.
 
-4. **Automated Unit & Adversarial Test Suite**:
-   ```bash
-   node --import jiti/register --test tests/*.test.ts
-   ```
-   *Expected:* 59/59 tests pass (0 failures).
-
-5. **Remotion Composition Render**:
-   ```bash
-   npm run render
-   ```
-   *Expected:* Exit code 0, renders `out/StudioShowcase.mp4`.
+### 5.5 Remotion Video and Still Exports
+```bash
+npm run render
+npx remotion still remotion/index.ts InteractiveSurfaceDemo-Vertical out/test-vertical.png --overwrite
+npx remotion still remotion/index.ts InteractiveSurfaceDemo out/test-base44.png --frame=120 --overwrite
+file out/test-vertical.png
+file out/test-base44.png
+```
+*Result*:
+- `out/InteractionDemo.mp4`: 1.7 MB (480 frames H.264)
+- `out/test-vertical.png`: PNG image data, 1080 x 1920
+- `out/test-base44.png`: PNG image data, 1920 x 1080

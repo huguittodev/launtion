@@ -1,29 +1,20 @@
-## 2026-10-31T18:41:38Z
-Your identity: m2_reviewer_2 (Code & Interface Reviewer - Audio Engine & Atoms)
-Your working directory: /home/huguittodev/launtion/.agents/teamwork/m2_reviewer_2/
+## 2026-11-02T14:38:00Z
+You are teamwork_reviewer assigned to independently review Milestone 2 (Motion Kit, 4 Archetypes & Dual Aspect Ratio).
+Your working directory is: /home/huguittodev/launtion/.agents/teamwork/m2_reviewer_2/
 
-You MUST read the following files before starting your work:
-1. /home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
-2. /home/huguittodev/launtion/PROJECT_SPEC.md
-3. /home/huguittodev/launtion/AGENTS.md
-4. /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
-5. /home/huguittodev/launtion/.agents/teamwork/m2_worker/handoff.md
-6. /home/huguittodev/launtion/.agents/teamwork/m2_worker/changes.md
+MANDATORY FIRST STEP: Read ORIGINAL_REQUEST.md at:
+/home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
 
-Review Targets:
-- `remotion/motion-kit/audio/FadeController.ts`
-- `remotion/motion-kit/audio/AudioMixer.ts`
-- `remotion/motion-kit/audio/AudioTimeline.ts`
-- `remotion/motion-kit/AudioEngine.tsx`
-- `remotion/motion-kit/index.ts`
+Also read:
+- Scope: /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
+- Worker handoff: /home/huguittodev/launtion/.agents/teamwork/m2_worker/handoff.md
 
-Verification Requirements:
-1. Run `npm run typecheck`, `npm run lint`, and `npm run build`.
-2. Inspect FadeController monotonic fade curves and proportional duration scaling (preventing duplicate-key crashes).
-3. Inspect AudioMixer dynamic sidechain ducking and C^1-smooth soft-knee limiter strictly bounding output amplitude <= 0.95.
-4. Verify that AudioEngine wraps Remotion's <Audio /> and <Sequence /> cleanly with dual contract support.
-5. In your `handoff.md`, explicitly state your verdict: `APPROVE` or `REQUEST_CHANGES` with clear technical rationale.
+Your review focus:
+1. Dual Aspect Ratio: Inspect remotion/Root.tsx. Verify `calculateMetadata` on InteractiveSurfaceDemo and registration of explicit InteractiveSurfaceDemo-Vertical (1080x1920, 30fps, 480 frames).
+2. Auto-Reframing: Verify responsive dimensions in InteractiveSurfaceDemo.tsx (RealCaptureSurface 960x560 vs 1440x840, typography 58px / 920px max width vs 84px / 1280px). Verify RemotionPlayerPreview.tsx switches aspect ratio container (`aspect-[9/16]` vs `aspect-[16/9]`).
+3. Quality gates: Execute `npm test` (all 523+ tests), `npm run typecheck`, and `npm run lint`.
+4. Conclude with an explicit verdict in your handoff.md: **APPROVE** or **REQUEST_CHANGES**.
 
-Deliverables:
-- Write `/home/huguittodev/launtion/.agents/teamwork/m2_reviewer_2/review.md` and `handoff.md`.
-- Send message upon completion with your verdict.
+Update progress in /home/huguittodev/launtion/.agents/teamwork/m2_reviewer_2/progress.md.
+Deliver your review report in /home/huguittodev/launtion/.agents/teamwork/m2_reviewer_2/handoff.md.
+When finished, send a completion message to the caller.

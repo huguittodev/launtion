@@ -1,13 +1,17 @@
-# Progress Log — m2_challenger_1
+# Progress — m2_challenger_1
 
-Last visited: 2026-10-31T18:49:00Z
+Last visited: 2026-11-02T15:48:30Z
+Status: Completed — Verdict: APPROVE
 
-## Status
-- [x] Initialized DISPATCH.md and BRIEFING.md
-- [x] Read required context files and target code
-- [x] Formulated adversarial challenge test suite (`tests/adversarial-camera-drift.test.ts`)
-- [x] Executed empirical tests (93 tests passing in 320ms, 42,875 grid search combinations, 10,000 Monte Carlo vectors)
-- [x] Executed and verified build, typecheck, lint (0 errors, 0 warnings), and Remotion video render (`out/StudioShowcase.mp4`)
-- [x] Identified 2 key implementation edge-case limitations (off-center anchor drift and legacy percentage normalization)
-- [/] Writing challenge_report.md and handoff.md
-- [ ] Delivering final message to orchestrator with APPROVE verdict
+## Steps
+- [x] Initialized DISPATCH.md, BRIEFING.md, and progress.md
+- [x] Read ORIGINAL_REQUEST.md, PROJECT.md, and worker handoff.md
+- [x] Inspect source code: resolveMediaType, RealCaptureSurface media rendering, MotionArchetypeSchema, Remotion compositions
+- [x] Run baseline test suite (523 tests pass), typecheck (0 errors), lint (1 unused variable warning found), Next.js build (successful)
+- [x] Empirical verification of Remotion still renders (1080x1920 portrait and 1920x1080 landscape)
+- [x] Design and execute adversarial stress tests: `tests/adversarial-milestone2.test.ts` (21 tests created and passing, 550 total tests in repo)
+- [x] Verified Remotion OffthreadVideo (volume=0, objectFit: cover) and Img (objectFit: cover) embedding and fallback to children
+- [x] Complete Remotion MP4 render test (1.7MB H.264 video exported)
+- [x] Update BRIEFING.md
+- [x] Deliver handoff.md with verdict: APPROVE
+- [x] Notify orchestrator via send_message

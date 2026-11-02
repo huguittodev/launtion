@@ -1,60 +1,58 @@
-# BRIEFING — 2026-10-31T18:47:00Z
+# BRIEFING — 2026-11-02T14:45:00Z
 
 ## Mission
-Empirically challenge mathematical precision, boundary conditions, and stress limits of Bezier trajectories (BezierPath.ts) and AudioMixer headroom / limiter / FadeController. Deliver challenge report and pass/fail verdict.
+Adversarially challenge and empirically verify Milestone 2 (Motion Kit, 4 Archetypes & Dual Aspect Ratio), focusing on Camera Kinematics & Focal Drift under 1080x1920 (9:16), Safe Margins & Auto-Reframing, and rendering verification.
 
 ## 🔒 My Identity
 - Archetype: challenger
 - Roles: critic, specialist
 - Working directory: /home/huguittodev/launtion/.agents/teamwork/m2_challenger_2/
-- Original parent: e050f1ce-2de9-448e-9c52-f601bd890052
-- Milestone: M2
+- Original parent: 7223f18e-1aa2-4cd2-952f-cb94d118ec51
+- Milestone: Milestone 2
 - Instance: 2 of 2
 
 ## 🔒 Key Constraints
 - Review-only — do NOT modify implementation code
-- Run empirical verification code directly; do not rely on claims or worker logs
-- Strictly store only metadata/reports in .agents/teamwork/
-- Deliver challenge_report.md and handoff.md with APPROVE or FAIL verdict
+- Empirical verification mandatory — write and run verification harnesses, don't trust claims
+- No source, tests, or data files in `.agents/teamwork/` — metadata only
+- Render/verify vertical composition (1080x1920) still render
+- Conclude with explicit verdict: APPROVE or REJECT
 
 ## Current Parent
-- Conversation ID: e050f1ce-2de9-448e-9c52-f601bd890052
-- Updated: 2026-10-31T18:47:00Z
+- Conversation ID: 7223f18e-1aa2-4cd2-952f-cb94d118ec51
+- Updated: 2026-11-02T14:38:26Z
 
 ## Review Scope
-- **Files to review**:
-  - `remotion/motion-kit/cursor/BezierPath.ts`
-  - `remotion/motion-kit/audio/AudioMixer.ts`
-  - `remotion/motion-kit/audio/FadeController.ts`
-- **Interface contracts**: `/home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md`, `PROJECT_SPEC.md`
-- **Review criteria**: Mathematical correctness, boundary stability, convex hull containment, soft limiter polyphony headroom, sidechain ducking, fade scaling.
+- **Files to review**: CameraRig3D, RealCaptureSurface, Aspect Ratio handling, Remotion compositions
+- **Interface contracts**: /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
+- **Review criteria**: Focal drift <= 0.5px (and mathematical zero validation across 168 configurations), horizontal safe margins >= 60px in 9:16, Remotion vertical render validity, test suite integrity
 
 ## Key Decisions Made
-- Authored and ran `tests/adversarial-bezier-audio.test.ts` with 24 adversarial test cases across 10 suites.
-- Verified 10,000 quadratic and 5,000 cubic Bezier evaluations against convex hull containment oracle (0 violations).
-- Verified soft-knee limiter across 10 to 10,000 simultaneous voices (output strictly bounded to $\le 0.95$, never $> 1.0$).
-- Verified dynamic sidechain ducking and proportional fade duration clamping.
-- Ran static typecheck, lint, build, test suite (83/83 passing), and Remotion render (`out/StudioShowcase.mp4`).
-- Issued final verdict: **`APPROVE`**.
+- Created independent adversarial test suite in `tests/adversarial-milestone2-dual-aspect.test.ts` testing 168 combinatorial configs of 3D rotations, zooms, and focal coordinates under 1080x1920.
+- Executed Remotion still render of `InteractiveSurfaceDemo-Vertical` producing `out/test-vertical-challenger.png` (1080x1920).
+- Confirmed mathematical zero focal drift (< 1e-6 px) internally and max oracle drift of 0.0243 px <= 0.5 px.
+- Confirmed 60px horizontal safe margin in 9:16 mode preventing content clipping.
+- Flagged discrepancy in worker's claim: ESLint warning existed in `tests/motion-kit-archetypes.test.ts:20:8` ('MediaType' unused).
+- Concluded with verdict: APPROVE (core functionality is rock-solid and verified).
 
 ## Artifact Index
-- `.agents/teamwork/m2_challenger_2/DISPATCH.md` — Incoming dispatch log
-- `.agents/teamwork/m2_challenger_2/BRIEFING.md` — Agent working memory
-- `.agents/teamwork/m2_challenger_2/progress.md` — Liveness & status tracking
-- `.agents/teamwork/m2_challenger_2/challenge_report.md` — Detailed adversarial test results
-- `.agents/teamwork/m2_challenger_2/handoff.md` — 5-component handoff report
-- `tests/adversarial-bezier-audio.test.ts` — Automated adversarial regression test suite
+- DISPATCH.md — incoming dispatch record
+- BRIEFING.md — working memory and identity
+- progress.md — task progress and heartbeat
+- handoff.md — final challenge report with verdict
+- tests/adversarial-milestone2-dual-aspect.test.ts — independent verification test suite
+- out/test-vertical-challenger.png — rendered 1080x1920 still frame
 
 ## Attack Surface
 - **Hypotheses tested**:
-  - Collinear control points could drift off 1D trajectory (Passed: slope preserved within $10^{-9}$, coord drift $< 10^{-12}$).
-  - Zero-distance chords could produce NaN or division by zero in normal computation (Passed: $dist < 0.001$ guard works).
-  - Evaluated Bezier points could escape convex hull (Passed: 15,000 checks, 0 violations).
-  - Polyphonic cue summation could exceed 0.95 or 1.0 (Passed: asymptotically bounded to $0.950000$ for up to 10,000 voices and $\infty$).
-  - Simultaneous energetic SFX could duck ambient beat below ducking floor (Passed: floor $0.55$ strictly preserved).
-  - Extreme overlapping fades could crash Remotion interpolation (Passed: proportional clamping ensures $fadeIn' + fadeOut' \le D$).
-- **Vulnerabilities found**: None.
-- **Untested angles**: Hardware GPU canvas shader execution (out of scope for deterministic Remotion Node CPU renderer).
+  1. Camera focal drift exceeds 0.5px under vertical resolution (1080x1920) with non-zero rotations and zooms -> REJECTED (drift is mathematically 0.0000px, max oracle error 0.0243px).
+  2. RealCaptureSurface (960x560) crops content or has <60px horizontal safe margin in 9:16 mode -> REJECTED (exact 60px margin confirmed).
+  3. Remotion vertical composition fails to render still or has incorrect resolution -> REJECTED (valid 1080x1920 PNG rendered).
+  4. Worker claims 0 lint warnings -> FALSIFIED (1 warning in worker test).
+- **Vulnerabilities found**:
+  - Minor: ESLint warning `@typescript-eslint/no-unused-vars` in `tests/motion-kit-archetypes.test.ts:20:8`. Non-blocking.
+- **Untested angles**:
+  - Dynamic user-uploaded video playback inside Remotion player in live browser context (deferred to M3/M4 E2E).
 
 ## Loaded Skills
-- None requested in dispatch.
+- None requested in dispatch

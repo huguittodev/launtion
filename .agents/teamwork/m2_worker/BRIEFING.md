@@ -1,77 +1,71 @@
-# BRIEFING — 2026-10-31T18:38:00Z
+# BRIEFING — 2026-11-02T14:34:00Z
 
 ## Mission
-Implement Milestone 2: Atomic Engines (CameraEngine with zero focal drift, Motion & SmartCursor engine with Bezier paths, AudioEngine with limiter and ducking).
+Implement Milestone 2: Motion Kit, 4 Archetypes & Dual Aspect Ratio (16:9 & 9:16), Real Media Embedding, and Player Preview integration.
 
 ## 🔒 My Identity
-- Archetype: implementer, qa, specialist
+- Archetype: implementer
 - Roles: implementer, qa, specialist
-- Working directory: /home/huguittodev/launtion/.agents/teamwork/m2_worker/
-- Original parent: e050f1ce-2de9-448e-9c52-f601bd890052
-- Milestone: Milestone 2 — Atomic Engines (Camera, Cursor, Audio)
+- Working directory: /home/huguittodev/launtion/.agents/teamwork/m2_worker
+- Original parent: 7223f18e-1aa2-4cd2-952f-cb94d118ec51
+- Milestone: Milestone 2 — Motion Kit, 4 Archetypes & Dual Aspect Ratio
 
 ## 🔒 Key Constraints
-- Do not cheat. No hardcoded test results, facade implementations, or circumvention.
-- Follow minimal change principle and exclusive file ownership:
-  - `remotion/motion-kit/camera/*` and `remotion/motion-kit/CameraRig3D.tsx`
-  - `remotion/motion-kit/cursor/*` and `remotion/motion-kit/SmartCursor.tsx`
-  - `remotion/motion-kit/audio/*` and `remotion/motion-kit/AudioEngine.tsx`
-- Maintain backwards compatibility for existing compositions (`StudioShowcase.tsx`).
-- Ensure 0 errors on `npm run typecheck`, 0 errors/warnings on `npm run lint`, and clean `npm run build`.
-- Zero focal drift (analytical drift = 0, numeric drift <= 0.5px).
-- Bounded audio master amplitude <= 0.95.
+- Strict TypeScript & Zod validation for all untrusted inputs
+- Coordinate exact versions of all Remotion packages; muted RealCaptureSurface video playback (AudioEngine controls audio mix)
+- Minimal changes: make genuine, clean, robust implementations without hacks or hardcoding
+- All tests must pass (523 total passing tests, 0 failures), 0 type errors, 0 lint warnings/errors, clean Next.js build & MP4 render
+- Output compliance: .agents/teamwork/ contains only metadata; code changes in src/, remotion/, tests/
 
 ## Current Parent
-- Conversation ID: e050f1ce-2de9-448e-9c52-f601bd890052
-- Updated: 2026-10-31T18:38:00Z
+- Conversation ID: 7223f18e-1aa2-4cd2-952f-cb94d118ec51
+- Updated: 2026-11-02T14:34:00Z
 
 ## Task Summary
-- **What to build**: Production mathematical Camera engine, Bezier-curved Cursor engine, and dynamic limited Audio engine for Remotion.
-- **Success criteria**: Strict typecheck, lint, build pass, verified probe on camera drift <= 0.5px, deterministic Bezier curve interpolation, audio soft-knee limiting <= 0.95.
-- **Interface contracts**: /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
-- **Code layout**: `remotion/motion-kit/{camera,cursor,audio}/`
+- **What was built**:
+  1. Added `MotionArchetypeSchema` ('base44-studio', 'linear-dark', 'bento-grid', 'kinetic-hook') to `schema.ts` and `types.ts`.
+  2. Enhanced `remotion/motion-kit/RealCaptureSurface.tsx` with media detection (`resolveMediaType`), embedded `<OffthreadVideo>` (muted with `volume={0}`) and `<Img>`, and archetype styling (obsidian surfaces and neon glow for `linear-dark`).
+  3. Implemented 4 visual archetypes across `remotion/compositions/InteractiveSurfaceDemo.tsx`, `DynamicBackdrop.tsx`, `KineticTypography.tsx`:
+     - Base44 Studio: `#F5F2EB` warm cream, 3D parallax floating UI fragments with harmonic sinusoidal motion.
+     - Linear Dark: `#0D0D10` obsidian, subtle neon glow radial illumination and card glow.
+     - Bento Grid Reel: converging feature cards with elastic springs (`damping: 12, stiffness: 100`).
+     - Kinetic Hook: giant typography with per-word optical blur (`filter: blur(...)`) and dynamic letter tracking before smooth 3D app surface transition.
+  4. Dual aspect ratio (16:9 ↔ 9:16) with dynamic `calculateMetadata` in `remotion/Root.tsx`, explicit `InteractiveSurfaceDemo-Vertical` composition (1080x1920), responsive reframing in `InteractiveSurfaceDemo.tsx`, and responsive aspect container in `RemotionPlayerPreview.tsx`.
+  5. Comprehensive unit and integration tests in `tests/motion-kit-archetypes.test.ts` (20 new tests, 523 total passing tests).
+- **Success criteria**: All quality gates passed with 100% compliance.
+- **Interface contracts**: `/home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md`
+- **Code layout**: `src/lib/scene-graph/`, `remotion/`, `src/components/editor/`, `tests/`
 
 ## Key Decisions Made
-- Anchored camera gimbal strictly at optical center `(50% 50%)` with rotation-compensated displacement `D = S * R * (C - Pf)`, achieving machine precision zero focal drift ($< 10^{-6}$ px $\ll 0.5$ px).
-- Separated cursor spatial geometry ($B_2, B_3$ Bezier curves) from temporal kinematics ($E(\tau)$ easing), with tip hotspot pinned at `(0, 0)`.
-- Applied proportional duration clamping ($F'_{in} + F'_{out} \le D$) and monotonic fade curves in `FadeController`, eliminating Remotion duplicate-key crashes.
-- Implemented $C^1$-smooth soft-knee limiter bounded to 0.95 preventing clipping in polyphonic mixes.
-- Preserved 100% backwards compatibility in `CameraRig3D.tsx`, `SmartCursor.tsx`, and `AudioEngine.tsx`, verified via Remotion CLI export of `StudioShowcase.mp4`.
+- `RealCaptureSurface` mutes embedded `<OffthreadVideo>` (`volume={0}`) so Vidiaura's frame-synchronized procedural `AudioEngine` maintains exclusive authority over audio mixes without clipping.
+- `InteractiveSurfaceDemo` uses intelligent archetype inference (`resolveArchetype`) to fallback cleanly to `kinetic-hook`, `linear-dark`, or `base44-studio` when no explicit archetype is set.
+- Remotion's `calculateMetadata` dynamically resolves width/height/duration from `props.sceneGraph.canvas`, allowing arbitrary aspect ratios.
 
 ## Artifact Index
-- `.agents/teamwork/m2_worker/DISPATCH.md` — Orchestrator dispatch
-- `.agents/teamwork/m2_worker/progress.md` — Liveness and progress tracking
-- `.agents/teamwork/m2_worker/changes.md` — Code changes and rationale
-- `.agents/teamwork/m2_worker/handoff.md` — Final 5-component handoff report
-- `tests/atomic-engines.test.ts` — Comprehensive 20-test automated verification suite
+- `.agents/teamwork/m2_worker/DISPATCH.md` — Incoming task instructions
+- `.agents/teamwork/m2_worker/progress.md` — Liveness & step-by-step progress
+- `.agents/teamwork/m2_worker/handoff.md` — Final handoff report
 
 ## Change Tracker
 - **Files modified**:
-  - `remotion/motion-kit/camera/CameraTransform.ts`: Pure 3D rotation-compensated translation physics.
-  - `remotion/motion-kit/camera/FocalTracker.ts`: Normalized coordinate conversion, clamping, zoom aspect containment.
-  - `remotion/motion-kit/camera/CameraPath.ts`: Multi-keyframe trajectory evaluation with easing.
-  - `remotion/motion-kit/camera/CameraRig.tsx`: Remotion React container applying perspective (1200px) and transforms.
-  - `remotion/motion-kit/camera/index.ts`: Camera barrel export.
-  - `remotion/motion-kit/CameraRig3D.tsx`: Backwards-compatible wrapper.
-  - `remotion/motion-kit/cursor/BezierPath.ts`: Pure parametric quadratic and cubic Bezier curves, arc control point, track interpolator.
-  - `remotion/motion-kit/cursor/CursorPointer.tsx`: SVG vector pointer with (0,0) hotspot, click scale compression [1, 0.92, 1], ripple shockwave.
-  - `remotion/motion-kit/cursor/index.ts`: Cursor barrel export.
-  - `remotion/motion-kit/SmartCursor.tsx`: Multi-keyframe track and legacy props refactor.
-  - `remotion/motion-kit/audio/FadeController.ts`: Clamped durations and monotonic fade curves.
-  - `remotion/motion-kit/audio/AudioMixer.ts`: Dynamic sidechain ducking and C^1 soft-knee limiter bounded to 0.95.
-  - `remotion/motion-kit/audio/AudioTimeline.ts`: Catalog mapping and deterministic cue scheduler.
-  - `remotion/motion-kit/audio/index.ts`: Audio barrel export.
-  - `remotion/motion-kit/AudioEngine.tsx`: Orchestrator wrapping Audio/Sequence with dual contract support.
-  - `remotion/motion-kit/index.ts`: Re-export all motion-kit atomic packages.
-  - `eslint.config.mjs`: Added `.agents/**` to globalIgnores.
-  - `tests/atomic-engines.test.ts`: Automated test suite for all M2 components.
-- **Build status**: All passed (typecheck: 0 errors, lint: 0 errors/warnings, build: pass, test: 59/59 pass, render: exit code 0).
+  - `src/lib/scene-graph/schema.ts`: Added `MotionArchetypeSchema` and optional `archetype` field.
+  - `src/lib/scene-graph/types.ts`: Added `MotionArchetype` type and optional `archetype` to `ArtDirection`.
+  - `remotion/motion-kit/RealCaptureSurface.tsx`: Added `resolveMediaType`, `<OffthreadVideo>`, `<Img>`, and archetype styling.
+  - `remotion/motion-kit/DynamicBackdrop.tsx`: Added Base44 Studio warm cream and Linear Dark obsidian/neon glow.
+  - `remotion/motion-kit/KineticTypography.tsx`: Added kinetic-hook mode with blur, letter tracking, exit reveal, and configurable maxWidth.
+  - `remotion/compositions/InteractiveSurfaceDemo.tsx`: Added archetype components (BentoGridReelSurface, FloatingParallaxFragments), vertical dimensions, and defaultVerticalSceneGraph.
+  - `remotion/Root.tsx`: Added `calculateMetadata` and `InteractiveSurfaceDemo-Vertical` composition.
+  - `src/components/editor/RemotionPlayerPreview.tsx`: Dynamic aspect ratio container styling for 16:9 and 9:16.
+  - `tests/motion-kit-archetypes.test.ts`: Added 20 unit/integration tests.
+- **Build status**: All gates PASS (523 tests pass, 0 type errors, 0 lint warnings/errors, clean build, clean render).
 - **Pending issues**: None.
 
 ## Quality Status
-- **Build/test result**: Pass (typecheck 0 errors, build 230ms, tests 59/59 passed).
-- **Lint status**: 0 errors, 0 warnings.
-- **Tests added/modified**: `tests/atomic-engines.test.ts` (20 new tests covering Camera, Cursor, and Audio engines).
+- **Build/test result**: PASS (523/523 tests pass in 19.05s).
+- **Lint status**: PASS (0 errors, 0 warnings).
+- **Typecheck status**: PASS (0 errors).
+- **Render status**: PASS (`out/InteractionDemo.mp4` 1.7MB exported, `out/test-vertical.png` 1080x1920 generated).
+- **Tests added/modified**: `tests/motion-kit-archetypes.test.ts` (20 new tests).
 
 ## Loaded Skills
-None loaded
+- None

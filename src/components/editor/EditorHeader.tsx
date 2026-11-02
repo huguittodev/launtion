@@ -94,7 +94,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-[#FF5C35] shadow-[0_0_8px_#FF5C35]" />
           <span className="font-semibold text-sm text-[#FAF9F5] tracking-tight">
-            Launtion Studio
+            Vidiaura Studio
           </span>
           <span className="text-xs text-neutral-500 hidden sm:inline">•</span>
           {onUpdateProjectName ? (

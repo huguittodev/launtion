@@ -1,176 +1,134 @@
-# Project: Launtion Atomic Motion & Audio Engine Consolidation
+# Project: Vidiaura — AI SaaS Video Ad & Launch Platform
 
 ## Architecture
-- **Pipeline Data Flow**:
-  `demoInteractionMap.json` (Telemetric Interaction Telemetry)
-       ↓
-  `src/lib/interaction-map/` (`schema.ts`, `CoordinateMapper.ts`)
-       ↓
-  `src/lib/scene-graph/adapter.ts` (`interactionToSceneGraphAdapter`)
-       ↓
-  `src/lib/scene-graph/schema.ts` (`SceneGraph` JSON specification)
-       ↓
-  Remotion Engines:
-    - Camera: `remotion/motion-kit/camera/` (`CameraTransform`, `FocalTracker`, `CameraPath`, `CameraRig`)
-    - Motion & Cursor: `remotion/motion-kit/cursor/` (`BezierPath`, `CursorPointer`, `SmartCursor`)
-    - Atoms: `remotion/motion-kit/synthetic-ui/`, `DynamicBackdrop`, `RealCaptureSurface`, `KineticTypography`
-    - Audio: `remotion/motion-kit/audio/` (`FadeController`, `AudioMixer`, `AudioTimeline`, `AudioEngine`)
-       ↓
-  `remotion/compositions/InteractiveSurfaceDemo.tsx` (100% data-driven Remotion composition)
-       ↓
-  Remotion CLI Renderer (`npx remotion render ... out/InteractionDemo.mp4`)
+Vidiaura transforms screen recordings, screenshots, and simple product prompts into cinematic SaaS promotional and launch videos with Base44-grade motion graphics and AutoAE-grade minimalist UX.
+
+```
+                    [ AutoAE-Style Single-Entry Landing Page ]
+                               (src/app/page.tsx)
+                     /                                  \
+  [ Prompt + Media Attachment ]                 [ 1-Click Remix Style ]
+                │                                          │
+                ▼                                          ▼
+   [ Multimodal AI Engine ]                   [ SceneGraph v2.0 State ]
+(/api/input-intelligence & creative-director)             │
+                │                                          ▼
+                └──────────────────────────────► [ Ultra-Minimalist Editor ]
+                                                   (src/app/editor/page.tsx)
+                                                  - 3-4 Essential Texts
+                                                  - 4 Curated Archetypes
+                                                  - 16:9 ↔ 9:16 Aspect Switcher
+                                                  - Real-time Remotion <Player>
+                                                           │
+                                                           ▼
+                                                [ Remotion Motion Kit ]
+                                                  - RealCaptureSurface (<Video>/<Img>)
+                                                  - CameraRig3D (Zero Focal Drift)
+                                                  - 4 Motion Archetypes
+                                                  - Procedural Audio Mixer (Ducking)
+                                                           │
+                                                           ▼
+                                                [ Background Render Worker ]
+                                                  (MP4 Export & Auto-Download)
+```
 
 ## Feature Inventory
+Every feature identified during the Survey phase mapped to its assigned milestone.
 | # | Feature | Description | Milestone | Source |
 |---|---------|-------------|-----------|--------|
-| 1 | Pre-implementation Component Audit | Matrix (REUSE, REFACTOR, REPLACE, NEW) mapped across all existing files | M1 | R1 |
-| 2 | InteractionMap Zod Schema & Types | Base resolution, FPS, duration, events (click, hover, focus, scroll) with mandatory individual `provenance` ('observed' \| 'inferred' \| 'simulated') | M1 | R2 |
-| 3 | CoordinateMapper | Pure conversion functions between normalized [0,1] and pixel coordinates | M1 | R4 |
-| 4 | demoInteractionMap.json | Realistic SaaS interaction sequence with diverse events and provenances | M1 | R4, R5 |
-| 5 | SceneGraph Zod Schema & Types | Discriminated union of scenes, art direction, and audio track specification | M1 | R2 |
-| 6 | Interaction-to-SceneGraph Adapter | Deterministic pure function converting InteractionMap into SceneGraph | M1 | R3 |
-| 7 | SFX Licensing & Provenance Document | Commercial rights documentation (`public/sfx/SFX_LICENSES.md`) for 6 WAV assets | M1 | R4, AGENTS.md |
-| 8 | CameraTransform | Pure 3D CSS matrix with optical center translation $T = C - P_f$ | M2 | R4 |
-| 9 | FocalTracker | Coordinate normalization, bounds clamping, focal centering | M2 | R4 |
-| 10 | CameraPath | Continuous multi-keyframe trajectory interpolation with configurable easing | M2 | R4 |
-| 11 | CameraRig Component | Orchestrator component applying perspective and decoupled transforms | M2 | R4 |
-| 12 | Camera Focal Drift Minimization | Zero analytical drift; sub-pixel drift bounded by $e \le 0.5$ px | M2 | R4, Acceptance |
-| 13 | BezierPath | Pure quadratic $B_2(t)$ and cubic $B_3(t)$ parametric Bezier curve math | M2 | R4 |
-| 14 | CursorPointer | SVG vector pointer with physical click compression, drop-shadow, ripple | M2 | R4 |
-| 15 | SmartCursor Component Refactor | Refactored cursor moving smoothly along Bezier trajectories | M2 | R4 |
-| 16 | SyntheticUI & Typography Consolidation | Verify and consolidate mature reusable UI atoms (`REUSE`) | M2 | R1, R4 |
-| 17 | FadeController | Monotonic-safe mathematical fade curves with duration clamping | M2 | R4 |
-| 18 | AudioMixer | Master gain staging, polyphonic headroom protection, soft limiting | M2 | R4 |
-| 19 | AudioTimeline | Frame-accurate deterministic audio cue scheduler | M2 | R4 |
-| 20 | AudioEngine Component Refactor | Refactored audio engine wrapping timeline, mixer, and fade controller | M2 | R4 |
-| 21 | InteractiveSurfaceDemo Composition | 100% data-driven showcase composition consuming SceneGraph via props | M3 | R5 |
-| 22 | Root Composition Registration | Register `InteractiveSurfaceDemo` in `remotion/Root.tsx` | M3 | R4 |
-| 23 | Native Node 24 Test Runner | Execute unit tests via `node --no-warnings --test tests/**/*.test.ts` | M4 | R4, Acceptance |
-| 24 | Schema & Math Unit Tests | Tests for Zod schemas, CoordinateMapper, CameraTransform, BezierPath | M4 | Acceptance |
-| 25 | Camera Drift Automated Benchmark | Test validating focal drift $e \le 0.5$ px across zoom levels | M4 | Acceptance |
-| 26 | Audio Sync & Headroom Tests | Tests validating frame-accurate scheduling and polyphonic gain bounds | M4 | Acceptance |
-| 27 | Codebase Verification Suite | `npm run typecheck`, `npm run lint`, `npm run build` with 0 errors | M4 | Acceptance |
-| 28 | Remotion Video Render | Render `out/InteractionDemo.mp4` with exit code 0 | M4 | Acceptance |
-| 29 | Forensic Integrity Audit | Systematic audit for authentic implementation and zero cheating | M4 | Hard Rule |
+| 1 | Vidiaura Package Identity | Rename package name to `vidiaura` in `package.json` | M1 | Survey R1 |
+| 2 | Vidiaura HTML Metadata | Global title and metadata in `src/app/layout.tsx` | M1 | Survey R1 |
+| 3 | App Headers & Navigation Branding | Vidiaura branding in `Header.tsx` and `EditorHeader.tsx` | M1 | Survey R1 |
+| 4 | AI System Prompt Identity | Executive Creative Director & Vision Analyst rebranded to Vidiaura | M1 | Survey R1 |
+| 5 | Export Download Filename | MP4 and JSON export filenames prefixed with `vidiaura-` | M1 | Survey R1 |
+| 6 | Schema Backward Compatibility | Invariant guaranteeing `SceneGraphSchema` and contracts remain compatible | M1 | Survey R1 |
+| 7 | Expanded AudioAsset Schema | Zod enum admitting all 18 sound assets while preserving legacy assets | M1 | Survey R6 |
+| 8 | 12-Piece SaaS SFX Bank | Professional CC0/synthesized sound effects in `public/sfx/` | M1 | Survey R6 |
+| 9 | Procedural Keystroke Alternation | Round-robin alternation across `mechanical-tap-1..4` | M1 | Survey R6 |
+| 10 | Procedural Click Alternation | Alternation between `click-soft`, `click-switch`, and `mouse-click` | M1 | Survey R6 |
+| 11 | Scene Transition SFX Triggers | Automatic transition whooshes on scene boundaries | M1 | Survey R6 |
+| 12 | Dynamic Sidechain Ducking | Dynamic attenuation of background music during priority 2 SFX | M1 | Survey R6 |
+| 13 | C^1 Soft-Knee Headroom Limiter | Polyphonic volume bounded <= 0.95 (0 digital clipping) | M1 | Survey R6 |
+| 14 | Expanded Media MIME Types | Support `.webm` (`video/webm`) and `.jpg` (`image/jpg`) in schemas | M1 | Survey R4 |
+| 15 | Real Media 3D Surface Embedding | Render uploaded video (`<Video>`) or image (`<Img>`) in `RealCaptureSurface` | M2 | Survey R5 |
+| 16 | Base44 Studio Archetype | Warm cream `#F5F2EB`, 3D parallax UI fragments, bold grotesque typography | M2 | Survey R5 |
+| 17 | Linear Dark Archetype | Obsidian `#0D0D10`, subtle neon glow (`0 0 25px`), Bento micro-animations | M2 | Survey R5 |
+| 18 | Bento Grid Reel Archetype | Dynamic grid of feature cards converging with elastic springs | M2 | Survey R5 |
+| 19 | Kinetic Hook Archetype | Giant animated typography word-by-word with blur and letter tracking | M2 | Survey R5 |
+| 20 | Zero-Drift Camera Rig | Analytical 3D transformation guaranteeing focal drift <= 0.5px | M2 | Survey R5 |
+| 21 | Dual Aspect Ratio Auto-Reframing | Camera and surface bounds adapting to 16:9 and 9:16 viewports | M2 | Survey R5 |
+| 22 | Dynamic Composition Metadata | Remotion `Root.tsx` `calculateMetadata` and vertical composition | M2 | Survey R5 |
+| 23 | Central Prompt Input Bar | AutoAE-style input bar ("Describe tu SaaS o qué quieres destacar...") | M3 | Survey R2 |
+| 24 | Media Attachment Button | File selector for `.mp4`, `.webm`, `.png`, `.jpg` with preview badge | M3 | Survey R2 |
+| 25 | Media Size Guardrail | Client and server validation for 20MB payload limit | M3 | Survey R2 |
+| 26 | Primary Action "Crear Vídeo con IA" | Initiates generation and transitions smoothly to editor | M3 | Survey R2 |
+| 27 | Trending Motion Styles Gallery | Visual gallery showcasing the 4 archetypes with video/style badges | M3 | Survey R2 |
+| 28 | 1-Click "Remix with AI" | Pre-populates prompt and archetype style with 1 click | M3 | Survey R2 |
+| 29 | Centered Remotion Player | Full-size Remotion `<Player>` previewing composition cleanly | M3 | Survey R3 |
+| 30 | 3-4 Key Editable Texts | Minimalist side panel for Hook, Product Title, Value Prop, CTA | M3 | Survey R3 |
+| 31 | Quick Style Archetype Selector | 1-click tile selector switching between the 4 archetypes | M3 | Survey R3 |
+| 32 | Dual Aspect Ratio Switcher UI | Toggle between 16:9 Horizontal and 9:16 Vertical with live player update | M3 | Survey R3 |
+| 33 | 1-Click "Descargar Vídeo MP4" | Direct export action launching background worker with auto-download | M3 | Survey R3 |
+| 34 | Reactive Live Preview | Instant update of Remotion player on any change without reload | M3 | Survey R3 |
+| 35 | Technical Controls Encapsulation | Removes coordinate reticles, sliders, and hex pickers from UI | M3 | Survey R3 |
+| 36 | Multimodal Landmark Extraction | Vision AI extracting interactive UI landmarks and coordinates | M4 | Survey R4 |
+| 37 | Brand & Identity Extraction | Extracting product name, summary, and brand color palette from media | M4 | Survey R4 |
+| 38 | Interaction Moment Detection | Identifying clicks, input foci, and primary feature inspect moments | M4 | Survey R4 |
+| 39 | 5-Scene Storyboard Assembly | Assembling 480-frame narrative embedding real media in 3D frame | M4 | Survey R4 |
+| 40 | Quality Gate Verification | Full test suite (471+), typecheck, lint, Next.js build, MP4 render | M4 | Survey QA |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Contracts, Foundations & SFX Rights | InteractionMap schema/mapper/demo, SceneGraph schema/adapter, SFX_LICENSES.md | none | DONE (Verified: types.ts, schema.ts, CoordinateMapper.ts, demoInteractionMap.json, scene-graph schema/types/adapter.ts, SFX_LICENSES.md) |
-| M2 | Atomic Engines Implementation | Camera Engine (CameraTransform, FocalTracker, CameraPath, CameraRig), Cursor Engine (BezierPath, CursorPointer, SmartCursor), Audio Engine (FadeController, AudioMixer, AudioTimeline, AudioEngine) | M1 | DONE (Verified: drift <= 0.0918 px << 0.5 px, Bezier curves, audio limiter <= 0.95, 93 tests pass) |
-| M3 | Showcase Composition & Integration | InteractiveSurfaceDemo composition driven by SceneGraph, Root.tsx registration | M1, M2 | PLANNED |
-| M4 | E2E Testing, Quality Gates & Render | Native Node 24 tests (math, drift, schemas, audio), typecheck, lint, build, Remotion MP4 render, forensic audit | M3 | PLANNED |
+| M1 | Brand Rebranding & Audio Bank Foundations | Package renaming, metadata, titles, 12+ SFX WAV synthesis, AudioAsset schema expansion, procedural audio alternation & sidechain ducking, MIME types | none | DONE |
+| M2 | Motion Kit, 4 Archetypes & Dual Aspect Ratio | `RealCaptureSurface` media embedding (`<Video>`/`<Img>`), 4 style archetypes, 16:9 ↔ 9:16 auto-reframing, `calculateMetadata` in `Root.tsx` | M1 | IN_PROGRESS |
+| M3 | AutoAE Landing Page & Ultra-Minimalist Editor | Redesign `src/app/page.tsx` (AutoAE style) & `src/app/editor/page.tsx` (clean player, 3-4 texts, quick style/ratio selectors, MP4 auto-download) | M1, M2 | PLANNED |
+| M4 | Multimodal AI Pipeline & E2E Quality Gates | `/api/creative-director` & `/api/input-intelligence` brand/media extraction & 5-scene assembly; full QA gates (npm test, typecheck, lint, build, render) | M1, M2, M3 | PLANNED |
 
 ## Interface Contracts
+### AudioAsset Contract
+- `AudioAssetSchema`: admits all 18 audio asset keys (`mouse-click`, `camera-whoosh`, `keyboard-tap`, `chime`, `soft-pop`, `ambient-beat`, `transition-whoosh-heavy`, `transition-whoosh-fast`, `sound-riser`, `sub-bass-drop`, `click-switch`, `click-soft`, `mechanical-tap-1..4`, `pop-clean`, `success-chime`).
+- Audio files located in `public/sfx/`, 16-bit 44.1kHz mono WAV, CC0 provenance.
 
-### InteractionMap Contract (`src/lib/interaction-map/schema.ts`)
-```ts
-export type EventProvenance = 'observed' | 'inferred' | 'simulated';
+### SceneGraph & Canvas Contract
+- `canvas.width` and `canvas.height`: supports both `1920x1080` (16:9) and `1080x1920` (9:16).
+- `artDirection.backdropVariant`: supports `'light-editorial'`, `'dark-precision'`, `'solid'`, `'aurora-blur'`.
+- `node.payload`: supports `url` and `mockInterface` holding user video or image URLs/data-URIs.
 
-export interface InteractionEvent {
-  id: string;
-  type: 'click' | 'hover' | 'focus' | 'scroll';
-  frame: number;
-  duration?: number;
-  x: number; // normalized [0.0, 1.0]
-  y: number; // normalized [0.0, 1.0]
-  targetId?: string;
-  provenance: EventProvenance;
-  metadata?: Record<string, unknown>;
-}
-
-export interface InteractionMap {
-  version: '2.0';
-  baseResolution: { width: number; height: number };
-  fps: number;
-  durationInFrames: number;
-  events: InteractionEvent[];
-}
-```
-
-### SceneGraph Contract (`src/lib/scene-graph/schema.ts`)
-```ts
-export interface CameraKeyframe {
-  frame: number;
-  x: number; // normalized [0.0, 1.0]
-  y: number; // normalized [0.0, 1.0]
-  zoom: number; // 1.0 - 3.5
-  rotateX?: number;
-  rotateY?: number;
-  rotateZ?: number;
-  easing?: 'linear' | 'ease-in-out' | 'spring';
-}
-
-export interface CursorKeyframe {
-  frame: number;
-  x: number;
-  y: number;
-  controlX?: number; // Bezier curvature control point
-  controlY?: number;
-  click?: boolean;
-}
-
-export interface AudioCue {
-  id: string;
-  frame: number;
-  asset: 'mouse-click' | 'camera-whoosh' | 'keyboard-tap' | 'chime' | 'soft-pop' | 'ambient-beat';
-  volume?: number;
-  fadeInFrames?: number;
-  fadeOutFrames?: number;
-}
-
-export interface SceneGraph {
-  version: '2.0';
-  canvas: { width: number; height: number; fps: number; durationInFrames: number };
-  artDirection: {
-    backdropVariant: 'dark-precision' | 'light-editorial' | 'aurora-blur' | 'solid';
-    surfaceTheme: 'light' | 'dark';
-    primaryAccent: string;
-  };
-  cameraTrack: CameraKeyframe[];
-  cursorTrack: CursorKeyframe[];
-  audioTrack: AudioCue[];
-  scenes: SceneNode[];
-}
-```
-
-### Interaction-to-SceneGraph Adapter Contract (`src/lib/scene-graph/adapter.ts`)
-```ts
-export function interactionToSceneGraphAdapter(interactionMap: InteractionMap): SceneGraph;
-```
+### Editor Reducer Action Contract
+- `UPDATE_TEXT`: `{ key: string, value: string }`
+- `UPDATE_ART_DIRECTION`: `{ primaryAccent?: string, backdropVariant?: BackdropVariant, surfaceTheme?: SurfaceTheme }`
+- `SET_ASPECT_RATIO`: `{ aspectRatio: '16:9' | '9:16' }`
+- `LOAD_SCENE_GRAPH`: `{ sceneGraph: SceneGraph }`
 
 ## Code Layout & Exclusive File Ownership
-- **Software Architect**:
+- **Milestone 1**:
+  - `package.json`
+  - `src/app/layout.tsx`
+  - `src/components/Header.tsx`
+  - `src/app/api/render/[id]/download/route.ts`
+  - `public/sfx/*`
   - `src/lib/scene-graph/schema.ts`
   - `src/lib/scene-graph/types.ts`
-  - `src/lib/scene-graph/adapter.ts`
-  - `remotion/compositions/InteractiveSurfaceDemo.tsx`
+  - `src/lib/input-intelligence/schema.ts`
+  - `remotion/motion-kit/audio/*`
+- **Milestone 2**:
   - `remotion/Root.tsx`
-- **Interaction Engine**:
-  - `src/lib/interaction-map/schema.ts`
-  - `src/lib/interaction-map/types.ts`
-  - `src/lib/interaction-map/CoordinateMapper.ts`
-  - `src/lib/interaction-map/demoInteractionMap.json`
-- **Camera Engine**:
-  - `remotion/motion-kit/camera/CameraTransform.ts`
-  - `remotion/motion-kit/camera/FocalTracker.ts`
-  - `remotion/motion-kit/camera/CameraPath.ts`
+  - `remotion/compositions/InteractiveSurfaceDemo.tsx`
+  - `remotion/motion-kit/synthetic-ui/RealCaptureSurface.tsx`
+  - `remotion/motion-kit/typography/KineticTypography.tsx`
+  - `remotion/motion-kit/camera/CameraRig3D.tsx`
   - `remotion/motion-kit/camera/CameraRig.tsx`
-  - `remotion/motion-kit/CameraRig3D.tsx` (re-export wrapper for backwards compatibility)
-- **Motion & Atoms Engine**:
-  - `remotion/motion-kit/cursor/BezierPath.ts`
-  - `remotion/motion-kit/cursor/CursorPointer.tsx`
-  - `remotion/motion-kit/SmartCursor.tsx`
-- **Audio & SFX Engine**:
-  - `remotion/motion-kit/audio/FadeController.ts`
-  - `remotion/motion-kit/audio/AudioMixer.ts`
-  - `remotion/motion-kit/audio/AudioTimeline.ts`
-  - `remotion/motion-kit/AudioEngine.tsx`
-  - `public/sfx/SFX_LICENSES.md`
-- **QA & Testing**:
-  - `tests/interaction-map.test.ts`
-  - `tests/scene-graph.test.ts`
-  - `tests/camera-math.test.ts`
-  - `tests/bezier-path.test.ts`
-  - `tests/audio-engine.test.ts`
-  - `tests/integration-pipeline.test.ts`
+  - `src/components/editor/RemotionPlayerPreview.tsx`
+- **Milestone 3**:
+  - `src/app/page.tsx`
+  - `src/app/editor/page.tsx`
+  - `src/components/editor/EditorHeader.tsx`
+  - `src/components/editor/EditorSidebar.tsx`
+  - `src/lib/editor/editor-state.ts`
+- **Milestone 4**:
+  - `src/app/api/creative-director/route.ts`
+  - `src/app/api/input-intelligence/route.ts`
+  - `src/lib/ai/*`
+  - `src/lib/input-intelligence/*`
+  - `tests/*`

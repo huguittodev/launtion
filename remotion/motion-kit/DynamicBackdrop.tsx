@@ -1,5 +1,8 @@
 import React from 'react';
 import { interpolate } from 'remotion';
+import type { MotionArchetype } from '../../src/lib/scene-graph/types';
+
+export type { MotionArchetype };
 
 export type BackdropVariant =
   | 'light-editorial'
@@ -10,7 +13,9 @@ export type BackdropVariant =
 export interface DynamicBackdropProps {
   frame: number;
   variant?: BackdropVariant;
+  archetype?: MotionArchetype;
   backgroundColor?: string;
+  accentGlow?: string;
   dotGrid?: boolean;
 }
 
@@ -22,7 +27,9 @@ export interface DynamicBackdropProps {
 export const DynamicBackdrop: React.FC<DynamicBackdropProps> = ({
   frame,
   variant = 'light-editorial',
+  archetype,
   backgroundColor,
+  accentGlow,
   dotGrid = true,
 }) => {
   // Movimiento ondulante continuo y determinista para gradientes vivos
@@ -48,24 +55,35 @@ export const DynamicBackdrop: React.FC<DynamicBackdropProps> = ({
     [60, 75]
   );
 
-  if (variant === 'dark-precision') {
+  if (variant === 'dark-precision' || archetype === 'linear-dark') {
+    const darkBg = backgroundColor ?? '#0D0D10';
+    const glow = accentGlow ?? 'rgba(94, 106, 210, 0.16)';
     return (
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: backgroundColor ?? '#121211',
+          backgroundColor: darkBg,
           overflow: 'hidden',
           zIndex: 0,
         }}
       >
+        {/* Subtle Neon Radial Illumination for Linear Dark */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: `radial-gradient(circle at 50% 38%, ${glow} 0%, rgba(13, 13, 16, 0) 65%)`,
+            pointerEvents: 'none',
+          }}
+        />
         {dotGrid && (
           <div
             style={{
               position: 'absolute',
               inset: 0,
               backgroundImage:
-                'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)',
+                'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
               backgroundSize: '36px 36px',
             }}
           />
@@ -132,26 +150,37 @@ export const DynamicBackdrop: React.FC<DynamicBackdropProps> = ({
     );
   }
 
-  // 'light-editorial' por defecto
+  // 'light-editorial' o 'base44-studio' por defecto (Warm Cream #F5F2EB)
+  const creamBg = backgroundColor ?? '#F5F2EB';
   return (
     <div
       style={{
         position: 'absolute',
         inset: 0,
-        backgroundColor: backgroundColor ?? '#F4F1EA',
+        backgroundColor: creamBg,
         overflow: 'hidden',
         zIndex: 0,
       }}
     >
+      {/* Ambient warm lighting vignette */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.4) 0%, rgba(245, 242, 235, 0) 70%)',
+          pointerEvents: 'none',
+        }}
+      />
       {dotGrid && (
         <div
           style={{
             position: 'absolute',
             inset: 0,
             backgroundImage:
-              'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.045) 1px, transparent 0)',
-            backgroundSize: '40px 40px',
-            opacity: 0.85,
+              'radial-gradient(circle at 1px 1px, rgba(24, 23, 21, 0.045) 1px, transparent 0)',
+            backgroundSize: '36px 36px',
+            opacity: 0.9,
           }}
         />
       )}

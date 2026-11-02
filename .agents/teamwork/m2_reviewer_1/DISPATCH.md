@@ -1,32 +1,20 @@
-## 2026-10-31T18:41:31Z
-Your identity: m2_reviewer_1 (Code & Interface Reviewer - Camera & Cursor Engines)
-Your working directory: /home/huguittodev/launtion/.agents/teamwork/m2_reviewer_1/
+## 2026-11-02T14:37:54Z
+You are teamwork_reviewer assigned to independently review Milestone 2 (Motion Kit, 4 Archetypes & Dual Aspect Ratio).
+Your working directory is: /home/huguittodev/launtion/.agents/teamwork/m2_reviewer_1/
 
-You MUST read the following files before starting your work:
-1. /home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
-2. /home/huguittodev/launtion/PROJECT_SPEC.md
-3. /home/huguittodev/launtion/AGENTS.md
-4. /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
-5. /home/huguittodev/launtion/.agents/teamwork/m2_worker/handoff.md
-6. /home/huguittodev/launtion/.agents/teamwork/m2_worker/changes.md
+MANDATORY FIRST STEP: Read ORIGINAL_REQUEST.md at:
+/home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
 
-Review Targets:
-- `remotion/motion-kit/camera/CameraTransform.ts`
-- `remotion/motion-kit/camera/FocalTracker.ts`
-- `remotion/motion-kit/camera/CameraPath.ts`
-- `remotion/motion-kit/camera/CameraRig.tsx`
-- `remotion/motion-kit/CameraRig3D.tsx`
-- `remotion/motion-kit/cursor/BezierPath.ts`
-- `remotion/motion-kit/cursor/CursorPointer.tsx`
-- `remotion/motion-kit/SmartCursor.tsx`
+Also read:
+- Scope: /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
+- Worker handoff: /home/huguittodev/launtion/.agents/teamwork/m2_worker/handoff.md
 
-Verification Requirements:
-1. Run `npm run typecheck` and `npm run lint`.
-2. Inspect rotation-compensated translation physics D = S * R * (C - Pf) and verify that focal drift is mathematically eliminated.
-3. Inspect quadratic B2(t) and cubic B3(t) Bezier formulas in BezierPath.ts.
-4. Inspect CursorPointer.tsx SVG styling, tip hotspot normalization, physical click compression, and expanding ripple.
-5. In your `handoff.md`, explicitly state your verdict: `APPROVE` or `REQUEST_CHANGES` with clear technical rationale.
+Your review focus:
+1. Real Media Embedding: Inspect remotion/motion-kit/RealCaptureSurface.tsx and remotion/compositions/InteractiveSurfaceDemo.tsx. Verify `resolveMediaType` correctly identifies videos and images, rendering Remotion's `<OffthreadVideo>` with volume={0} (muted so AudioEngine controls the audio mix) and `<Img>` with `objectFit: 'cover'`, and falls back cleanly to children.
+2. 4 Archetypes: Verify Base44 Studio (warm cream #F5F2EB, 3D parallax UI fragments with Z offsets), Linear Dark (obsidian #0D0D10, neon glow borders), Bento Grid Reel (converging cards with elastic spring), and Kinetic Hook (giant typography word-by-word with blur and letter tracking).
+3. Verification: Execute `npm test`, `npm run typecheck`, and `npm run lint`.
+4. Conclude with an explicit verdict in your handoff.md: **APPROVE** or **REQUEST_CHANGES**.
 
-Deliverables:
-- Write `/home/huguittodev/launtion/.agents/teamwork/m2_reviewer_1/review.md` and `handoff.md`.
-- Send message upon completion with your verdict.
+Update progress in /home/huguittodev/launtion/.agents/teamwork/m2_reviewer_1/progress.md.
+Deliver your review report in /home/huguittodev/launtion/.agents/teamwork/m2_reviewer_1/handoff.md.
+When finished, send a completion message to the caller.

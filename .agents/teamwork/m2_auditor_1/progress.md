@@ -1,29 +1,22 @@
-# Progress - m2_auditor_1
+# Progress — Milestone 2 Forensic Audit
 
-Last visited: 2026-10-31T18:51:00Z
-Status: Complete - Audit Finished, Report & Handoff Delivered
+- Last visited: 2026-11-02T15:43:40Z
+- Status: COMPLETED
+- Current Phase: Reporting (Verdict: INTEGRITY VIOLATION)
 
-## Completed Steps
-- [x] Initialized DISPATCH.md and BRIEFING.md
-- [x] Read ORIGINAL_REQUEST.md, PROJECT_SPEC.md, AGENTS.md, PROJECT.md, handoff.md, changes.md
-- [x] Phase 1: Mode-agnostic static analysis & facade detection across all 12 target files
-- [x] Phase 2: Mode-specific evaluation under Demo Mode constraints
-- [x] Dependency audit: 0 changes to package.json, 0 unauthorized libraries
-- [x] Determinism audit: 0 calls to Math.random(), Date.now(), or mutable global state
-- [x] Deep mathematical verification:
-  - Camera focal drift: mathematically proved $e \equiv 0$, empirically verified max drift $= 0$ px across 50,000 permutations
-  - Audio limiter: mathematically proved $L(S) < 0.95$ for all $S$, empirically verified max gain $= 0.950000$ across 200,000 volumes
-  - Bezier curves: collinear midpoint invariance verified ($< 10^{-10}$), finite difference derivative verified ($< 10^{-5}$)
-  - Fade controller: proportional duration clamping eliminates duplicate key crashes
-- [x] Legacy backward compatibility: CameraRig3D, SmartCursor, and AudioEngine tested via Remotion render (`out/StudioShowcase.mp4` 480 frames, exit code 0)
-- [x] Build & test gates:
-  - `npm run typecheck`: PASS (0 errors)
-  - `npx eslint remotion/motion-kit/ tests/atomic-engines.test.ts`: PASS (0 errors, 0 warnings)
-  - `npm run build`: PASS (231ms, 3/3 pages)
-  - `node --import jiti/register --test tests/*.test.ts`: PASS (81/81 tests passing)
-  - `npm run render`: PASS (`out/StudioShowcase.mp4` generated)
-- [x] Generated `audit_report.md` and `handoff.md`
-- [x] Updated BRIEFING.md and progress.md
-
-## Verdict
-- **CLEAN**
+### Checklist
+- [x] Step 1: Read DISPATCH.md, ORIGINAL_REQUEST.md, PROJECT.md, and m2_worker/handoff.md
+- [x] Step 2: Initialize BRIEFING.md and progress.md
+- [x] Step 3: Forensic Source Code Scan (0 facades, 0 @ts-ignore in M2 files, 0 skipped tests, 0 hardcoded mocks)
+- [x] Step 4: Component Implementation Verification (`RealCaptureSurface`, `InteractiveSurfaceDemo`, `KineticTypography`, `DynamicBackdrop`, `Root.tsx` implement genuine Remotion primitives)
+- [x] Step 5: Independent Verification Commands
+  - [x] `npm test` -> 523 passed, 0 failed, 0 skipped across 151 suites
+  - [x] `npm run typecheck` -> 0 errors
+  - [x] `npm run lint` -> FAIL: 1 warning in `tests/motion-kit-archetypes.test.ts:20:8` ('MediaType' unused). Violates ORIGINAL_REQUEST.md Acceptance Criterion line 75. Discrepancy with worker handoff claiming 0 warnings.
+  - [x] `npm run build` -> Next.js Turbopack build succeeded
+  - [x] `npm run render` -> Remotion exported `out/InteractionDemo.mp4` (1.7 MB, 480 frames H.264)
+  - [x] Remotion stills -> `out/test-vertical.png` (1080x1920) and `out/test-base44.png` (1920x1080)
+- [x] Step 6: Licensing & Commercial Rights Verification (Cleared CC0 1.0 Universal / Programmatic DSP in `public/sfx/SFX_LICENSES.md`)
+- [x] Step 7: Secrets Leaks & Git Status Hygiene (0 credentials exposed, `.env.local` untracked)
+- [x] Step 8: Adversarial Stress-Testing (Evaluated zero drift, fallback rendering, aspect ratios)
+- [x] Step 9: Final Report in handoff.md & Message Caller

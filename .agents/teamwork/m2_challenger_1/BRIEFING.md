@@ -1,62 +1,60 @@
-# BRIEFING — 2026-10-31T18:48:50Z
+# BRIEFING — 2026-11-02T15:47:30Z
 
 ## Mission
-Adversarially challenge and verify the stability and focal drift of the Camera Engine (CameraTransform, FocalTracker, CameraPath).
+Empirically challenge, stress-test, and verify Milestone 2 (Motion Kit, 4 Archetypes & Dual Aspect Ratio) implementation by m2_worker, focusing on media resolution, schema validation, and rendering fallbacks.
 
 ## 🔒 My Identity
-- Archetype: empirical-challenger
+- Archetype: challenger
 - Roles: critic, specialist
 - Working directory: /home/huguittodev/launtion/.agents/teamwork/m2_challenger_1
-- Original parent: e050f1ce-2de9-448e-9c52-f601bd890052
-- Milestone: milestone-2
-- Instance: 1 of 2
+- Original parent: 7223f18e-1aa2-4cd2-952f-cb94d118ec51
+- Milestone: Milestone 2 (Motion Kit, 4 Archetypes & Dual Aspect Ratio)
+- Instance: 1 of 1
 
 ## 🔒 Key Constraints
-- Review-only — do NOT modify implementation code (report bugs as findings)
-- Must empirically challenge via written and executed tests (generators, oracles, stress harnesses)
-- Must not place code/tests in .agents/teamwork/ (only metadata allowed)
-- Strictly verify focal drift error <= 0.5px across 100% of test cases
-- Explicitly state verdict: APPROVE or FAIL in handoff.md
+- Review-only — do NOT modify implementation code
+- Report any failures as findings — do NOT fix them yourself
+- .agents/teamwork/ holds only agent metadata — NEVER place source code, tests, or data files here
+- Conclude with an explicit verdict: APPROVE or REJECT
 
 ## Current Parent
-- Conversation ID: e050f1ce-2de9-448e-9c52-f601bd890052
+- Conversation ID: 7223f18e-1aa2-4cd2-952f-cb94d118ec51
 - Updated: not yet
 
 ## Review Scope
-- **Files to review**: `remotion/motion-kit/camera/CameraTransform.ts`, `remotion/motion-kit/camera/FocalTracker.ts`, `remotion/motion-kit/camera/CameraPath.ts`
+- **Files to review**: `remotion/motion-kit/RealCaptureSurface.tsx`, `src/lib/scene-graph/schema.ts`, `remotion/Root.tsx`, `remotion/compositions/InteractiveSurfaceDemo.tsx`, `src/components/editor/RemotionPlayerPreview.tsx`
 - **Interface contracts**: `/home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md`
-- **Review criteria**: Focal drift <= 0.5px, 3D projection mathematical consistency across resolutions, zooms, rotations, extreme focal targets.
+- **Review criteria**: Empirical stress testing of media resolution, Remotion video/img embedding & muting, MotionArchetypeSchema parsing, and dual aspect ratio framing.
 
 ## Key Decisions Made
-- Initialized empirical adversarial verification plan.
-- Executed 42,875 mandatory grid search cases across resolutions, zooms, rotations, and extreme targets.
-- Implemented independent CSS Transform & 4x4 Homogenous Projection Oracle parsing real CSS transform strings.
-- Executed 10,000 continuous Monte Carlo test vectors, frame-by-frame trajectory test, and aspect ratio stress tests.
-- Discovered 2 implementation limitations/bugs:
-  1. Off-center anchor drift: when `anchorPoint != (0.5, 0.5)`, D = S * R * (Anchor - Pf) rotates and scales the anchor offset relative to C, resulting in up to 170px drift for non-centered framing targets.
-  2. Legacy percentage auto-detection in `FocalTracker.ts`: dividing any value > 1.0 by 100 warps out-of-bounds normalized coordinates (e.g. 1.05 -> 0.0105).
-- Confirmed: Under standard optical center centering (0.5, 0.5), measured focal drift error is <= 0.0001px analytically and <= 0.0918px under 4-decimal CSS string rounding across 100% of test cases (strictly <= 0.5px threshold).
-- Verdict: APPROVE for Camera Engine optical center zero-drift physics; reported anchor and normalization edge case findings.
+- Authored and executed dedicated adversarial test suite `tests/adversarial-milestone2.test.ts` (21 tests).
+- Confirmed that Remotion `<OffthreadVideo>` renders with volume=0 (strictly muted) and `objectFit: 'cover'`, preventing audio bleed into Vidiaura's frame-synchronized procedural `AudioEngine`.
+- Verified fallback to `{children}` when target media is missing, empty, or non-media.
+- Discovered and documented minor edge case: uppercase data URI schemes (`DATA:video/...`) and query-embedded extensions (`?file=video.mp4&token=123`) return `null`.
+- Confirmed zero focal drift (<= 0.5px, max observed 0.0px) across portrait 1080x1920 viewport configurations.
+- Rendered MP4 and stills empirically to verify Remotion pipelines end-to-end.
+- Final verdict: APPROVE.
 
 ## Artifact Index
-- [DISPATCH.md] — Dispatch log
-- [BRIEFING.md] — Persistent briefing
-- [progress.md] — Heartbeat progress
-- [tests/adversarial-camera-drift.test.ts] — Automated adversarial test suite (93 total tests passing)
-- [challenge_report.md] — Detailed adversarial stress test report
-- [handoff.md] — Handoff with verdict
+- `/home/huguittodev/launtion/.agents/teamwork/m2_challenger_1/BRIEFING.md` — Persistent working memory
+- `/home/huguittodev/launtion/.agents/teamwork/m2_challenger_1/progress.md` — Liveness heartbeat
+- `/home/huguittodev/launtion/.agents/teamwork/m2_challenger_1/handoff.md` — 5-component adversarial audit report with APPROVE verdict
+- `/home/huguittodev/launtion/tests/adversarial-milestone2.test.ts` — Empirical verification test suite (21 passing tests)
 
 ## Attack Surface
 - **Hypotheses tested**:
-  - H1: Camera focal drift exceeds 0.5px under diverse viewport aspect ratios and resolutions. (Refuted: drift <= 0.00007px).
-  - H2: Camera focal drift exceeds 0.5px under high zoom (5.0) and compound 3D rotations. (Refuted: drift <= 0.00007px).
-  - H3: Real CSS transform string parsing with 4-decimal rounding causes significant focal drift. (Refuted: max drift <= 0.0918px << 0.5px).
-  - H4: Non-centered anchor points maintain focal centering. (Confirmed failure: non-centered anchors induce rotation/scale drift up to 170px).
-  - H5: FocalTracker handles out-of-bounds coordinates safely. (Partial failure: values > 1.0 treated as legacy percentages).
+  1. `resolveMediaType` handles standard, uppercase, query/hash URLs, blob URIs, and data URIs with codecs. (PASS)
+  2. `RealCaptureSurface` renders `<OffthreadVideo>` with volume=0 and `<Img>` with objectFit: cover. (PASS)
+  3. `RealCaptureSurface` falls back safely to `{children}` without throwing on invalid/empty/non-media inputs. (PASS)
+  4. `MotionArchetypeSchema` rejects all casing variants, typos, invalid primitives, boundary objects, and code injections. (PASS)
+  5. `ArtDirectionSchema` preserves backward compatibility when `archetype` is omitted, and rejects `archetype: null`. (PASS)
+  6. Portrait 1080x1920 dual aspect ratio reframing maintains analytical focal drift <= 0.5px. (PASS)
 - **Vulnerabilities found**:
-  1. Non-centered `anchorPoint` parameter induces up to 170px drift under rotation/zoom.
-  2. `FocalTracker.normalizeFocalPoint` divides any x/y > 1.0 by 100.
-- **Untested angles**: Full WebGL shader pipeline (out of scope for Remotion DOM CSS 3D engine).
+  1. Uppercase data URI schemes/MIME (`DATA:video/mp4`, `data:VIDEO/mp4`) return `null` due to case-sensitive check prior to lowercasing.
+  2. URLs where file extension is only present in an intermediate query param followed by `&` return `null`.
+  3. 1 ESLint warning in `tests/motion-kit-archetypes.test.ts` for unused type import `MediaType`.
+- **Untested angles**:
+  - Live client-side dragging of 2D focal reticle in browser DOM (requires browser pointer events, mocked in Node).
 
 ## Loaded Skills
-None
+None loaded.

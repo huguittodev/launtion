@@ -6,6 +6,12 @@
 /**
  * Art direction theme settings for dynamic backdrops and UI surfaces.
  */
+export type MotionArchetype =
+  | 'base44-studio'
+  | 'linear-dark'
+  | 'bento-grid'
+  | 'kinetic-hook';
+
 export type BackdropVariant = 'dark-precision' | 'light-editorial' | 'aurora-blur' | 'solid';
 export type SurfaceTheme = 'light' | 'dark';
 
@@ -13,6 +19,7 @@ export interface ArtDirection {
   backdropVariant: BackdropVariant;
   surfaceTheme: SurfaceTheme;
   primaryAccent: string; // Hex color string (#RGB or #RRGGBB)
+  archetype?: MotionArchetype;
 }
 
 /**
@@ -60,7 +67,19 @@ export type AudioAsset =
   | 'keyboard-tap'
   | 'chime'
   | 'soft-pop'
-  | 'ambient-beat';
+  | 'ambient-beat'
+  | 'transition-whoosh-heavy'
+  | 'transition-whoosh-fast'
+  | 'sound-riser'
+  | 'sub-bass-drop'
+  | 'click-switch'
+  | 'click-soft'
+  | 'mechanical-tap-1'
+  | 'mechanical-tap-2'
+  | 'mechanical-tap-3'
+  | 'mechanical-tap-4'
+  | 'pop-clean'
+  | 'success-chime';
 
 /**
  * Audio track cue scheduled at a specific frame.

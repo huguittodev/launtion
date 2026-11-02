@@ -29,7 +29,7 @@ import type {
 } from './types';
 import { generateDeterministicVisualFallback } from './visual-fallback';
 
-export const GEMINI_VISION_SYSTEM_PROMPT = `You are the Computer Vision & UI Telemetry Analyst for Launtion Studio.
+export const GEMINI_VISION_SYSTEM_PROMPT = `You are the Computer Vision & UI Telemetry Analyst for Vidiaura Studio.
 Your task is to analyze the provided software capture (screenshot or video frame) and extract key interactive landmarks with precise bounding boxes.
 
 ### INVIOLABLE RULES:

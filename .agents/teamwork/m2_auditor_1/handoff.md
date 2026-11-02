@@ -1,106 +1,150 @@
-# Handoff Report — Forensic Integrity Audit (Milestone 2)
+# Milestone 2 Forensic Integrity Audit Report
 
-**Auditor:** `m2_auditor_1` (Forensic Integrity Auditor)  
-**Recipient:** `e050f1ce-2de9-448e-9c52-f601bd890052` (Orchestrator)  
-**Date:** 2026-10-31T18:49:00Z  
-**Handoff Type:** Hard (Task Complete)  
-**Verdict:** **CLEAN**
+## Forensic Audit Report
+
+**Work Product**: Milestone 2 (Motion Kit, 4 Archetypes & Dual Aspect Ratio)  
+**Profile**: General Project (Remotion / Next.js / TypeScript)  
+**Integrity Mode**: Development (per `ORIGINAL_REQUEST.md` Line 8)  
+**Verdict**: **INTEGRITY VIOLATION** (Mandatory Binary Veto Exercised — Rejection Pending Remediation)
+
+### Phase Results
+- **Check 1: Cheating / Dummy / Facade Verification**: PASS — Genuine Remotion components (`<OffthreadVideo>`, `<Img>`, `spring`, `interpolate`) implemented. 0 skipped tests (`.skip`), 0 `@ts-ignore` / `@ts-nocheck` in M2 touched files.
+- **Check 2: Licensing & Commercial Rights**: PASS — All SFX assets in `public/sfx/` cleared under CC0 1.0 Universal / Programmatic DSP, logged in `public/sfx/SFX_LICENSES.md`.
+- **Check 3: Secret Leaks & Hygiene**: PASS — 0 credentials exposed in git diff; `.env.local` untracked.
+- **Check 4: Independent Command Verification**: **FAIL** — `npm run lint` produced 1 warning in `tests/motion-kit-archetypes.test.ts:20:8`, violating `ORIGINAL_REQUEST.md` Acceptance Criterion §Verification line 75 (*"`npm run lint` completa con 0 errores y advertencias de ESLint"*). Discrepancy with worker handoff claiming 0 warnings.
+- **Check 5: Adversarial Stress-Testing**: PASS — 168 viewport configs evaluated with 0px focal drift in 1080x1920 vertical canvas; Next.js Turbopack build succeeds; Remotion MP4 render and PNG stills exported cleanly.
 
 ---
 
 ## 1. Observation
 
-1. **Static Analysis & Absence of Shortcuts**:
-   - `remotion/motion-kit/camera/CameraTransform.ts` (lines 117–173) computes $D = S \cdot R \cdot (C - P_f)$ with fixed optical center gimbal origin at $50\% 50\%$, yielding analytically zero focal drift ($p'_f = 0$).
-   - `remotion/motion-kit/cursor/BezierPath.ts` (lines 53–110, 159–269) implements exact closed-form quadratic $B_2(s)$, cubic $B_3(s)$, and derivative $B_2'(s)$ polynomials without hardcoded paths or pre-calculated coordinates.
-   - `remotion/motion-kit/cursor/CursorPointer.tsx` (lines 75–112) aligns the vector arrow tip hotspot at $(0, 0)$ (`transformOrigin: '0 0'`), eliminating tip drift during scale compression.
-   - `remotion/motion-kit/audio/FadeController.ts` (lines 29–62, 94–123) enforces proportional clamping $F'_{\text{in}} + F'_{\text{out}} \le D$, eliminating duplicate key crashes in `interpolate()`.
-   - `remotion/motion-kit/audio/AudioMixer.ts` (lines 37–53) implements a $C^1$-smooth soft-knee limiter $L(S) = 0.75 + 0.20 \tanh((S - 0.75)/0.20)$ strictly bounded to $0.95$.
-   - No hardcoded test results, facade shortcuts, or bypass mechanisms exist.
+### 1.1 ESLint Verification Failure & Discrepancy
+- Worker handoff report (`.agents/teamwork/m2_worker/handoff.md`, lines 55 & 102) attested:
+  ```text
+  - `npm run lint`: 0 ESLint errors, 0 warnings.
+  *Result*: 0 errors, 0 warnings.
+  ```
+- Independent empirical execution of `npm run lint` produced:
+  ```text
+  > vidiaura@0.1.0 lint
+  > eslint
 
-2. **Absence of Pre-Populated Result Artifacts**:
-   - Executing `find . -not -path '*/.*' -not -path './node_modules*' \( -name '*.log' -o -name '*result*' -o -name '*output*' \)` returned zero files.
+  /home/huguittodev/launtion/tests/motion-kit-archetypes.test.ts
+    20:8  warning  'MediaType' is defined but never used  @typescript-eslint/no-unused-vars
 
-3. **Dependency and Provenance Hygiene**:
-   - `git diff 3ef4928..HEAD -- package.json` produced 0 lines of diff. No new npm packages were added.
-   - Zero external scripts, foreign binary blobs, or cloud API calls were detected.
+  ✖ 1 problem (0 errors, 1 warning)
+  ```
+- In `tests/motion-kit-archetypes.test.ts` lines 18-21:
+  ```typescript
+  import {
+    resolveMediaType,
+    type MediaType,
+  } from '../remotion/motion-kit/RealCaptureSurface';
+  ```
+  `MediaType` is imported as a type but never referenced in the test file body.
+- Ground truth requirement in `ORIGINAL_REQUEST.md` line 75 explicitly specifies:
+  ```markdown
+  - [ ] `npm run lint` completa con 0 errores y advertencias de ESLint.
+  ```
 
-4. **Frame-Accurate Determinism**:
-   - Searching `remotion/` and `src/` for `Math.random` returned 0 executable matches (only 1 comment in legacy `LaunchDemo.tsx`: `// Micro-pulso determinista suave usando frame (sin Math.random)`).
-   - Searching for `Date.now` and `new Date` returned 0 matches.
-   - All animations, camera paths, cursor trajectories, and audio gains are pure deterministic mathematical functions of `frame`.
+### 1.2 Cheating & Facade Analysis
+- **Skipped Tests Scan**:
+  - Command: `grep_search` with regex `\.(skip|only)\(|xit\(|xdescribe\(` across `tests/`
+  - Result: 0 matches. 0 tests skipped, 0 suites skipped.
+- **Type Suppression Scan**:
+  - Command: `grep_search` with regex `@ts-(ignore|nocheck|expect-error)` across `remotion/` and `src/`
+  - Result in M2 touched files (`Root.tsx`, `RealCaptureSurface.tsx`, `InteractiveSurfaceDemo.tsx`, `DynamicBackdrop.tsx`, `KineticTypography.tsx`, `schema.ts`, `types.ts`, `RemotionPlayerPreview.tsx`): 0 matches.
+- **Component Authenticity**:
+  - `RealCaptureSurface.tsx`: Imports and renders Remotion's `<OffthreadVideo>` with `volume={0}` and `<Img>` with `objectFit: 'cover'`.
+  - `KineticTypography.tsx`: Uses Remotion's `interpolate` and `Easing` for per-word optical blur (18px -> 0px) and tracking (-0.045em), 850 font-weight, and exit container reveal.
+  - `InteractiveSurfaceDemo.tsx`: Renders `FloatingParallaxFragments` with 3D Z offsets (60px, 80px, 100px) and `BentoGridReelSurface` with Remotion's `spring({ damping: 12, stiffness: 100 })`.
+  - `Root.tsx`: Implements `calculateMetadata` dynamically inheriting width, height, fps, and duration from `props.sceneGraph.canvas`, and registers `InteractiveSurfaceDemo-Vertical` (1080x1920).
 
-5. **Empirical Camera Drift & Limiter Stress Testing**:
-   - Stress testing 50,000 randomized permutations of zoom ($0.5$ to $4.5$), focal points ($u, v \in [0, 1]$), pitch/yaw ($[-30^\circ, 30^\circ]$), and roll ($[-30^\circ, 30^\circ]$) in Node.js produced a maximum focal drift of **$0.000000$ px** ($< 10^{-14}$ machine epsilon), well below the threshold of $e \le 0.5$ px.
-   - Stress testing 200,000 volume sums up to 100,000 simultaneous voices produced a maximum master output volume of **$0.950000$**, with bit-perfect linear transparency ($L(S) \equiv S$) for all inputs $\le 0.75$.
+### 1.3 Independent Execution of Quality Gates
+- **`npm test`**:
+  ```text
+  ℹ tests 523
+  ℹ suites 151
+  ℹ pass 523
+  ℹ fail 0
+  ℹ cancelled 0
+  ℹ skipped 0
+  ℹ todo 0
+  ℹ duration_ms 22160.061733
+  ```
+- **`npm run typecheck`**:
+  ```text
+  > vidiaura@0.1.0 typecheck
+  > tsc --noEmit
+  Exited with code 0.
+  ```
+- **`npm run build`**:
+  ```text
+  ▲ Next.js 16.4.3 (Turbopack)
+  ✓ Compiled successfully in 514ms
+  ✓ Generating static pages using 12 workers (8/8) in 882ms
+  Exited with code 0.
+  ```
+- **`npm run render`**:
+  ```text
+  ○ out/InteractionDemo.mp4 1.7 MB (480 frames, H.264)
+  Exited with code 0.
+  ```
+- **Still Exports**:
+  ```text
+  out/test-vertical.png: PNG image data, 1080 x 1920, 8-bit/color RGB, non-interlaced
+  out/test-base44.png:   PNG image data, 1920 x 1080, 8-bit/color RGB, non-interlaced
+  ```
 
-6. **Backward Compatibility & Video Rendering**:
-   - `CameraRig3D.tsx`, `SmartCursor.tsx`, and `AudioEngine.tsx` faithfully translate legacy percentage props and coordinate spaces to atomic components.
-   - Running `npm run render` rendered `remotion/index.ts StudioShowcase out/StudioShowcase.mp4` across all 480 frames with exit code 0.
-
-7. **Build and Test Verification**:
-   - `npm run typecheck` passed with code 0 (0 TypeScript errors).
-   - `npx eslint remotion/motion-kit/ tests/atomic-engines.test.ts` passed with code 0 (0 errors, 0 warnings).
-   - `npm run build` completed Next.js 16.4.3 production build in 231ms (3/3 static pages).
-   - `node --import jiti/register --test tests/*.test.ts` passed with 81/81 tests passing across 19 suites (0 failures).
+### 1.4 Licensing & Secrets Audit
+- `public/sfx/SFX_LICENSES.md` documents all 18 sound assets with SHA-256 hashes, CC0 1.0 Universal / Programmatic DSP licenses, and Content ID immunity.
+- `git diff HEAD | grep -iE 'AI_KEY|API_KEY|SECRET|TOKEN|BEARER'` revealed 0 leaked credentials.
+- `.env.local` is untracked and correctly gitignored.
 
 ---
 
 ## 2. Logic Chain
 
-1. **From Observation 1**: Because the code contains genuine trigonometric, polynomial, and hyperbolic functions evaluated per frame rather than static constants, hardcoded lookups, or empty stubs, the atomic engines satisfy the requirement for genuine, non-facade implementations.
-2. **From Observation 2 & 3**: Because `package.json` was unmodified, zero pre-populated test artifacts existed, and zero external code was imported for core design logic, the work product adheres strictly to Demo Mode integrity constraints.
-3. **From Observation 4**: Because neither `Math.random()` nor `Date.now()` is called, and all state transitions are derived strictly from timeline frame numbers, rendering is bit-for-bit deterministic and reproducible across multiple execution environments.
-4. **From Observation 5**: Because the analytical displacement $D = S \cdot R \cdot (C - P_f)$ maps the focal point to viewport optical center under 3D perspective projection, the analytical drift is identically zero, and numerical floating-point drift is confirmed to be $< 10^{-14}$ px across 50,000 parameter combinations ($\ll 0.5$ px). Additionally, because $\tanh(x) < 1.0$ for all real $x$, $L(S) < 0.95$ for all possible sound cue overlaps, guaranteeing zero digital clipping.
-5. **From Observation 6 & 7**: Because legacy compositions (`StudioShowcase.tsx`) render to MP4 without error, all 81 unit tests pass, and TypeScript/ESLint/Next.js builds succeed, Milestone 2 is fully functional, backwards-compatible, and architecturally verified.
+1. **Precedence of Ground Truth**: In accordance with the Auditor System Instructions, `ORIGINAL_REQUEST.md` takes absolute precedence over all worker claims or intermediate plans.
+2. **Explicit Zero-Warning Acceptance Standard**: `ORIGINAL_REQUEST.md` line 75 states: `npm run lint completa con 0 errores y advertencias de ESLint`.
+3. **Empirical Discrepancy**: While the worker handoff claimed "0 ESLint errors, 0 warnings", empirical execution produced `✖ 1 problem (0 errors, 1 warning)` in `tests/motion-kit-archetypes.test.ts:20:8` due to an unused `type MediaType` import.
+4. **Mandatory Veto Invariant**: Under Forensic Integrity guidelines: "Trust NOTHING — verify EVERYTHING. If ANY check fails, your verdict is INTEGRITY VIOLATION and you MUST reject the work product."
+5. **Audit-Only Constraint**: As an auditor, code modification is strictly forbidden ("Audit-only — do NOT modify implementation code"). The failure cannot be silently patched by the auditor; it must be formally vetoed and remanded to the worker/remediation agent.
 
 ---
 
 ## 3. Caveats
 
-- **ESLint Full Repo Context**: Running `npm run lint` across the entire workspace flags 3 unused-import warnings in an untracked adversarial test (`tests/adversarial-bezier-audio.test.ts`) currently being drafted concurrently by peer agent `m2_challenger_2`. The Milestone 2 production files and official test suite (`tests/atomic-engines.test.ts`) have 0 errors and 0 warnings.
-- **Node Audio Decoding**: Remotion `<Audio />` tags utilize browser Web Audio/FFmpeg pipelines during video render; mathematical gain calculation, ducking envelopes, and limiter transfer curves were verified in both Node.js unit tests and full Remotion video export (`out/StudioShowcase.mp4`).
+1. The underlying component implementations (`RealCaptureSurface`, `InteractiveSurfaceDemo`, `KineticTypography`, `DynamicBackdrop`, `Root.tsx`) and the test assertions in `tests/motion-kit-archetypes.test.ts` are technically sound, robust, and mathematically verified (523 tests passing, zero focal drift, valid renders).
+2. The violation is narrowly scoped to a single unused type import in `tests/motion-kit-archetypes.test.ts` line 20 (`type MediaType`). Once removed or referenced, `npm run lint` will achieve 0 errors and 0 warnings.
+3. Because the auditor is forbidden from modifying files outside its folder, this must be remediated by a worker agent.
 
 ---
 
 ## 4. Conclusion
 
-**Verdict: CLEAN**
+The audit verdict is **INTEGRITY VIOLATION**. Milestone 2 is **REJECTED** under the auditor's mandatory binary veto due to:
+1. Failure of ESLint zero-warning acceptance criterion (`ORIGINAL_REQUEST.md` R75).
+2. Discrepancy between attested handoff status ("0 warnings") and empirical execution ("1 warning").
 
-The Milestone 2 atomic engine implementation (`remotion/motion-kit/camera/*`, `remotion/motion-kit/cursor/*`, and `remotion/motion-kit/audio/*`) is **100% genuine, mathematically rigorous, deterministic, backwards-compatible, and free of any integrity violations**. Milestone 2 is accepted and ready for Milestone 3 (Showcase Composition & Integration).
+**Required Remediation**:
+Remove `type MediaType` from line 20 of `tests/motion-kit-archetypes.test.ts` (or utilize it in a type assertion within the suite) and re-verify that `npm run lint` outputs exactly: `0 errors, 0 warnings`.
 
 ---
 
 ## 5. Verification Method
 
-To independently reproduce the forensic verification, run the following commands in `/home/huguittodev/launtion`:
+To verify the violation and confirm the required remediation:
 
-1. **Verify Static Typecheck**:
+1. **Reproduce the violation**:
    ```bash
-   npm run typecheck
+   npm run lint
    ```
-   *Expected:* Exit code 0, 0 errors.
+   *Expected output*: `warning 'MediaType' is defined but never used @typescript-eslint/no-unused-vars` (1 warning).
 
-2. **Verify Milestone 2 Lint**:
+2. **Verify remediation condition**:
+   Upon editing `tests/motion-kit-archetypes.test.ts` to remove the unused import:
    ```bash
-   npx eslint remotion/motion-kit/ tests/atomic-engines.test.ts
+   npm run lint
    ```
-   *Expected:* Exit code 0, 0 errors, 0 warnings.
-
-3. **Verify Production Build**:
-   ```bash
-   npm run build
-   ```
-   *Expected:* Exit code 0, Next.js compiled in $< 1$s.
-
-4. **Verify Test Suites (81 Tests)**:
-   ```bash
-   node --import jiti/register --test tests/*.test.ts
-   ```
-   *Expected:* 81/81 passing (0 failed).
-
-5. **Verify Remotion MP4 Render**:
-   ```bash
-   npm run render
-   ```
-   *Expected:* Exit code 0, generates `out/StudioShowcase.mp4`.
+   *Required output*: Exits with code 0, 0 errors, 0 warnings.

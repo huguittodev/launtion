@@ -12,8 +12,10 @@ import { SceneGraphSchema } from '../scene-graph/schema';
 export const AllowedMimeTypesEnum = z.enum([
   'image/png',
   'image/jpeg',
+  'image/jpg',
   'image/webp',
   'video/mp4',
+  'video/webm',
 ]);
 
 export type AllowedMimeType = z.infer<typeof AllowedMimeTypesEnum>;

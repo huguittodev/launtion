@@ -1,34 +1,24 @@
-## 2026-10-31T18:08:20Z
-Your identity: m1_challenger_2 (Adversarial Verifier - Adapter & Mapper Transformation)
-Your working directory: /home/huguittodev/launtion/.agents/teamwork/m1_challenger_2/
+## 2026-11-02T13:58:43Z
+You are teamwork_challenger assigned to empirically challenge and verify Milestone 1 (Brand Rebranding & Audio Bank Foundations).
+Your working directory is: /home/huguittodev/launtion/.agents/teamwork/m1_challenger_2/
 
-You MUST read the following files before starting your work:
-1. /home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
-2. /home/huguittodev/launtion/PROJECT_SPEC.md
-3. /home/huguittodev/launtion/AGENTS.md
-4. /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
-5. /home/huguittodev/launtion/.agents/teamwork/m1_worker/handoff.md
+MANDATORY FIRST STEP: Read ORIGINAL_REQUEST.md at:
+/home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
 
-Target Code to Challenge:
-- `src/lib/interaction-map/CoordinateMapper.ts`
-- `src/lib/scene-graph/types.ts`
-- `src/lib/scene-graph/schema.ts`
-- `src/lib/scene-graph/adapter.ts`
+Also read:
+- Scope: /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
+- Worker handoff: /home/huguittodev/launtion/.agents/teamwork/m1_worker/handoff.md
 
-Challenge Objective:
-You are an adversarial verifier. Empirically challenge the mathematical precision and transformation robustness of `CoordinateMapper` and `interactionToSceneGraphAdapter`:
-1. Test `CoordinateMapper`:
-   - Out-of-bounds inputs, NaN, Infinity, negative canvas dimensions.
-   - Round-trip accuracy: `toNormalized(toPixels(u, v, W, H), W, H) == (u, v)`.
-2. Test `interactionToSceneGraphAdapter`:
-   - Empty events array (must produce valid base SceneGraph).
-   - Single event, 100 simultaneous events on same frame, events at extreme corners `(0, 0)` and `(1, 1)`.
-   - Verify that output of adapter strictly parses against `SceneGraphSchema.parse()`.
-   - Check that derived camera track keyframes are strictly monotonic in time.
-   - Check that cursor Bezier control points are valid numbers within reasonable bounds.
-   - Check that all scheduled audio assets are within the allowed catalog of 6 assets.
-3. In your `handoff.md`, explicitly state your verdict: `APPROVE` or `FAIL`.
+Your adversarial challenge focus:
+1. Procedural Scheduling Stress Testing:
+   - Generate test keystroke sequences of length 1, 2, 4, 100, and 1000. Verify that `getMechanicalTapAsset(i)` strictly cycles modulo 4 across mechanical-tap-1..4 with zero skips, zero undefined values, and uniform distribution.
+   - Verify `resolveClickAsset` across primary, secondary, and subtle roles.
+2. Ducking & Limiter Mathematical Stress Testing:
+   - Construct catastrophic polyphony scenarios where all 18 audio assets trigger on the exact same frame at maximum volume.
+   - Verify via Monte Carlo / sweep tests that `softLimitGain` strictly bounds master volume <= 0.95 under all positive sum inputs ($S \in [0.0, 100.0]$), with continuous $C^1$ derivative at knee $K=0.75$.
+   - Verify that priority-1 cues (taps, clicks) cause 0.000 dB ducking (multiplier = 1.0), and priority-2 cues duck smoothly to 0.55 floor without undershooting.
+3. Conclude with an explicit verdict in your handoff.md: **APPROVE** or **REJECT**.
 
-Deliverables:
-- Write `/home/huguittodev/launtion/.agents/teamwork/m1_challenger_2/challenge_report.md` and `handoff.md`.
-- Send message upon completion with your verdict.
+Update progress in /home/huguittodev/launtion/.agents/teamwork/m1_challenger_2/progress.md.
+Deliver your report in /home/huguittodev/launtion/.agents/teamwork/m1_challenger_2/handoff.md.
+When finished, send a completion message to the caller.

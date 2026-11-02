@@ -102,7 +102,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       encodeURIComponent(JSON.stringify(sceneGraph, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `launtion-scenegraph-${Date.now()}.json`);
+    downloadAnchor.setAttribute('download', `vidiaura-scenegraph-${Date.now()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -482,7 +482,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 {downloadUrl && (
                   <a
                     href={downloadUrl}
-                    download={`launtion-render-${jobId}.mp4`}
+                    download={`vidiaura-render-${jobId}.mp4`}
                     className="px-5 py-2 rounded-lg text-xs font-semibold bg-[#22C55E] hover:bg-[#16A34A] text-white shadow-lg transition-all flex items-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

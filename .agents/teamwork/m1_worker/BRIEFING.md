@@ -1,71 +1,75 @@
-# BRIEFING — 2026-10-31T18:05:00Z
+# BRIEFING — 2026-11-02T13:57:00Z
 
 ## Mission
-Implement Phase 2 & 3 foundational contracts: InteractionMap Zod schema & types, CoordinateMapper, demoInteractionMap.json, SceneGraph Zod schema & types, interactionToSceneGraphAdapter, and SFX_LICENSES.md, strictly verified with typecheck, lint, and schema round-trip tests.
+Implement Milestone 1: Brand Rebranding to Vidiaura & Audio Bank Foundations (SFX WAV synthesis, Audio Schemas, AudioTimeline procedural engine, and unit tests) with 100% test, lint, and build pass.
 
 ## 🔒 My Identity
-- Archetype: implementer
-- Roles: implementer, qa, specialist
+- Archetype: implementer / qa
+- Roles: implementer, qa
 - Working directory: /home/huguittodev/launtion/.agents/teamwork/m1_worker/
-- Original parent: e050f1ce-2de9-448e-9c52-f601bd890052
-- Milestone: Phase 2/3 Contracts & Foundations
+- Original parent: 7223f18e-1aa2-4cd2-952f-cb94d118ec51
+- Milestone: Milestone 1: Brand Rebranding & Audio Bank Foundations
 
 ## 🔒 Key Constraints
-- Strict TypeScript & Zod schemas with allowlists and coordinate bounds [0.0, 1.0].
-- InteractionMap event types: 'click' | 'hover' | 'focus' | 'scroll'.
-- Mandatory individual event provenance: 'observed' | 'inferred' | 'simulated'.
-- Schema .refine() validating event frames <= durationInFrames.
-- Pure mathematical CoordinateMapper functions: toPixels, toNormalized, clamp01, fitWithinBounds.
-- demoInteractionMap.json: 480 frames, 1920x1080, all 24 events documented in demo_report.md §2.2 with explicit provenance.
-- SceneGraph: discriminated union of scene types (kinetic_typography, synthetic_prompt_box, product_interaction_3d, icon_grid_morph, synthetic_hero_button, synthetic_connect_pills, synthetic_code_tree, brand_closing_cta).
-- Pure deterministic interactionToSceneGraphAdapter(interactionMap): camera keyframes, cursor Bezier arcs with control points, audio cues with SFX allowlist, scene sequence nodes.
-- public/sfx/SFX_LICENSES.md: Commercial legal clearance for 6 WAV assets.
-- 0 typecheck errors, 0 lint warnings/errors.
-- DO NOT CHEAT, no dummy facades, no hardcoding.
+- Apply rebrand changes to package.json, src/app/layout.tsx, src/components/Header.tsx, src/components/editor/EditorHeader.tsx, src/components/editor/ExportModal.tsx, src/app/api/render/[id]/download/route.ts, src/lib/ai/gemini-adapter.ts, src/lib/input-intelligence/gemini-vision-adapter.ts.
+- Synthesize all 12 WAV files via scripts/generate-sfx.ts into public/sfx/.
+- Document all 18 audio assets in public/sfx/SFX_LICENSES.md.
+- Extend AudioAssetSchema and AudioAsset in src/lib/scene-graph/schema.ts and types.ts.
+- Extend AllowedMimeTypesEnum in src/lib/input-intelligence/schema.ts ('video/webm', 'image/jpg').
+- Update remotion/motion-kit/audio/AudioTimeline.ts with SFX_CATALOG, ducking priorities, round-robin taps, click alternation, transition whooshes.
+- Create tests/audio-expansion.test.ts.
+- Quality gates: npm test (481+ passing, 0 failing), npm run typecheck (0 errors), npm run lint (0 errors/warnings), npm run build (success).
+- DO NOT CHEAT: Genuine implementations only.
 
 ## Current Parent
-- Conversation ID: e050f1ce-2de9-448e-9c52-f601bd890052
-- Updated: 2026-10-31T18:05:00Z
+- Conversation ID: 7223f18e-1aa2-4cd2-952f-cb94d118ec51
+- Updated: 2026-11-02T13:57:00Z
 
 ## Task Summary
-- **What to build**: InteractionMap and SceneGraph schemas, types, coordinate mapper, demo interaction map, interaction-to-scene-graph adapter, SFX license clearance.
-- **Success criteria**: Strict validation, full coverage of 24 events, complete 8-scene sequence, typecheck clean, lint clean, parse verification passing.
-- **Interface contracts**: PROJECT_SPEC.md, AGENTS.md, orchestrator/PROJECT.md, spec_report.md, adapter_report.md, demo_report.md.
-- **Code layout**: src/lib/interaction-map/, src/lib/scene-graph/, public/sfx/.
+- **What to build**: Full Milestone 1 rebrand, SFX generation, Audio schema extensions, AudioTimeline procedural SFX & ducking engine, and expansion unit tests.
+- **Success criteria**: All 18 SFX WAVs present in public/sfx/, all schemas extended, AudioTimeline enhanced with round-robin taps, click alternation, transition whooshes & priorities, tests/audio-expansion.test.ts passing, typecheck/lint/build clean.
+- **Interface contracts**: /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
+- **Code layout**: /home/huguittodev/launtion/
 
 ## Key Decisions Made
-- Implemented pure functional and static class methods in `CoordinateMapper` (`toPixels`, `toNormalized`, `clamp01`, `fitWithinBounds`, `clamp`, `clampNormalized`, `mapLocalToCanvasNormalized`, etc.) for zero-dependency math.
-- Implemented `InteractionMapSchema` with strict `.refine()` enforcing `evt.frame <= durationInFrames` and mandatory individual event provenance (`'observed' | 'inferred' | 'simulated'`).
-- Created `demoInteractionMap.json` with 24 events exactly matching `demo_report.md` §2.2 and §2.4 (10 observed, 7 inferred, 7 simulated) across 4 narrative phases.
-- Implemented `SceneGraphSchema` with discriminated union covering all 8 scene node types, canvas configuration, art direction, camera keyframes (zoom [0.8, 3.5]), cursor keyframes (Bezier curvature control points), audio track (6-WAV allowlist), and `.refine()` temporal containment.
-- Implemented `interactionToSceneGraphAdapter` as a pure deterministic function transforming events into camera dolly keyframes, cursor Bezier arcs, audio cues, and scene nodes.
-- Created `public/sfx/SFX_LICENSES.md` providing legal clearance and acoustic documentation for all 6 existing WAV assets.
-- Verified 0 errors across `npm run typecheck`, `npm run lint`, `npm run build`, and round-trip parsing tests.
+- Rebranded package name to `vidiaura` while maintaining exact Remotion 4.0.539 dependencies.
+- Synthesized 12 studio-grade CC0 WAV audio files via pure DSP (Mulberry32 PRNG + RBJ Biquad filters) into `public/sfx/`.
+- Extended `AudioAsset` and `AudioAssetSchema` non-breakingly from 6 to 18 assets.
+- Extended `AllowedMimeTypesEnum` with `video/webm` and `image/jpg`.
+- Upgraded `AudioTimeline.ts` with complete `SFX_CATALOG`, round-robin keystrokes (`mechanical-tap-1..4`), click alternation, and scene transition whooshes.
+- Added comprehensive unit tests in `tests/audio-expansion.test.ts` covering schemas, ducking, limiter, and procedural scheduling.
 
 ## Artifact Index
-- `DISPATCH.md` — Parent assignment and instructions
-- `BRIEFING.md` — Persistent working memory and state
-- `progress.md` — Liveness heartbeat and step tracker
-- `changes.md` — Detailed file modification summary
-- `handoff.md` — Formal 5-component handoff report
+- DISPATCH.md — Dispatch assignment from parent
+- BRIEFING.md — Persistent working memory
+- progress.md — Liveness heartbeat and milestone tracking
+- handoff.md — Final 5-component completion handoff report
 
 ## Change Tracker
-- **Files created**:
-  - `src/lib/interaction-map/types.ts`: InteractionMap type definitions
-  - `src/lib/interaction-map/schema.ts`: Zod validation schemas
-  - `src/lib/interaction-map/CoordinateMapper.ts`: Coordinate conversion math
-  - `src/lib/interaction-map/demoInteractionMap.json`: 24-event demo interaction map
-  - `src/lib/scene-graph/types.ts`: SceneGraph type definitions & 8-scene union
-  - `src/lib/scene-graph/schema.ts`: SceneGraph Zod schema with refinement
-  - `src/lib/scene-graph/adapter.ts`: Pure deterministic telemetry adapter
-  - `public/sfx/SFX_LICENSES.md`: Commercial clearance manifest
-- **Build status**: `tsc --noEmit` PASS (0 errors), `eslint` PASS (0 errors/warnings), `next build` PASS (0 errors), round-trip PASS (0 errors)
+- **Files modified**:
+  - `package.json`: Rebranded package name to "vidiaura"
+  - `src/app/layout.tsx`: Updated metadata, OpenGraph, and Twitter tags
+  - `src/components/Header.tsx`: Rebranded top brand link to "Vidiaura"
+  - `src/components/editor/EditorHeader.tsx`: Rebranded Studio header to "Vidiaura Studio"
+  - `src/app/api/render/[id]/download/route.ts`: Updated download filename prefix to "vidiaura-"
+  - `src/components/editor/ExportModal.tsx`: Updated JSON and MP4 export filename prefixes to "vidiaura-"
+  - `src/lib/ai/gemini-adapter.ts`: Updated Creative Director prompt to Vidiaura
+  - `src/lib/input-intelligence/gemini-vision-adapter.ts`: Updated Vision Analyst prompt to Vidiaura Studio
+  - `scripts/generate-sfx.ts`: Created deterministic DSP synthesizer script for 12 WAV files
+  - `public/sfx/*.wav`: Synthesized 12 WAV sound assets
+  - `public/sfx/SFX_LICENSES.md`: Documented all 18 audio assets with provenance & technical metrics
+  - `src/lib/scene-graph/types.ts`: Extended AudioAsset union to 18 assets
+  - `src/lib/scene-graph/schema.ts`: Extended AudioAssetSchema Zod enum to 18 assets
+  - `src/lib/input-intelligence/schema.ts`: Extended AllowedMimeTypesEnum with video/webm and image/jpg
+  - `remotion/motion-kit/audio/AudioTimeline.ts`: Full 18-asset catalog, procedural keystroke/click/whoosh engine
+  - `tests/audio-expansion.test.ts`: Created 10 automated unit tests for M1 audio engine
+- **Build status**: Pass (npm test: 481/481 pass; typecheck: 0 errors; lint: 0 errors; build: Next.js clean compile; render: 480/480 frames MP4 export)
 - **Pending issues**: None
 
 ## Quality Status
-- **Build/test result**: All checks passed cleanly (0 errors)
-- **Lint status**: 0 violations, 0 warnings
-- **Tests added/modified**: Schema round-trip parse & adapter execution verified
+- **Build/test result**: 481 passed, 0 failed, 140 suites (100% pass)
+- **Lint status**: 0 errors, 0 warnings
+- **Tests added/modified**: +10 unit tests in `tests/audio-expansion.test.ts`
 
 ## Loaded Skills
-- None
+None required for this milestone.

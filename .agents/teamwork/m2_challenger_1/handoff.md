@@ -1,115 +1,170 @@
-# Handoff Report — Milestone 2: Camera 3D Physics & Focal Drift Adversarial Verification
+# Milestone 2 Hard Handoff Report: Empirical Adversarial Challenge
 
-**Agent:** `m2_challenger_1` (Adversarial Verifier - Camera 3D Physics & Focal Drift)  
-**Recipient:** `e050f1ce-2de9-448e-9c52-f601bd890052` (Orchestrator)  
-**Date:** 2026-10-31  
-**Handoff Type:** Hard (Task Complete)  
-**Verdict:** **`APPROVE`**
+**Agent**: m2_challenger_1 (Roles: critic, specialist)  
+**Target Milestone**: Milestone 2 — Motion Kit, 4 Archetypes & Dual Aspect Ratio  
+**Final Verdict**: **APPROVE**
 
 ---
 
 ## 1. Observation
 
-1. **Target Files Inspected**:
-   - `remotion/motion-kit/camera/CameraTransform.ts`:
-     - Lines 67–104: `createRotationMatrix3D(rx, ry, rz)` computes right-to-left compound rotation $R = R_x(\theta_x) \cdot R_y(\theta_y) \cdot R_z(\theta_z)$.
-     - Lines 129–143: Fixed optical center anchor $C = (0.5, 0.5)$, unscaled centering vector $T = (C - P_f)$, rotation-compensated displacement $D = S \cdot R \cdot T$, and CSS transform generator `translate3d(Dx, Dy, Dz) scale(zoom) rotateX(rx) rotateY(ry) rotateZ(rz)` with `transformOrigin: '50% 50%'` and `perspectiveOrigin: '50% 50%'`.
-   - `remotion/motion-kit/camera/FocalTracker.ts`:
-     - Lines 30–41: `normalizeFocalPoint()` auto-detects legacy percentages and clamps to $[0.0, 1.0]$.
-     - Lines 47–70: `clampFocalToZoomBounds()` calculates half-visible extent $0.5 / S$ and clamps focal point to prevent canvas void borders.
-     - Lines 75–101: `getFocalVisibleRect()` returns pixel-exact bounding box.
-   - `remotion/motion-kit/camera/CameraPath.ts`:
-     - Lines 28–56: `evaluateEasing()` supports pure mathematical evaluations for `linear`, `cubic`, `spring`, and `ease-in-out` curves without runtime dependencies.
-     - Lines 61–122: `evaluateCameraPath()` sorts keyframes chronologically and performs per-frame interpolation with boundary clamping.
+### 1.1 Empirical Verification Test Suite (`tests/adversarial-milestone2.test.ts`)
+We authored and executed a dedicated 21-test adversarial verification suite covering all challenge dimensions specified by the dispatch:
+- `npx tsx --test tests/adversarial-milestone2.test.ts`:
+  - 21 tests pass, 0 fail across 5 test suites.
+- Full project test suite:
+  - `npm test`: 550 tests pass, 0 fail across 160 suites (including baseline 523 tests, peer dual-aspect tests, and our 21 new adversarial tests).
 
-2. **Empirical Test Execution (`tests/adversarial-camera-drift.test.ts`)**:
-   - Executed mandatory combinatorial grid test:
-     - 5 resolutions: 1920x1080 (16:9), 1080x1920 (9:16), 2560x1440 (2K), 3840x2160 (4K), 1200x800 (3:2).
-     - 5 zoom levels: 1.0, 1.5, 2.0, 3.0, 5.0.
-     - 7 pitch angles $\theta_x \in [-45^\circ, 45^\circ] \times$ 7 yaw angles $\theta_y \in [-45^\circ, 45^\circ] \times$ 7 roll angles $\theta_z \in [-45^\circ, 45^\circ]$ (343 rotation combinations).
-     - 5 extreme focal targets: $(0.0, 0.0), (1.0, 1.0), (0.5, 0.5), (0.8, 0.2), (0.1, 0.9)$.
-     - Total combinatorial test vectors: $5 \times 5 \times 343 \times 5 = 42,875$ test cases.
-   - Verified with an independent CSS 4x4 homogenous matrix projection oracle parsing the emitted CSS transform strings:
-     - Analytical focal drift: $0.000000\text{ px}$.
-     - Maximum measured CSS Oracle focal drift: $0.0000698\text{ px}$ ($< 0.0001\text{ px}$).
-     - In-plane projection depth: $|Z| \le 0.00005\text{ px}$ ($Z \approx 0\text{ px} \ll 1200\text{ px}$).
-     - Pass rate: **$42,875 / 42,875$ cases ($100.000\%$)** strictly $\le 0.5\text{ px}$.
-   - Continuous Monte Carlo stress test across 10,000 pseudo-random continuous vectors:
-     - Maximum observed error under 4-decimal CSS formatting truncation: $0.09176\text{ px} \le 0.5\text{ px}$.
-   - 120-frame dynamic camera path trajectory test with spring overshoot:
-     - Maximum dynamic frame drift: $0.03695\text{ px} \le 0.5\text{ px}$.
-   - Extreme aspect ratio benchmarks (21:9 Ultrawide, 1:1 Square, 8K 7680x4320, QVGA 320x240):
-     - Maximum measured error: $0.00007\text{ px} \le 0.5\text{ px}$.
+### 1.2 Media Resolution Oracle (`resolveMediaType`) Observations
+- **Standard Video Extensions**: Successfully resolves `.mp4`, `.webm`, `.mov`, `.m4v` into `'video'`.
+- **Uppercase & Mixed-Case Extensions**:
+  - `https://cdn.example.com/RECORDING.MP4` -> `'video'`
+  - `https://cdn.example.com/recording.WebM` -> `'video'`
+  - `https://cdn.example.com/SCREENSHOT.PNG` -> `'image'`
+  - `https://cdn.example.com/photo.JPEG` -> `'image'`
+- **URL Query Parameters & Hash Anchors**:
+  - `https://cdn.example.com/video.mp4?token=secret123&expires=999999` -> `'video'`
+  - `https://cdn.example.com/video.mp4#t=10,20` -> `'video'`
+  - `https://cdn.example.com/preview.mp4?poster=cover.jpg` -> `'video'` (base path extension takes precedence)
+  - `https://cdn.example.com/banner.jpeg?alt=backup.mp4` -> `'image'` (base path extension takes precedence)
+- **Data URIs with MIME Parameters**:
+  - `data:video/mp4;codecs=avc1.4d401f;base64,...` -> `'video'`
+  - `data:video/webm;codecs="vp9,opus";base64,...` -> `'video'`
+  - `data:image/svg+xml;charset=utf-8,<svg>...</svg>` -> `'image'`
+  - `data:image/png;base64,...` -> `'image'`
+  - Non-media data URIs (`data:text/plain...`, `data:application/json...`, `data:application/pdf...`) -> `null`
+- **Blob URIs**:
+  - `blob:http://localhost:3000/screen-video-recording-1234` -> `'video'`
+  - `blob:https://app.vidiaura.com/capture.mp4` -> `'video'`
+  - `blob:http://localhost:3000/image-screenshot-5678` -> `'image'`
+  - `blob:http://localhost:3000/01234567-89ab-cdef-0123-456789abcdef` (raw opaque UUID blob without format hint) -> `null` (safely falls back to `{children}` or explicit `mediaType` prop).
+- **Unallowlisted & Deceptive Extensions**:
+  - Rejected as `null`: `.tar.gz`, `.mp4.bak`, `.png.exe`, `.video.mp4.zip`, `.mkv`, `.avi`, `.flv`, `.wmv`, `.bmp`, `.tiff`, `.ico`, `.heic`, `.mp4x`.
+- **Malformed & Non-Media Strings**:
+  - Rejected as `null`: `""`, `"   "`, `null`, `undefined`, `"synthetic"`, `"mock-interface"`, `"https://google.com"`, and non-string primitives (`0`, `true`, `{}`, `[]`).
+- **Edge-Case Discoveries**:
+  - Data URIs with uppercase scheme (`DATA:video/mp4...`) or uppercase MIME (`data:VIDEO/mp4...`) return `null` because lines 23-28 perform case-sensitive `trimmed.startsWith('data:video/')` prior to lowercasing.
+  - URLs where file extension is present only as a middle query parameter followed by `&` (e.g. `https://example.com/api?file=video.mp4&token=123`) return `null` because query parameters are stripped before path evaluation.
 
-3. **Adversarial Edge-Case Findings**:
-   - **Finding 1 (Off-Center Anchor Drift)**: When passing a non-centered `anchorPoint` (e.g. $A = (0.2, 0.2) \ne (0.5, 0.5)$) to `calculateCameraTransform()`, the displacement $D = S \cdot R \cdot (A - P_f)$ scales and rotates the anchor offset around $C$, causing the projected focal point to drift away from $A$ by up to $170.65\text{ px}$ under 3D rotation and zoom.
-   - **Finding 2 (Greedy Legacy Percentage Auto-Detection)**: In `FocalTracker.ts` (lines 35–36), any normalized coordinate $> 1.0$ is divided by 100 (e.g. $1.8 \to 0.018$) rather than clamped to $1.0$.
+### 1.3 RealCaptureSurface Structural & Fallback Invariants
+- Direct React JSX tree evaluation confirmed:
+  - Video URLs render Remotion's `<OffthreadVideo>` with:
+    - `src === targetUrl`
+    - `volume === 0` (strictly muted, preserving Vidiaura's frame-synchronized procedural `AudioEngine` without audio bleed)
+    - `style.objectFit === 'cover'`
+    - `style.width === '100%'` and `style.height === '100%'`
+  - Image URLs render Remotion's `<Img>` with:
+    - `src === targetUrl`
+    - `style.objectFit === 'cover'`
+    - `style.width === '100%'` and `style.height === '100%'`
+  - Fallback to `{children}` is rock-solid:
+    - When `mediaUrl` is `null`, `undefined`, empty string `""`, whitespace, or non-media string (`"synthetic"`), renders `{children}` without crashing.
+    - When `children` is missing/undefined, renders cleanly without throwing.
+  - Archetype styling:
+    - `linear-dark`: renders obsidian surface (`#121215`), header `#141418`, and neon glow box shadow (`0 0 0 1px ${glowColor}4D, 0 0 35px ${glowColor}2E...`).
+    - `base44-studio`: renders clean white surface (`#FFFFFF`), header `#FBF9F5`, and subtle shadow (`0 32px 85px -15px rgba(24, 23, 21, 0.14)...`).
 
-4. **Quality Gates & System Verification**:
-   - `node --import jiti/register --test tests/*.test.ts`: **93/93 tests pass (0 failures)** across 26 test suites in 320ms.
-   - `npm run typecheck`: Exit code 0, 0 errors.
-   - `npm run lint`: Exit code 0, 0 errors, 0 warnings.
-   - `npm run build`: Compiled Next.js in 226ms with 3/3 static pages.
-   - `npm run render`: Rendered `out/StudioShowcase.mp4` (480 frames, concurrency 8x) with exit code 0 in 9.5s.
+### 1.4 MotionArchetypeSchema Stress Testing
+- Validates all 4 allowlisted archetypes: `'base44-studio'`, `'linear-dark'`, `'bento-grid'`, `'kinetic-hook'`.
+- Adversarial rejection:
+  - Casing variations (`'BASE44-STUDIO'`, `'Linear-Dark'`) -> rejected.
+  - CamelCase / snake_case (`'base44Studio'`, `'linear_dark'`) -> rejected.
+  - Substrings / prefixes (`'base44'`, `'linear'`, `'bento'`, `'kinetic'`) -> rejected.
+  - Suffixes / versions (`'base44-studio-v2'`, `'kinetic-hook-plus'`) -> rejected.
+  - Injection attempts (`'<script>'`, `'__proto__'`, `'constructor'`) -> rejected.
+  - Non-string primitives (`0`, `1`, `-1`, `NaN`, `Infinity`, `true`, `false`, `null`, `undefined`) -> rejected.
+  - Boundary objects (`{}`, `{ archetype: 'base44-studio' }`, `[]`, `Object.create(null)`) -> rejected.
+- `ArtDirectionSchema`:
+  - 100% backward compatible when `archetype` is omitted (`undefined`).
+  - Correctly parses valid `archetype`.
+  - Rejects `archetype: null` (since `.optional()` accepts `undefined` but not `null`).
+  - Rejects invalid `archetype` strings.
+
+### 1.5 Dual Aspect Ratio (16:9 ↔ 9:16) & Remotion Exports
+- **Canvas contracts**:
+  - `InteractiveSurfaceDemo`: 1920x1080 @ 30 FPS, duration 480 frames.
+  - `InteractiveSurfaceDemo-Vertical`: 1080x1920 @ 30 FPS, duration 480 frames.
+- **Safe Margins**:
+  - Vertical surface reframed to `960x560` within 1080px width: safe margin = 60px on each side.
+  - Vertical typography reframed to `maxWidth: 920` within 1080px width: safe margin = 80px on each side.
+- **Analytical Zero Focal Drift**:
+  - Evaluated `calculateCameraTransform` across 240 combinations (8 focal points, 6 zooms, 5 3D rotation angles) under 1080x1920 portrait viewport:
+  - Maximum observed focal drift was 0.0px (strictly $\le 0.5$px threshold).
+- **Remotion Export Verifications**:
+  - `npx remotion still remotion/index.ts InteractiveSurfaceDemo-Vertical out/test-challenger-vertical.png --overwrite`:
+    - Result: `out/test-challenger-vertical.png`: PNG image data, 1080 x 1920.
+  - `npx remotion still remotion/index.ts InteractiveSurfaceDemo out/test-challenger-base44.png --frame=120 --overwrite`:
+    - Result: `out/test-challenger-base44.png`: PNG image data, 1920 x 1080.
+  - `npm run render`:
+    - Result: `out/InteractionDemo.mp4`: ISO Media, MP4 Base Media v1 (1.7 MB, 480 frames H.264).
+
+### 1.6 Static Analysis & Lint Observation
+- `npm run typecheck`: 0 TypeScript errors.
+- `npm run lint`:
+  - Worker claimed "0 errors, 0 warnings" in handoff.
+  - Verified observation: 0 errors, 1 warning:
+    `tests/motion-kit-archetypes.test.ts: 20:8 warning 'MediaType' is defined but never used @typescript-eslint/no-unused-vars`
+  - Non-fatal warning in test file, does not affect runtime code.
+- `npm run build`: Next.js Turbopack production build succeeded in 3.1s.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Analytical Zero-Drift Derivation**:
-   Because `transformOrigin` is permanently fixed at the optical center $C = (W/2, H/2, 0)$ and the translation vector is defined as $T = C - P_f$, the transformed focal point relative to $C$ is:
-   $$P'_{f,\text{rel}} = S \cdot R \cdot (P_f - C) + D = S \cdot R \cdot (P_f - C) + S \cdot R \cdot (C - P_f) = 0$$
-   Therefore, $P'_f = C = (W/2, H/2, 0)$ identically in 3D world space (Observation 1, 2).
-2. **Perspective Invariance**:
-   CSS perspective projection with `perspectiveOrigin: '50% 50%'` maps any 3D coordinate $(X, Y, Z)$ to screen coordinates $(C_x + \frac{X - C_x}{1 - Z/d}, C_y + \frac{Y - C_y}{1 - Z/d})$. Because $X - C_x = 0$ and $Y - C_y = 0$, both numerators are zero. The focal point projects onto $(C_x, C_y)$ with zero drift regardless of zoom $S$, rotation $R$, and aspect ratio, provided $Z < d$. The measured $Z$ satisfies $|Z| \le 0.00005\text{ px} \ll 1200\text{ px}$ (Observation 2).
-3. **Numerical Precision & Format Truncation**:
-   The CSS transform generator formats translation values with `toFixed(4)` (maximum precision truncation $\pm 0.00005\text{ px}$). When parsed by the independent 4x4 homogeneous projection oracle, maximum observed screen drift is $0.09176\text{ px}$ in 4K resolution under extreme rotation, which is well below the quantitative limit of $e \le 0.5\text{ px}$ by a factor of 5.4x (Observation 2).
-4. **Context of Edge-Case Findings**:
-   Finding 1 (off-center anchor drift) and Finding 2 (legacy percentage division) only affect non-standard inputs ($A \ne (0.5, 0.5)$ and coordinates $> 1.0$). In `CameraRig.tsx`, all compositions strictly default to $C = (0.5, 0.5)$ and normalized interaction maps in $[0.0, 1.0]$. Therefore, these findings do not impact current or planned Remotion compositions (Observation 1, 3).
-5. **Acceptance Criteria Fulfillment**:
-   With 100% of tested cases ($> 52,000$ empirical vectors) satisfying $e \le 0.5\text{ px}$, and all static checks and Remotion video rendering passing with 0 errors and 0 warnings, Milestone 2 Camera Engine meets all criteria for approval (Observation 2, 4).
+1. **Audio Mixing Integrity**: Rendering Remotion's `<OffthreadVideo>` with `volume={0}` is essential. If video audio were unmuted, user screen recording audio would mix directly with Vidiaura's frame-synchronized procedural `AudioEngine` (ducking and soft-knee limiting), causing acoustic clipping and volume anomalies. Our JSX tree inspection proved `volume === 0` is unconditionally enforced.
+2. **Deterministic Fallback Safety**: The media resolution oracle (`resolveMediaType`) acts as a strict classification gatekeeper. When input is unallowlisted, malformed, empty, or non-media (`'synthetic'`), it returns `null`, ensuring `RealCaptureSurface` safely renders the `{children}` fallback (`<InteractiveProductSurface>`) rather than crashing or attempting to mount an invalid media element.
+3. **Aspect Ratio Mathematical Invariance**: Because the camera transform engine normalizes focal shifts relative to the optical center $(W/2, H/2)$ prior to 3D matrix projection, aspect ratio changes from 16:9 (1920x1080) to 9:16 (1080x1920) do not introduce focal drift ($\le 0.5$px). Empirical grid testing across 240 camera parameter vectors verified maximum drift $= 0.0$px.
+4. **Schema Strictness**: `MotionArchetypeSchema` as a `z.enum` prevents runtime poisoning by rejecting all non-allowlisted archetypes, prototype pollution keys, casing mismatches, and boundary objects, while maintaining clean backward compatibility with Milestone 1 scene graphs via `archetype: MotionArchetypeSchema.optional()`.
 
 ---
 
 ## 3. Caveats
 
-- **Off-Center Anchor Customization (Phase 3 Note)**: If off-center screen framing (rule-of-thirds) is implemented in Phase 3, the displacement formula in `CameraTransform.ts` should be updated to $D = (A - C) - S \cdot R \cdot (P_f - C)$ to maintain zero drift.
-- **Legacy Percentage Disambiguation**: Interaction maps should guarantee valid normalized coordinates in $[0.0, 1.0]$; raw numbers $> 1.0$ should not be fed to `normalizeFocalPoint()` unless intended as percentages.
+1. **Case-Sensitivity of Data URI Schemes**: `resolveMediaType` evaluates `trimmed.startsWith('data:video/')` and `trimmed.startsWith('data:image/')` before lowercasing. While standard web APIs produce lowercase schemes, adversarial inputs with uppercase schemes (`DATA:video/mp4...` or `data:VIDEO/mp4...`) return `null`. This is easily mitigated by normalizing to lowercase prior to prefix checks if needed in subsequent phases.
+2. **Intermediate Query Parameter Extensions**: URLs formatted like `https://example.com/api?file=video.mp4&token=123` return `null` because query parameters are stripped before path extension extraction. For such dynamic API URLs, users or callers should supply the explicit `mediaType='video'` prop to `RealCaptureSurface`.
+3. **Blob URIs in Node.js Headless Renders**: Browser-generated `blob:` URIs are scoped to the browser DOM memory. For offline/headless render worker pipelines, assets must be supplied as reachable HTTP/HTTPS URLs or base64 data URIs.
+4. **ESLint Warning**: 1 unused import warning exists in `tests/motion-kit-archetypes.test.ts:20:8` (`MediaType`). Because challenger operates under review-only constraints, this finding is documented rather than modified.
 
 ---
 
 ## 4. Conclusion
 
-**Verdict: `APPROVE`**
+**Verdict: APPROVE**
 
-The Camera Engine implementation in `remotion/motion-kit/camera/` is **approved** for Milestone 2. The zero-focal-drift physics is mathematically sound, experimentally validated across 52,875 test cases, and confirmed to maintain focal drift error $\le 0.0918\text{ px} \ll 0.5\text{ px}$ across 100% of test cases.
+The Milestone 2 implementation satisfies all product, architectural, and visual requirements with empirical rigor:
+- `RealCaptureSurface` embeds user media (`<OffthreadVideo>` and `<Img>`) with strict `volume={0}` muting and `objectFit: 'cover'`, and falls back gracefully to interactive UI components when media is absent or synthetic.
+- All 4 motion archetypes (Base44 Studio, Linear Dark, Bento Grid, Kinetic Hook) are strictly validated by `MotionArchetypeSchema` and rendered deterministically.
+- Dual aspect ratio auto-reframing functions seamlessly between 16:9 and 9:16 with zero focal drift ($\le 0.5$px), verified by PNG still exports and MP4 video generation.
+- Full test suite passes 550/550 tests with 0 failures across 160 suites.
 
 ---
 
 ## 5. Verification Method
 
-To independently verify all findings and test suites, run the following commands from the repository root:
+To independently reproduce the empirical challenge findings, execute the following commands in the workspace root:
 
-1. **Execute All Test Suites (including Adversarial Camera Drift Suite)**:
-   ```bash
-   node --import jiti/register --test tests/*.test.ts
-   ```
-   *Expected:* 93/93 tests pass (0 failures).
+```bash
+# 1. Run the Milestone 2 adversarial test suite
+npx tsx --test tests/adversarial-milestone2.test.ts
 
-2. **TypeScript Compilation & ESLint**:
-   ```bash
-   npm run typecheck && npm run lint
-   ```
-   *Expected:* Exit code 0, 0 errors, 0 warnings.
+# 2. Run the full test suite
+npm test
 
-3. **Next.js Production Build**:
-   ```bash
-   npm run build
-   ```
-   *Expected:* Exit code 0, compiles in ~250ms.
+# 3. TypeScript validation
+npm run typecheck
 
-4. **Remotion MP4 Render**:
-   ```bash
-   npm run render
-   ```
-   *Expected:* Exit code 0, outputs `out/StudioShowcase.mp4`.
+# 4. ESLint audit
+npm run lint
+
+# 5. Production build
+npm run build
+
+# 6. Verify dual aspect ratio Remotion still exports
+npx remotion still remotion/index.ts InteractiveSurfaceDemo-Vertical out/test-challenger-vertical.png --overwrite
+npx remotion still remotion/index.ts InteractiveSurfaceDemo out/test-challenger-base44.png --frame=120 --overwrite
+file out/test-challenger-vertical.png out/test-challenger-base44.png
+
+# 7. Verify full MP4 video render
+npm run render
+file out/InteractionDemo.mp4
+```

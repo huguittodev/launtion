@@ -58,7 +58,7 @@ export async function GET(
 
   const stat = fs.statSync(job.outputPath);
   const fileSize = stat.size;
-  const filename = `launtion-${job.compositionId}-${job.id}.mp4`;
+  const filename = `vidiaura-${job.compositionId}-${job.id}.mp4`;
 
   const rangeHeader = req.headers.get('range');
 

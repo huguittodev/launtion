@@ -1,39 +1,30 @@
-## 2026-10-31T18:42:05Z
-Your identity: m2_auditor_1 (Forensic Integrity Auditor - Milestone 2)
-Your working directory: /home/huguittodev/launtion/.agents/teamwork/m2_auditor_1/
+## 2026-11-02T14:38:33Z
 
-You MUST read the following files before starting your work:
-1. /home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
-2. /home/huguittodev/launtion/PROJECT_SPEC.md
-3. /home/huguittodev/launtion/AGENTS.md
-4. /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
-5. /home/huguittodev/launtion/.agents/teamwork/m2_worker/handoff.md
-6. /home/huguittodev/launtion/.agents/teamwork/m2_worker/changes.md
+You are teamwork_auditor assigned to conduct a Forensic Integrity Audit on Milestone 2 (Motion Kit, 4 Archetypes & Dual Aspect Ratio).
+Your working directory is: /home/huguittodev/launtion/.agents/teamwork/m2_auditor_1/
 
-Audit Targets:
-- `remotion/motion-kit/camera/CameraTransform.ts`
-- `remotion/motion-kit/camera/FocalTracker.ts`
-- `remotion/motion-kit/camera/CameraPath.ts`
-- `remotion/motion-kit/camera/CameraRig.tsx`
-- `remotion/motion-kit/CameraRig3D.tsx`
-- `remotion/motion-kit/cursor/BezierPath.ts`
-- `remotion/motion-kit/cursor/CursorPointer.tsx`
-- `remotion/motion-kit/SmartCursor.tsx`
-- `remotion/motion-kit/audio/FadeController.ts`
-- `remotion/motion-kit/audio/AudioMixer.ts`
-- `remotion/motion-kit/audio/AudioTimeline.ts`
-- `remotion/motion-kit/AudioEngine.tsx`
+MANDATORY FIRST STEP: Read ORIGINAL_REQUEST.md at:
+/home/huguittodev/launtion/.agents/teamwork/ORIGINAL_REQUEST.md
 
-Forensic Integrity Mandate:
-Perform deep static analysis, code provenance inspection, and runtime tracing:
-1. Check for genuine implementations vs. dummy facades or hardcoded shortcuts.
-2. Check for unauthorized external dependencies, unauthorized npm packages, or unapproved scripts.
-3. Check for non-deterministic behavior: unseeded `Math.random()`, `Date.now()`, global mutable state.
-4. Verify that legacy facades (`CameraRig3D.tsx`, `SmartCursor.tsx`, `AudioEngine.tsx`) preserve 100% genuine backward compatibility.
-5. Verify that camera drift is genuinely $< 0.5$ px mathematically rather than hardcoded in tests.
-6. Verify that audio limiter genuinely prevents digital clipping.
-7. State your binary verdict clearly in `handoff.md`: `CLEAN` or `INTEGRITY VIOLATION`.
+Also read:
+- Scope: /home/huguittodev/launtion/.agents/teamwork/orchestrator/PROJECT.md
+- Worker handoff: /home/huguittodev/launtion/.agents/teamwork/m2_worker/handoff.md
 
-Deliverables:
-- Write `/home/huguittodev/launtion/.agents/teamwork/m2_auditor_1/audit_report.md` and `handoff.md`.
-- Send message upon completion with your forensic verdict.
+Your Forensic Audit checks (SWE/Remotion integrity):
+1. Cheating / Dummy / Facade Verification:
+   - Check if any test in tests/ has hardcoded results, mocked assertions that bypass genuine logic, or skipped tests (`test.skip`, `it.skip`).
+   - Check if any files have `// @ts-ignore` or `// @ts-nocheck` to hide type errors in M2 touched files (`Root.tsx`, `RealCaptureSurface.tsx`, `InteractiveSurfaceDemo.tsx`, `DynamicBackdrop.tsx`, `KineticTypography.tsx`, `schema.ts`, `types.ts`, `RemotionPlayerPreview.tsx`).
+   - Verify that media embedding and archetypes implement genuine Remotion components (`<OffthreadVideo>`, `<Img>`, `spring`, `interpolate`) and not dummy placeholders.
+2. Licensing & Commercial Rights:
+   - Verify all audio/visual components comply with commercial export rights.
+3. Secret Leaks & Hygiene:
+   - Verify no secrets or sensitive keys were committed or exposed.
+4. Independent Command Verification:
+   - Independently execute `npm test`, `npm run typecheck`, and `npm run lint`.
+5. Audit Verdict:
+   - You possess a MANDATORY BINARY VETO.
+   - Report an explicit verdict: **CLEAN** or **INTEGRITY VIOLATION** (with evidence).
+
+Update progress in /home/huguittodev/launtion/.agents/teamwork/m2_auditor_1/progress.md.
+Deliver your forensic report in /home/huguittodev/launtion/.agents/teamwork/m2_auditor_1/handoff.md.
+When finished, send a completion message to the caller.

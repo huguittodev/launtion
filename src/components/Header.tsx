@@ -9,7 +9,7 @@ export const Header: React.FC = () => {
           href="/"
           className="font-semibold tracking-tight text-neutral-900 text-lg hover:text-neutral-700 transition-colors"
         >
-          Launtion
+          Vidiaura
         </Link>
         <span className="text-xs px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200">
           v0.2.0 • Fase 3
