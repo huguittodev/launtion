@@ -1,6 +1,6 @@
-# AGENTS.md — Launtion
+# AGENTS.md — Launtion / Vidiaura
 
-Read `PROJECT_SPEC.md` before making implementation decisions. It is the initial source of truth for product scope, architecture, safety and acceptance criteria.
+`PROJECT_SPEC.md` is the product and architecture source of truth. Read it before changing scope or architecture. Its §21 marks phases 1–8 as `COMPLETADO`; don't rebuild completed subsystems unless the task asks for it.
 
 ## Hard rules
 
@@ -20,20 +20,52 @@ Read `PROJECT_SPEC.md` before making implementation decisions. It is the initial
 14. Music and sound effects must have documented rights suitable for the intended commercial exports.
 15. Test responsive layouts, visual legibility, 3D camera bounds, audio synchronization and error states.
 
-## Preferred implementation order (Launtion Engine v2)
+## Repository shape
 
-1. **Fase 1 — Motion Kit + Dirección de Arte en Remotion:** Primitivas de estudio (`CameraRig3D`, `SmartCursor`, `SyntheticUI`, `KineticTypography`, `IconGridMorph`, fondos dinámicos y motor de audio sincronizado por frame). Validar con una secuencia publicitaria de nivel Base44 en Remotion.
-2. **Fase 2 — InteractionMap:** Formato de coordenadas `(x, y, t)`, trayectorias de cursor, disparadores de clics y puntos focales para guiar la cámara 3D y los efectos de sonido.
-3. **Fase 3 — Scene Graph Schema (Zod) + Preview y Personalización Visual:** Esquema declarativo completo y UI con `@remotion/player` que permita editar textos, colores, iconos y mover puntos de zoom `(x, y)` en vivo sin errores.
-4. **Fase 4 — Creative Director Agent (Gemini):** Generación automática de guion, ritmo, cortes musicales y Scene Graph variado a partir de los datos del producto.
-5. **Fase 5 — Input Intelligence:** Análisis multimodal con Gemini sobre vídeos MP4 y capturas subidas para proponer puntos de interés e InteractionMap inicial editable.
-6. **Fase 6 — Grabador propio:** Captura directa de vídeo de pantalla + coordenadas reales del ratón y clics en el DOM.
-7. **Fase 7 — Render Worker en segundo plano:** Cola de trabajos, aislamiento de procesos, control de recursos y exportación MP4.
-8. **Fase 8 — Capa SaaS:** Supabase Auth/RLS, persistencia de proyectos, almacenamiento y pagos.
+- Single Next.js 16 App Router app at the repo root. The `apps/` + `packages/` layout in `PROJECT_SPEC.md` §15 is **not** implemented.
+- Routes: `/` landing/generation, `/editor` minimalist editor, `/editor/advanced` full studio; route handlers live under `src/app/api/`.
+- `src/lib/` is domain logic: `scene-graph/` (contract + InteractionMap adapter), `ai/` and `input-intelligence/` (Gemini + deterministic fallbacks), `render/` (queue/worker/bundler), `supabase/` (clients + persistence), `simple-editor/`, `recorder/`.
+- `remotion/` is the deterministic engine: `Root.tsx` registers compositions; `motion-kit/` holds camera, cursor, audio and SyntheticUI primitives.
+- `supabase/migrations/*.sql` owns tables, RLS and the private `project-assets` / `rendered-videos` buckets. Storage policies assume the first path segment is `auth.uid()`.
+- `tests/` uses Node's built-in test runner. There is no CI config, Jest, Vitest or Playwright.
+- `.agents/teamwork/**` contains historical multi-agent handoff notes; ignore it unless the task is about that process.
 
-## Before finishing a task
+## Commands
 
-- Run the relevant lint, typecheck, tests and build.
-- Test the affected flow, including error handling and visual output.
-- State what changed, what was verified, and any outstanding issue.
+- `npm run dev` — Next dev server (loads `.env.local`).
+- `npm test` — full suite from `tests/*.test.ts` (currently ~12s).
+- `npx tsx --test tests/<name>.test.ts` — one suite. Route-level tests import the handlers directly and use `NextRequest`; no running server is required.
+- `npm run lint` → `npm run typecheck` → `npm test` → `npm run build` — verification order.
+- `npm run remotion` — Remotion Studio via `remotion/index.ts`.
+- `npm run render` / `npm run render:showcase` / `npm run render:legacy` — MP4s into `out/`.
+- `npx tsx scripts/generate-sfx.ts` — regenerate the audio bank; add `--verify` to check existing files.
+- `package-lock.json` and `pnpm-lock.yaml` are both committed. Use either manager, but don't regenerate or delete the other lockfile.
+
+## SceneGraph invariants
+
+- `src/lib/scene-graph/schema.ts` (Zod) and `src/lib/scene-graph/types.ts` (TypeScript) are parallel, hand-maintained definitions. Any scene or payload change must update both, plus `remotion/compositions/InteractiveSurfaceDemo.tsx`, fixtures/demo graphs and tests.
+- Validate every graph with `SceneGraphSchema.safeParse` before it reaches the player or renderer. `simple-edit.ts` deliberately rejects invalid edits and returns the previous graph.
+- Only `InteractiveSurfaceDemo` consumes a `SceneGraph`. `StudioShowcase` and `LaunchDemo` are fixed legacy compositions. `InteractiveSurfaceDemo-Vertical` exists in Remotion Studio, but `src/lib/render/schema.ts` accepts only `InteractiveSurfaceDemo` / `StudioShowcase` / `LaunchDemo`; 9:16 exports go through `InteractiveSurfaceDemo` with a 1080×1920 canvas.
+- AI endpoints never emit React/JS. Gemini failures or missing keys return HTTP 200 with a deterministic fallback; check `source` (`gemini` vs `deterministic-fallback`) before assuming the model was used.
+- Browser media is memory-only: `draft-store.ts` strips `blob:` / `data:` URLs before `sessionStorage`, and `SimpleEditor` re-embeds the data URI only for export. Don't move large media into persistent storage.
+- All `@remotion/*` packages and `remotion` are pinned to exactly `4.0.539`; bump them together.
+
+## Render and persistence gotchas
+
+- `RenderQueue` is an in-memory `Map`, not the `render_jobs` table. Restart, hot reload or a second server instance loses jobs. Files go to `/tmp/launtion-renders`, the bundle cache to `/tmp/launtion-bundle-cache`, and the download route reads local disk.
+- Keep renders asynchronous: `POST /api/render` enqueues and returns 202; clients poll `/api/render/:id`.
+- With `MOCK_SUPABASE=true` (or no `NEXT_PUBLIC_SUPABASE_URL`), auth returns a fixed mock user and persistence uses the in-memory adapter. Otherwise `.env.local` points at live Supabase. Use mock mode for offline/dev mutations.
+- In mock mode, `x-user-id` / `x-user-email` override identity and `Authorization: Bearer invalid` simulates 401. User-scoped routes must rely on Postgres RLS, not the service-role client.
+- `.env.local` is gitignored and holds real keys. No `.env.example` exists yet; create/update it when adding variables.
+- Add or rename audio end-to-end: `AudioAssetSchema` (`schema.ts`), `AudioAsset` (`types.ts`), `SFX_CATALOG` (`remotion/motion-kit/audio/AudioTimeline.ts`), the WAV in `public/sfx/`, and `public/sfx/SFX_LICENSES.md`.
+
+## Before finishing
+
+- Run the verification order above; render or preview when visual/motion behavior changes.
+- Exercise the affected flow, including error handling.
+- Report what changed, what was verified, and any outstanding issue.
 - Update `PROJECT_SPEC.md` or the decision log when a long-term technical decision changes.
+
+## Branding
+
+The user-facing brand is **Vidiaura**. The repo directory and package metadata still use `launtion` / `vidiaura`, while README and `PROJECT_SPEC.md` say LaunchMotion. Don't mass-rename identifiers or copy as a "cleanup".
