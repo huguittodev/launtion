@@ -64,6 +64,8 @@ export const VisualLandmarkSchema = z.object({
   confidence: z.number().min(0.0).max(1.0).default(1.0),
   suggestedAction: SuggestedActionSchema.default('click'),
   targetZoom: z.number().min(0.8).max(3.5).optional(),
+  /** Seconds into the recording at which this element is interacted with (videos only). */
+  timeSeconds: z.number().min(0).max(3600).optional(),
 });
 
 export type VisualLandmark = z.infer<typeof VisualLandmarkSchema>;
@@ -113,6 +115,23 @@ export const InputIntelligencePayloadSchema = z
 
     targetDurationInFrames: z.number().int().min(60).max(1200).optional().default(480),
     fps: z.number().int().positive().optional().default(30),
+    /** Measured in the browser: media width / height. */
+    mediaAspect: z.number().min(0.3).max(4).optional(),
+    /** Measured in the browser for videos: duration in seconds. */
+    mediaDurationSeconds: z.number().positive().max(3600).optional(),
+    /**
+     * Timestamped JPEG frames sampled in the browser from a screen recording. Sending frames
+     * instead of the whole video makes analysis fast and gives exact timestamps.
+     */
+    frames: z
+      .array(
+        z.object({
+          timeSeconds: z.number().min(0).max(3600),
+          dataUri: z.string().startsWith('data:image/').max(400_000),
+        })
+      )
+      .max(32)
+      .optional(),
   })
   .refine(
     (data) => Boolean(data.fileBase64 || data.base64Data || data.fileData),

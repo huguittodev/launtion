@@ -117,6 +117,8 @@ export const ProductInteraction3DPayloadSchema = z.object({
   windowTitle: z.string().max(80).optional(),
   url: z.string().optional(),
   mockInterface: z.string().optional(),
+  /** width/height of the embedded recording; lets cursor and camera map onto real pixels. */
+  mediaAspect: z.number().min(0.3).max(4).optional(),
   eventsCount: z.number().int().nonnegative().optional(),
   cameraRig: z.record(z.string(), z.unknown()).optional(),
   cursor: z.record(z.string(), z.unknown()).optional(),

@@ -70,3 +70,24 @@ export function takePendingStyle(): MotionArchetype | null {
   }
 }
 
+
+const NOTICE_KEY = 'vidiaura:notice:v1';
+
+export function saveNotice(message: string | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (message) window.sessionStorage.setItem(NOTICE_KEY, message);
+    else window.sessionStorage.removeItem(NOTICE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readNotice(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.sessionStorage.getItem(NOTICE_KEY);
+  } catch {
+    return null;
+  }
+}

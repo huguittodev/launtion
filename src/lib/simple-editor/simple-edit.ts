@@ -7,6 +7,7 @@
  * rejected (the previous graph is returned) so the player can never break.
  */
 
+import { remapCanvasPoint } from '../scene-graph/media-layout';
 import { SceneGraphSchema } from '../scene-graph/schema';
 import type { MotionArchetype, SceneGraph } from '../scene-graph/types';
 import { neutral, sceneThemes, signal } from '../design/tokens';
@@ -200,18 +201,47 @@ export function applyAspect(graph: SceneGraph, format: AspectFormat): EditResult
   const size = FORMAT_SIZES[format];
   if (!size) return { graph, ok: false, error: 'Formato desconocido' };
   const candidate = structuredClone(graph);
+  const from = { width: graph.canvas.width, height: graph.canvas.height };
+  const to = { width: size.width, height: size.height };
+  const surface = candidate.scenes.find((s) => s.type === 'product_interaction_3d');
+  const aspect =
+    surface && surface.type === 'product_interaction_3d' ? surface.payload.mediaAspect : undefined;
+  if (from.width !== to.width || from.height !== to.height) {
+    // Keep cursor and camera on the same pixel of the recording after the reframe.
+    const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
+    for (const kf of candidate.cursorTrack ?? []) {
+      const p = remapCanvasPoint(from, to, aspect, { x: kf.x, y: kf.y });
+      kf.x = clamp01(p.x);
+      kf.y = clamp01(p.y);
+      if (kf.controlX !== undefined && kf.controlY !== undefined) {
+        const c = remapCanvasPoint(from, to, aspect, { x: kf.controlX, y: kf.controlY });
+        kf.controlX = clamp01(c.x);
+        kf.controlY = clamp01(c.y);
+      }
+    }
+    for (const kf of candidate.cameraTrack ?? []) {
+      const p = remapCanvasPoint(from, to, aspect, { x: kf.x, y: kf.y });
+      kf.x = clamp01(p.x);
+      kf.y = clamp01(p.y);
+    }
+  }
   candidate.canvas = { ...candidate.canvas, width: size.width, height: size.height };
   return validate(candidate, graph);
 }
 
 /** Sets the user's real recording/screenshot on every product_interaction_3d scene. */
-export function applyUserMedia(graph: SceneGraph, mediaUrl: string | null): EditResult {
+export function applyUserMedia(
+  graph: SceneGraph,
+  mediaUrl: string | null,
+  mediaAspect?: number
+): EditResult {
   if (!mediaUrl) return { graph, ok: true };
   const candidate = structuredClone(graph);
   let touched = false;
   for (const scene of candidate.scenes) {
     if (scene.type === 'product_interaction_3d') {
       scene.payload.url = mediaUrl;
+      if (mediaAspect) scene.payload.mediaAspect = mediaAspect;
       touched = true;
     }
   }

@@ -10,7 +10,7 @@
 import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
-import { saveDraft } from '@/lib/simple-editor/draft-store';
+import { saveDraft, saveNotice } from '@/lib/simple-editor/draft-store';
 import {
   ACCEPT_ATTRIBUTE,
   generateVideo,
@@ -53,8 +53,13 @@ export default function HomePage() {
     setError(null);
     setIsLoading(true);
     try {
-      const { graph, media } = await generateVideo({ prompt, file, style });
+      const { graph, media, source, reason } = await generateVideo({ prompt, file, style });
       saveDraft(graph, media);
+      saveNotice(
+        source === 'deterministic-fallback'
+          ? `La IA no pudo analizar tu contenido (${reason ?? 'sin detalle'}). Se ha usado una plantilla genérica: el cursor y el guion no siguen tu producto.`
+          : null
+      );
       router.push('/editor');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo crear el vídeo.');

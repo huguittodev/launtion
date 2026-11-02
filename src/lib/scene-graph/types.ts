@@ -117,6 +117,8 @@ export interface ProductInteraction3DPayload {
   windowTitle?: string;
   url?: string;
   mockInterface?: string;
+  /** width/height of the embedded recording; lets cursor and camera map onto real pixels. */
+  mediaAspect?: number;
   eventsCount?: number;
   cameraRig?: Record<string, unknown>;
   cursor?: Record<string, unknown>;

@@ -13,6 +13,7 @@ import { interpolate, spring, Sequence, useCurrentFrame } from 'remotion';
 import demoInteractionMapRaw from '../../src/lib/interaction-map/demoInteractionMap.json';
 import type { InteractionMap } from '../../src/lib/interaction-map/types';
 import { interactionToSceneGraphAdapter } from '../../src/lib/scene-graph/adapter';
+import { computeSurfaceLayout } from '../../src/lib/scene-graph/media-layout';
 import type {
   ArtDirection,
   CanvasConfig,
@@ -984,8 +985,9 @@ export const SceneNodeRenderer: React.FC<SceneNodeRendererProps> = ({
 
     case 'product_interaction_3d': {
       const p = node.payload;
-      const surfaceWidth = isVertical ? 960 : 1440;
-      const surfaceHeight = isVertical ? 560 : 840;
+      const surfaceLayout = computeSurfaceLayout(canvas, p.mediaAspect);
+      const surfaceWidth = surfaceLayout.surfaceWidth;
+      const surfaceHeight = surfaceLayout.surfaceHeight;
       const mediaSource = p.url || p.mockInterface;
 
       return (
@@ -1223,19 +1225,20 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
             </RealCaptureSurface>
           </div>
         )}
+      {/* Cursor lives in world space (inside the camera rig) so it stays glued to the
+          buttons of the recording while the camera zooms and pans. */}
+        <SmartCursor
+          frame={frame}
+          cursorTrack={sceneGraph.cursorTrack}
+          size={34}
+          color={
+            archetype === 'linear-dark' || isDark ? '#FAF9F5' : '#181716'
+          }
+          accentColor={sceneGraph.artDirection.primaryAccent}
+          showRipple={true}
+        />
       </CameraRig>
 
-      {/* 3. Cursor Overlay: Vector Smart Cursor with Multi-Keyframe Bezier Curves & Click Physics */}
-      <SmartCursor
-        frame={frame}
-        cursorTrack={sceneGraph.cursorTrack}
-        size={34}
-        color={
-          archetype === 'linear-dark' || isDark ? '#FAF9F5' : '#181716'
-        }
-        accentColor={sceneGraph.artDirection.primaryAccent}
-        showRipple={true}
-      />
 
       {/* 4. Audio Layer: Frame-Accurate SFX, Headroom Limiter, & Sidechain Ducking */}
       <AudioEngine audioTrack={sceneGraph.audioTrack} />

@@ -16,6 +16,7 @@ import type { InteractionEvent, InteractionMap } from '../interaction-map/types'
 import { interactionToSceneGraphAdapter } from '../scene-graph/adapter';
 import { SceneGraphSchema } from '../scene-graph/schema';
 import type { SceneGraph } from '../scene-graph/types';
+import { computeSurfaceLayout, mediaToCanvasNormalized } from '../scene-graph/media-layout';
 import type { SynthesizerOptions, VisualLandmark } from './types';
 
 /**
@@ -38,18 +39,45 @@ export function synthesizeInferredInteractionMap(
   const width = options?.baseWidth ?? 1920;
   const height = options?.baseHeight ?? 1080;
 
+  // Landmarks are detected in media space; cursor/camera live in canvas space.
+  const canvasSize = { width, height };
+  const layout = computeSurfaceLayout(canvasSize, options?.mediaAspect);
+  const toCanvasLandmark = (l: VisualLandmark): VisualLandmark => ({
+    ...l,
+    normalizedCenter: mediaToCanvasNormalized(
+      layout,
+      canvasSize,
+      l.normalizedCenter.x,
+      l.normalizedCenter.y
+    ),
+  });
+
+  // Timed landmarks (videos): choreograph from what actually happens, when it happens.
+  const timed = landmarks.filter((l) => typeof l.timeSeconds === 'number');
+  if (timed.length >= 2) {
+    return synthesizeTimedInteractionMap(timed, {
+      fps,
+      width,
+      height,
+      layout,
+      mediaDurationSeconds: options?.mediaDurationSeconds,
+    });
+  }
+
+  const mapped = landmarks.map(toCanvasLandmark);
+
   // 1. Identify key UI landmarks by semantic category and labels
-  const ctas = landmarks.filter((l) => l.category === 'cta');
-  const inputs = landmarks.filter((l) => l.category === 'input');
-  const cards = landmarks.filter((l) => l.category === 'card' || l.category === 'metric');
-  const navs = landmarks.filter((l) => l.category === 'navigation' || l.category === 'tab');
-  const others = landmarks.filter((l) => l.category === 'other');
+  const ctas = mapped.filter((l) => l.category === 'cta');
+  const inputs = mapped.filter((l) => l.category === 'input');
+  const cards = mapped.filter((l) => l.category === 'card' || l.category === 'metric');
+  const navs = mapped.filter((l) => l.category === 'navigation' || l.category === 'tab');
+  const others = mapped.filter((l) => l.category === 'other');
 
   // Fallback landmarks if specific categories were not detected
   const ctaTarget =
     ctas[0] ||
     others.find((o) => /button|start|deploy|publish|submit|sign/i.test(o.label)) ||
-    landmarks[0] || {
+    mapped[0] || {
       id: 'fallback-cta',
       label: options?.productContext?.targetCtaLabel || 'Get Started',
       category: 'cta' as const,
@@ -274,6 +302,131 @@ export function synthesizeInferredInteractionMap(
   return InteractionMapSchema.parse(rawMap);
 }
 
+const MAX_TIMED_DURATION = 1200;
+
+function zoomForLandmark(
+  l: VisualLandmark,
+  layout: ReturnType<typeof computeSurfaceLayout>,
+  canvas: { width: number; height: number }
+): number {
+  // Aim for the element to fill ~35% of the canvas width, within a tasteful range.
+  const box = l.box2d;
+  const boxW = box ? Math.abs(box[3] - box[1]) : 0;
+  const elementCanvasW = (boxW * layout.contentWidth) / canvas.width;
+  if (elementCanvasW > 0.01) {
+    return CoordinateMapper.clamp(Number((0.35 / elementCanvasW).toFixed(2)), 1.3, 2.6);
+  }
+  return l.category === 'cta' ? 2.2 : l.category === 'input' ? 1.8 : 1.6;
+}
+
+/**
+ * Builds an InteractionMap from landmarks that carry the second at which they are used in
+ * the recording. The recording plays from frame 0 at real time, so frame = seconds * fps.
+ */
+function synthesizeTimedInteractionMap(
+  timedLandmarks: VisualLandmark[],
+  ctx: {
+    fps: number;
+    width: number;
+    height: number;
+    layout: ReturnType<typeof computeSurfaceLayout>;
+    mediaDurationSeconds?: number;
+  }
+): InteractionMap {
+  const { fps, width, height, layout } = ctx;
+  const canvas = { width, height };
+  const sorted = [...timedLandmarks].sort((a, b) => (a.timeSeconds ?? 0) - (b.timeSeconds ?? 0));
+  const lastT = sorted[sorted.length - 1].timeSeconds ?? 0;
+  const seconds = ctx.mediaDurationSeconds ?? lastT + 2.5;
+  const duration = Math.min(MAX_TIMED_DURATION, Math.max(150, Math.ceil(seconds * fps)));
+
+  const events: InteractionEvent[] = [
+    {
+      id: 'timed-evt-00-overview',
+      type: 'focus',
+      frame: 0,
+      duration: 20,
+      x: 0.5,
+      y: 0.5,
+      provenance: 'inferred',
+      metadata: { zoomTarget: 1.0, description: 'Establishing overview' },
+    },
+  ];
+
+  let lastFrame = 20;
+  sorted.forEach((l, i) => {
+    const frame = Math.round((l.timeSeconds ?? 0) * fps);
+    if (frame >= duration - 10) return;
+    const c = mediaToCanvasNormalized(layout, canvas, l.normalizedCenter.x, l.normalizedCenter.y);
+    const x = safeCoordinate(c.x);
+    const y = safeCoordinate(c.y);
+    const zoom = zoomForLandmark(l, layout, canvas);
+    const approachFrame = Math.max(lastFrame + 8, frame - Math.round(fps * 0.6));
+    if (approachFrame < frame - 2) {
+      events.push({
+        id: `timed-evt-${String(i + 1).padStart(2, '0')}-approach-${l.id}`,
+        type: 'hover',
+        frame: approachFrame,
+        duration: Math.max(6, frame - approachFrame),
+        x,
+        y,
+        targetId: l.id,
+        provenance: 'inferred',
+        metadata: { zoomTarget: zoom, audioCue: 'camera-whoosh', targetElement: l.label },
+      });
+    }
+    const type = l.suggestedAction === 'click' ? 'click' : l.suggestedAction === 'focus' ? 'focus' : 'hover';
+    const metadata: Record<string, unknown> = {
+      zoomTarget: zoom,
+      targetElement: l.label,
+      category: l.category,
+    };
+    if (type === 'click') {
+      metadata.button = 'primary';
+      metadata.clickRipple = true;
+      metadata.audioCue = 'mouse-click';
+    } else if (l.category === 'input') {
+      metadata.audioCue = 'keyboard-tap';
+    }
+    events.push({
+      id: `timed-evt-${String(i + 1).padStart(2, '0')}-${type}-${l.id}`,
+      type,
+      frame: Math.max(approachFrame + 1, frame),
+      duration: type === 'click' ? 15 : Math.max(15, Math.round(fps * 0.8)),
+      x,
+      y,
+      targetId: l.id,
+      provenance: 'inferred',
+      metadata,
+    });
+    lastFrame = Math.max(approachFrame + 1, frame);
+  });
+
+  const pullbackFrame = Math.min(duration - 2, Math.max(lastFrame + 20, duration - Math.round(fps * 2)));
+  events.push({
+    id: 'timed-evt-99-pullback',
+    type: 'focus',
+    frame: pullbackFrame,
+    duration: Math.max(20, duration - pullbackFrame),
+    x: 0.5,
+    y: 0.5,
+    provenance: 'inferred',
+    metadata: { zoomTarget: 1.0, audioCue: 'chime', description: 'Pullback to overview' },
+  });
+
+  return InteractionMapSchema.parse({
+    version: '2.0',
+    baseResolution: { width, height },
+    fps,
+    durationInFrames: duration,
+    events: events.map((e) => ({
+      ...e,
+      provenance: 'inferred' as const,
+      frame: Math.max(0, Math.min(duration - 1, e.frame)),
+    })),
+  });
+}
+
 /**
  * Transforms an Inferred InteractionMap into a broadcast-quality SceneGraph (v2.0).
  */
@@ -295,6 +448,9 @@ export function adaptInferredInteractionToSceneGraph(
     if (surfaceScene && surfaceScene.payload) {
       surfaceScene.payload.mockInterface = options.assetDataUri;
       surfaceScene.payload.url = options.assetDataUri;
+      if (options.mediaAspect) {
+        surfaceScene.payload.mediaAspect = options.mediaAspect;
+      }
       if (options.assetFilename) {
         surfaceScene.payload.windowTitle = options.assetFilename;
       }

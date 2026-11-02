@@ -9,6 +9,7 @@
  * ZERO external AI libraries installed — purely standard web standards.
  */
 
+import { fetchWithRetry } from './fetch-retry';
 import { HexColorRegex, SceneGraphSchema } from '../scene-graph/schema';
 import type {
   AudioAsset,
@@ -283,6 +284,18 @@ export interface GenerateSceneGraphOptions {
   fetchFn?: typeof fetch;
 }
 
+/** Injected fetch (tests) is called once; the real network gets retries on transient errors. */
+function callGemini(
+  fetchFn: typeof fetch,
+  injected: boolean,
+  endpoint: string,
+  timeoutMs: number,
+  init: RequestInit
+): Promise<Response> {
+  if (injected) return fetchFn(endpoint, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+  return fetchWithRetry(fetchFn, endpoint, { ...init, timeoutMs });
+}
+
 /**
  * Main adapter function for Creative Director generation.
  * Calls Gemini REST endpoint with timeout guard, validates structured JSON with Zod,
@@ -295,8 +308,8 @@ export async function generateCreativeDirectorSceneGraph(
   const startTime = Date.now();
   const brief = ProductBriefSchema.parse(rawBrief);
   const apiKey = options?.apiKey ?? process.env.GEMINI_API_KEY;
-  const model = options?.model ?? process.env.GEMINI_TEXT_MODEL ?? 'gemini-2.5-flash';
-  const timeoutMs = options?.timeoutMs ?? 12000;
+  const model = options?.model ?? process.env.GEMINI_TEXT_MODEL ?? 'gemini-3.5-flash';
+  const timeoutMs = options?.timeoutMs ?? 30000;
   const fetchFn = options?.fetchFn ?? globalThis.fetch;
 
   // 1. If no API key is provided, execute deterministic fallback immediately
@@ -314,7 +327,7 @@ export async function generateCreativeDirectorSceneGraph(
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
   try {
-    const response = await fetchFn(endpoint, {
+    const response = await callGemini(fetchFn, options?.fetchFn !== undefined, endpoint, timeoutMs, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -336,7 +349,6 @@ export async function generateCreativeDirectorSceneGraph(
           responseMimeType: 'application/json',
         },
       }),
-      signal: AbortSignal.timeout(timeoutMs),
     });
 
     if (!response.ok) {

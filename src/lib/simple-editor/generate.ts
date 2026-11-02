@@ -69,6 +69,84 @@ export interface GenerateInput {
 export interface GenerateOutput {
   graph: SceneGraph;
   media: DraftMedia | null;
+  /** 'gemini' / 'gemini-vision' when the AI really ran; 'deterministic-fallback' otherwise. */
+  source: string;
+  reason?: string;
+}
+
+export interface VideoFrame {
+  timeSeconds: number;
+  dataUri: string;
+}
+
+/** Samples evenly spaced JPEG frames (640px wide) from a video, with exact timestamps. */
+export async function extractVideoFrames(file: File, durationSeconds: number): Promise<VideoFrame[]> {
+  const url = URL.createObjectURL(file);
+  try {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.preload = 'auto';
+    video.src = url;
+    await new Promise<void>((resolve, reject) => {
+      video.onloadeddata = () => resolve();
+      video.onerror = () => reject(new Error('No se pudo leer el vídeo.'));
+    });
+    const count = Math.min(24, Math.max(6, Math.ceil(durationSeconds / 2)));
+    const width = 640;
+    const height = Math.max(1, Math.round((width * video.videoHeight) / video.videoWidth));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return [];
+    const frames: VideoFrame[] = [];
+    for (let i = 0; i < count; i++) {
+      const t = Math.min(durationSeconds - 0.05, ((i + 0.5) * durationSeconds) / count);
+      await new Promise<void>((resolve) => {
+        video.onseeked = () => resolve();
+        video.currentTime = Math.max(0, t);
+      });
+      ctx.drawImage(video, 0, 0, width, height);
+      frames.push({ timeSeconds: Number(t.toFixed(2)), dataUri: canvas.toDataURL('image/jpeg', 0.6) });
+    }
+    return frames;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+export interface MediaMetadata {
+  aspect?: number;
+  durationSeconds?: number;
+}
+
+/** Reads real dimensions (and duration for videos) in the browser. */
+export function readMediaMetadata(file: File): Promise<MediaMetadata> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const done = (m: MediaMetadata) => {
+      URL.revokeObjectURL(url);
+      resolve(m);
+    };
+    if (file.type.startsWith('video/')) {
+      const v = document.createElement('video');
+      v.preload = 'metadata';
+      v.muted = true;
+      v.onloadedmetadata = () =>
+        done({
+          aspect: v.videoWidth && v.videoHeight ? v.videoWidth / v.videoHeight : undefined,
+          durationSeconds: Number.isFinite(v.duration) ? v.duration : undefined,
+        });
+      v.onerror = () => done({});
+      v.src = url;
+    } else {
+      const img = new Image();
+      img.onload = () =>
+        done({ aspect: img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : undefined });
+      img.onerror = () => done({});
+      img.src = url;
+    }
+  });
 }
 
 async function postJson(url: string, body: unknown): Promise<Record<string, unknown>> {
@@ -93,31 +171,46 @@ export async function generateVideo(input: GenerateInput): Promise<GenerateOutpu
 
   let rawGraph: unknown;
   let media: DraftMedia | null = null;
+  let source = 'unknown';
+  let reason: string | undefined;
+  let meta: MediaMetadata = {};
 
   if (input.file) {
     const uploadError = validateUpload(input.file);
     if (uploadError) throw new Error(uploadError);
     const dataUri = await fileToBase64DataUri(input.file);
+    meta = await readMediaMetadata(input.file);
+    const isVideo = input.file.type.startsWith('video/');
+    const frames =
+      isVideo && meta.durationSeconds ? await extractVideoFrames(input.file, meta.durationSeconds) : [];
     const data = await postJson('/api/input-intelligence', {
-      fileBase64: dataUri,
-      mimeType: input.file.type,
-      mediaType: input.file.type.startsWith('video/') ? 'video' : 'image',
+      // With frames, the poster frame stands in for the file: no need to upload the whole video.
+      fileBase64: frames.length > 0 ? frames[0].dataUri : dataUri,
+      mimeType: frames.length > 0 ? 'image/jpeg' : input.file.type,
+      mediaType: isVideo ? 'video' : 'image',
+      frames: frames.length > 0 ? frames : undefined,
       filename: input.file.name.slice(0, 150),
       prompt: prompt || undefined,
       productContext: prompt ? { title: deriveProductName(prompt).slice(0, 100) } : undefined,
+      mediaAspect: meta.aspect,
+      mediaDurationSeconds: meta.durationSeconds,
     });
     rawGraph = data.sceneGraph;
+    source = String(data.source ?? 'unknown');
+    reason = typeof data.reason === 'string' ? data.reason : undefined;
     media = { previewUrl: URL.createObjectURL(input.file), dataUri };
   } else {
     const data = await postJson('/api/creative-director', buildBrief(prompt));
     rawGraph = data.sceneGraph;
+    source = String(data.source ?? 'unknown');
+    reason = typeof data.reason === 'string' ? data.reason : undefined;
   }
 
   const parsed = SceneGraphSchema.safeParse(rawGraph);
   if (!parsed.success) throw new Error('La IA devolvió un guion no válido. Inténtalo de nuevo.');
 
   let graph = applyStyle(parsed.data, input.style).graph;
-  if (media) graph = applyUserMedia(graph, media.previewUrl).graph;
-  return { graph, media };
+  if (media) graph = applyUserMedia(graph, media.previewUrl, meta.aspect).graph;
+  return { graph, media, source, reason };
 }
 

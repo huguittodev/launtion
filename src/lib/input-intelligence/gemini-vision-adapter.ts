@@ -14,6 +14,7 @@
 
 import { CoordinateMapper } from '../interaction-map/CoordinateMapper';
 import { cleanModelJsonOutput } from '../ai/gemini-adapter';
+import { fetchWithRetry } from '../ai/fetch-retry';
 import {
   adaptInferredInteractionToSceneGraph,
   synthesizeInferredInteractionMap,
@@ -30,7 +31,13 @@ import type {
 import { generateDeterministicVisualFallback } from './visual-fallback';
 
 export const GEMINI_VISION_SYSTEM_PROMPT = `You are the Computer Vision & UI Telemetry Analyst for Vidiaura Studio.
-Your task is to analyze the provided software capture (screenshot or video frame) and extract key interactive landmarks with precise bounding boxes.
+Your task is to analyze the provided software capture (screenshot or screen recording) and extract key interactive landmarks with precise bounding boxes.
+
+### FOR VIDEOS (screen recordings):
+Watch the WHOLE recording. List the 4-10 most important moments in strict chronological order (clicks on buttons, typing in inputs, screen transitions, success states).
+For each element add "timeSeconds": the second of the recording at which the user interacts with it (or the element is most visible),
+and make "box2d" the bounding box of that element AS IT APPEARS AT THAT MOMENT, relative to the full video frame.
+Never reuse one box for different screens. For screenshots omit timeSeconds.
 
 ### INVIOLABLE RULES:
 1. OUTPUT JSON ONLY. No markdown, no conversational commentary, no code fences.
@@ -47,6 +54,7 @@ Your task is to analyze the provided software capture (screenshot or video frame
    - confidence: float between 0.0 and 1.0
    - box2d: [ymin, xmin, ymax, xmax]
    - suggestedAction: "click" | "hover" | "focus" | "scroll"
+   - timeSeconds: number (videos only, see above)
 
 JSON Format:
 {
@@ -58,7 +66,8 @@ JSON Format:
       "category": "cta",
       "confidence": 0.98,
       "box2d": [620, 750, 680, 910],
-      "suggestedAction": "click"
+      "suggestedAction": "click",
+      "timeSeconds": 4.2
     }
   ]
 }`;
@@ -175,6 +184,35 @@ export function ensureDataUri(rawBase64: string, mimeType: string): string {
 }
 
 /**
+ * Builds the multimodal request parts. With browser-sampled frames each image is preceded by
+ * its exact timestamp, so the model can report reliable `timeSeconds` values.
+ */
+function buildMediaParts(
+  userPrompt: string,
+  payload: InputIntelligencePayload | InputIntelligencePayloadInput,
+  pureBase64: string
+): Array<Record<string, unknown>> {
+  const frames = payload.frames;
+  if (frames && frames.length > 0) {
+    const parts: Array<Record<string, unknown>> = [
+      {
+        text:
+          userPrompt +
+          `\nThe recording is provided as ${frames.length} chronological screenshots sampled from the video` +
+          (payload.mediaDurationSeconds ? ` (total ${payload.mediaDurationSeconds.toFixed(1)}s)` : '') +
+          '. Each screenshot is preceded by its exact timestamp. Use those timestamps for timeSeconds.',
+      },
+    ];
+    for (const f of [...frames].sort((a, b) => a.timeSeconds - b.timeSeconds)) {
+      parts.push({ text: `Frame at t=${f.timeSeconds.toFixed(1)}s` });
+      parts.push({ inlineData: { mimeType: 'image/jpeg', data: extractRawBase64(f.dataUri) } });
+    }
+    return parts;
+  }
+  return [{ text: userPrompt }, { inlineData: { mimeType: payload.mimeType, data: pureBase64 } }];
+}
+
+/**
  * Primary multimodal analysis adapter for Gemini 2.5 Flash Vision.
  */
 export async function analyzeMediaWithGeminiVision(
@@ -184,8 +222,8 @@ export async function analyzeMediaWithGeminiVision(
   const startTime = Date.now();
 
   const apiKey = options?.apiKey ?? process.env.GEMINI_API_KEY;
-  const model = options?.model ?? process.env.GEMINI_VISION_MODEL ?? 'gemini-2.5-flash';
-  const timeoutMs = options?.timeoutMs ?? 15000;
+  const model = options?.model ?? process.env.GEMINI_VISION_MODEL ?? 'gemini-3.5-flash';
+  const timeoutMs = options?.timeoutMs ?? 90000;
   const fetchFn = options?.fetchFn ?? globalThis.fetch;
 
   const rawData = payload.fileBase64 || payload.base64Data || payload.fileData || '';
@@ -219,7 +257,9 @@ export async function analyzeMediaWithGeminiVision(
       additionalNotes: payload.prompt ?? null,
     });
 
-    const response = await fetchFn(endpoint, {
+    const response = await (options?.fetchFn !== undefined
+      ? (init: RequestInit) => fetchFn(endpoint, { ...init, signal: AbortSignal.timeout(timeoutMs) })
+      : (init: RequestInit) => fetchWithRetry(fetchFn, endpoint, { ...init, timeoutMs }))({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -229,15 +269,7 @@ export async function analyzeMediaWithGeminiVision(
         contents: [
           {
             role: 'user',
-            parts: [
-              { text: userPrompt },
-              {
-                inlineData: {
-                  mimeType: payload.mimeType,
-                  data: pureBase64,
-                },
-              },
-            ],
+            parts: buildMediaParts(userPrompt, payload, pureBase64),
           },
         ],
         systemInstruction: {
@@ -249,7 +281,6 @@ export async function analyzeMediaWithGeminiVision(
           responseMimeType: 'application/json',
         },
       }),
-      signal: AbortSignal.timeout(timeoutMs),
     });
 
     if (!response.ok) {
@@ -309,6 +340,14 @@ export async function analyzeMediaWithGeminiVision(
       const suggestedAction = normalizeAction(elem.suggestedAction, category);
       const targetZoom = category === 'cta' ? 2.35 : category === 'card' || category === 'metric' ? 2.1 : 1.5;
 
+      const rawTime = typeof elem.timeSeconds === 'number' ? elem.timeSeconds : Number(elem.timeSeconds);
+      const timeSeconds =
+        payload.mediaType === 'video' || payload.mimeType.startsWith('video/')
+          ? Number.isFinite(rawTime) && rawTime >= 0
+            ? rawTime
+            : undefined
+          : undefined;
+
       return {
         id,
         label,
@@ -319,6 +358,7 @@ export async function analyzeMediaWithGeminiVision(
         confidence,
         suggestedAction,
         targetZoom,
+        ...(timeSeconds !== undefined ? { timeSeconds } : {}),
       };
     });
 
@@ -335,11 +375,14 @@ export async function analyzeMediaWithGeminiVision(
       baseWidth: 1920,
       baseHeight: 1080,
       productContext,
+      mediaAspect: payload.mediaAspect,
+      mediaDurationSeconds: payload.mediaDurationSeconds,
     });
 
     const sceneGraph = adaptInferredInteractionToSceneGraph(interactionMap, {
       assetDataUri: dataUri,
       assetFilename: filename,
+      mediaAspect: payload.mediaAspect,
     });
 
     const latencyMs = Date.now() - startTime;

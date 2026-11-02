@@ -6,7 +6,7 @@ import type { PlayerRef } from '@remotion/player';
 import { ExportModal } from '../../components/editor/ExportModal';
 import { RemotionPlayerPreview } from '../../components/editor/RemotionPlayerPreview';
 import { defaultSceneGraph } from '../../../remotion/compositions/InteractiveSurfaceDemo';
-import { loadDraft, takePendingStyle } from '../../lib/simple-editor/draft-store';
+import { loadDraft, readNotice, takePendingStyle } from '../../lib/simple-editor/draft-store';
 import {
   SIMPLE_TEXT_LIMITS,
   STYLE_PRESETS,
@@ -44,6 +44,7 @@ export default function SimpleEditor() {
   const [graph, setGraph] = useState<SceneGraph>(init.graph);
   const [texts, setTexts] = useState<SimpleTexts>(() => readSimpleTexts(init.graph));
   const [notice, setNotice] = useState<string | null>(null);
+  const [aiNotice] = useState<string | null>(() => readNotice());
   const [isPlaying, setIsPlaying] = useState(false);
   const [exportKey, setExportKey] = useState<number | null>(null);
   const playerRef = useRef<PlayerRef | null>(null);
@@ -91,6 +92,12 @@ export default function SimpleEditor() {
           ← Nuevo vídeo
         </Link>
       </header>
+
+      {aiNotice && (
+        <div role="status" className="mx-6 mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {aiNotice}
+        </div>
+      )}
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-6 pb-10 grid grid-cols-1 lg:grid-cols-[1fr_22rem] gap-8 items-start">
         <section className="flex flex-col items-center gap-4">

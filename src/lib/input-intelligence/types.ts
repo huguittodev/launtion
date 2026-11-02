@@ -49,6 +49,10 @@ export interface SynthesizerOptions {
   productContext?: InputContext;
   assetDataUri?: string;
   assetFilename?: string;
+  /** width/height of the user's recording (used to map detected pixels onto the canvas). */
+  mediaAspect?: number;
+  /** Duration in seconds when the media is a video. */
+  mediaDurationSeconds?: number;
 }
 
 export interface FallbackOptions {
