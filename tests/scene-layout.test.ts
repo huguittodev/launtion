@@ -206,6 +206,7 @@ describe('stage layout', () => {
       'media_showcase',
       'metric_cards',
       'product_interaction_3d',
+      'saas_feature_grid',
       'synthetic_code_tree',
       'synthetic_connect_pills',
       'synthetic_hero_button',

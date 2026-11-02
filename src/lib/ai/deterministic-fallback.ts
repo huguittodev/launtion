@@ -180,21 +180,23 @@ export function generateDeterministicSceneGraph(rawBrief: ProductBrief | Product
     { frame: durationInFrames, x: 0.90, y: 0.90 },
   ];
 
-  // 6. Synchronized Audio Track with Allowlisted SFX
+  // 6. Synchronized Cinematic Audio Track (Iman Gadzhi SaaS high-energy style)
   const audioTrack: AudioCue[] = [
-    { id: 'cue-ambient-main', frame: 0, asset: 'ambient-beat', volume: 0.35, fadeInFrames: 15, fadeOutFrames: 45 },
+    { id: 'cue-ambient-main', frame: 0, asset: 'ambient-beat', volume: 0.28, fadeInFrames: 15, fadeOutFrames: 45 },
     { id: 'cue-keyboard-tap', frame: 10, asset: 'keyboard-tap', volume: 0.45 },
     { id: 'cue-click-prompt', frame: 65, asset: 'mouse-click', volume: 0.85 },
-    { id: 'cue-whoosh-surface', frame: 90, asset: 'camera-whoosh', volume: 0.45 },
-    { id: 'cue-whoosh-focus', frame: 120, asset: 'camera-whoosh', volume: 0.40 },
+    { id: 'cue-riser-1', frame: 70, asset: 'sound-riser', volume: 0.65 },
+    { id: 'cue-impact-surface', frame: 90, asset: 'sub-bass-drop', volume: 0.82 },
+    { id: 'cue-whoosh-surface', frame: 90, asset: 'transition-whoosh-heavy', volume: 0.72 },
     { id: 'cue-click-deploy', frame: 150, asset: 'mouse-click', volume: 0.85 },
     { id: 'cue-chime-deploy', frame: 190, asset: 'chime', volume: 0.75 },
-    { id: 'cue-whoosh-tree', frame: 240, asset: 'camera-whoosh', volume: 0.45 },
-    { id: 'cue-pop-nodes', frame: 260, asset: 'soft-pop', volume: 0.55 },
-    { id: 'cue-whoosh-hero', frame: 330, asset: 'camera-whoosh', volume: 0.45 },
-    { id: 'cue-click-hero', frame: 365, asset: 'mouse-click', volume: 0.85 },
-    { id: 'cue-chime-closing', frame: 400, asset: 'chime', volume: 0.70 },
-    { id: 'cue-chime-finale', frame: 440, asset: 'chime', volume: 0.65 },
+    { id: 'cue-pop-nodes', frame: 250, asset: 'pop-clean', volume: 0.60 },
+    { id: 'cue-trans-hero', frame: 328, asset: 'transition-whoosh-heavy', volume: 0.68 },
+    { id: 'cue-riser-cta', frame: 340, asset: 'sound-riser', volume: 0.70 },
+    { id: 'cue-click-hero', frame: 365, asset: 'mouse-click', volume: 0.88 },
+    { id: 'cue-success', frame: 380, asset: 'success-chime', volume: 0.82 },
+    { id: 'cue-trans-closing', frame: 398, asset: 'transition-whoosh-heavy', volume: 0.75 },
+    { id: 'cue-chime-closing', frame: 420, asset: 'chime', volume: 0.70, fadeOutFrames: 30 },
   ];
 
   const graph: SceneGraph = {

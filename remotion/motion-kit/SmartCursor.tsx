@@ -133,6 +133,13 @@ export const SmartCursor: React.FC<SmartCursorProps> = ({
     }
   }
 
+  // Smooth parking fade: cursor fades out when parked in the periphery (>= 0.92)
+  const parkCoord = Math.min(state.x, state.y);
+  const cursorOpacity = interpolate(parkCoord, [0.88, 0.94], [1, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+
   return (
     <CursorPointer
       x={state.x}
@@ -145,6 +152,9 @@ export const SmartCursor: React.FC<SmartCursorProps> = ({
       color={color}
       accentColor={accentColor}
       showRipple={showRipple}
+      style={{
+        opacity: cursorOpacity,
+      }}
     />
   );
 };

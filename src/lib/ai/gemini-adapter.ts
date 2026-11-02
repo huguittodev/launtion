@@ -50,28 +50,27 @@ Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-qual
     { "frame": 480, "x": 0.5, "y": 0.5, "zoom": 1.0, "rotateX": 0.0, "rotateY": 0.0, "rotateZ": 0, "easing": "ease-in-out" }
   ],
   "cursorTrack": [
-    { "frame": 0, "x": 0.85, "y": 0.85 },
-    { "frame": 65, "x": 0.70, "y": 0.65, "controlX": 0.78, "controlY": 0.80, "click": true },
-    { "frame": 110, "x": 0.30, "y": 0.75 },
-    { "frame": 150, "x": 0.72, "y": 0.34, "controlX": 0.55, "controlY": 0.42, "click": true },
-    { "frame": 200, "x": 0.88, "y": 0.85, "controlX": 0.82, "controlY": 0.60 },
-    { "frame": 365, "x": 0.50, "y": 0.50, "controlX": 0.65, "controlY": 0.60, "click": true },
-    { "frame": 420, "x": 0.90, "y": 0.90 },
-    { "frame": 480, "x": 0.90, "y": 0.90 }
+    { "frame": 0, "x": 0.95, "y": 0.95 },
+    { "frame": 240, "x": 0.95, "y": 0.95 },
+    { "frame": 265, "x": 0.50, "y": 0.55, "controlX": 0.75, "controlY": 0.80 },
+    { "frame": 280, "x": 0.50, "y": 0.50, "click": true },
+    { "frame": 310, "x": 0.95, "y": 0.95 },
+    { "frame": 480, "x": 0.95, "y": 0.95 }
   ],
   "audioTrack": [
-    { "id": "cue-ambient-main", "frame": 0, "asset": "ambient-beat", "volume": 0.35, "fadeInFrames": 15, "fadeOutFrames": 45 },
-    { "id": "cue-keyboard-tap", "frame": 10, "asset": "keyboard-tap", "volume": 0.45 },
-    { "id": "cue-click-prompt", "frame": 65, "asset": "mouse-click", "volume": 0.85 },
-    { "id": "cue-whoosh-surface", "frame": 90, "asset": "camera-whoosh", "volume": 0.45 },
-    { "id": "cue-whoosh-focus", "frame": 120, "asset": "camera-whoosh", "volume": 0.40 },
-    { "id": "cue-click-action", "frame": 150, "asset": "mouse-click", "volume": 0.85 },
-    { "id": "cue-chime-action", "frame": 190, "asset": "chime", "volume": 0.75 },
-    { "id": "cue-whoosh-tree", "frame": 240, "asset": "camera-whoosh", "volume": 0.45 },
-    { "id": "cue-pop-nodes", "frame": 260, "asset": "soft-pop", "volume": 0.55 },
-    { "id": "cue-whoosh-hero", "frame": 330, "asset": "camera-whoosh", "volume": 0.45 },
-    { "id": "cue-click-hero", "frame": 365, "asset": "mouse-click", "volume": 0.85 },
-    { "id": "cue-chime-closing", "frame": 400, "asset": "chime", "volume": 0.70 }
+    { "id": "cue-ambient", "frame": 0, "asset": "ambient-beat", "volume": 0.28, "fadeInFrames": 15, "fadeOutFrames": 30 },
+    { "id": "cue-riser-1", "frame": 55, "asset": "sound-riser", "volume": 0.65 },
+    { "id": "cue-impact-1", "frame": 88, "asset": "sub-bass-drop", "volume": 0.82 },
+    { "id": "cue-trans-1", "frame": 88, "asset": "transition-whoosh-heavy", "volume": 0.72 },
+    { "id": "cue-pop-1", "frame": 110, "asset": "pop-clean", "volume": 0.65 },
+    { "id": "cue-pop-2", "frame": 128, "asset": "pop-clean", "volume": 0.62 },
+    { "id": "cue-pop-3", "frame": 146, "asset": "pop-clean", "volume": 0.60 },
+    { "id": "cue-trans-2", "frame": 238, "asset": "transition-whoosh-heavy", "volume": 0.68 },
+    { "id": "cue-riser-cta", "frame": 250, "asset": "sound-riser", "volume": 0.70 },
+    { "id": "cue-click-hero", "frame": 280, "asset": "click-switch", "volume": 0.88 },
+    { "id": "cue-success", "frame": 295, "asset": "success-chime", "volume": 0.82 },
+    { "id": "cue-trans-closing", "frame": 338, "asset": "transition-whoosh-heavy", "volume": 0.75 },
+    { "id": "cue-chime-end", "frame": 410, "asset": "chime", "volume": 0.70, "fadeOutFrames": 30 }
   ],
   "scenes": [
     {
@@ -132,6 +131,7 @@ Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-qual
 3. Supported scene types:
     - "kinetic_typography": Punchy words hook.
     - "metric_cards": KPI results cards (metrics: array of {value, label, trend}).
+    - "saas_feature_grid": 2×2 or 3-column SaaS feature grid with emoji icons (headline, features: array of {icon, name, description}).
     - "conversational_mockup": WhatsApp/Chat demo (messages: array of {sender: 'user'|'assistant', text, time}).
     - "media_showcase": User image/video screenshot with cinematic zoom (headline, tagline, zoomScale).
     - "synthetic_prompt_box": AI prompt command box (textToType, typingSpeed).
@@ -140,9 +140,17 @@ Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-qual
 4. Procedural Variety Rule:
     - If the product is about WhatsApp, appointments, bookings, chat, or support -> use conversational_mockup.
     - If it's about metrics, growth, finance, performance, or sales -> use metric_cards.
+    - If it highlights key features, capabilities, or tools -> use saas_feature_grid.
     - NEVER use synthetic_code_tree for non-developer products!
 5. All keyframes, cues, and scene start frames MUST be <= 480.
-6. Allowed audio assets: "ambient-beat", "mouse-click", "camera-whoosh", "keyboard-tap", "soft-pop", "chime".
+6. Allowed audio assets & cinematic sound design:
+    - Bed: "ambient-beat" (nominal volume 0.25-0.35 throughout).
+    - Transitions: "transition-whoosh-heavy" (major scene cuts), "transition-whoosh-fast" (quick cuts), "camera-whoosh" (camera pans).
+    - Tension build: "sound-riser" (2-3 seconds build up before hero CTA or key reveal).
+    - Impacts: "sub-bass-drop" (cinematic deep impact on the first major reveal/hook payoff), "pop-clean" / "soft-pop" (cards/tiles popping in).
+    - Actions: "click-switch" (punchy button click), "click-soft" / "mouse-click" (UI clicks), "keyboard-tap", "mechanical-tap-1" through "mechanical-tap-4" (typing).
+    - Payoff: "success-chime" (after CTA button press), "chime" (brand closing).
+    - Cinematics Rule: ALWAYS pair sub-bass-drop with transition-whoosh-heavy at the first major reveal. ALWAYS play sound-riser before the CTA click. ALWAYS trigger success-chime after the CTA button is clicked!
 7. Allowed backdrop variants: "dark-precision", "light-editorial", "aurora-blur", "solid".
 8. Allowed surface themes: "light", "dark".
 9. Primary accent must be a valid hex color code (e.g. "${DEFAULT_ACCENT}").
@@ -153,7 +161,10 @@ Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-qual
     - tagline <= 100 chars
     - headline <= 60 chars
     - title <= 50 chars
-11. Tailor all headlines, descriptions, button texts and scene copy specifically to the user's SaaS brief!`;
+11. Cursor interaction rules:
+    - Park the cursor at (0.95, 0.95) with NO clicks during visual scenes (kinetic_typography, metric_cards, saas_feature_grid, media_showcase, brand_closing_cta).
+    - ONLY move and click the cursor during interactive scenes (synthetic_hero_button, synthetic_prompt_box). Target coordinates must be (0.50, 0.50) and click frame must match the scene's clickFrame!
+12. Tailor all headlines, descriptions, button texts and scene copy specifically to the user's SaaS brief!`;
 
 /**
  * Builds the user prompt describing the SaaS product brief.
@@ -192,12 +203,24 @@ export function cleanModelJsonOutput(text: string): string {
 }
 
 const ALLOWED_AUDIO_ASSETS: readonly AudioAsset[] = [
+  'ambient-beat',
   'mouse-click',
   'camera-whoosh',
   'keyboard-tap',
-  'chime',
   'soft-pop',
-  'ambient-beat',
+  'chime',
+  'transition-whoosh-heavy',
+  'transition-whoosh-fast',
+  'sound-riser',
+  'sub-bass-drop',
+  'click-switch',
+  'click-soft',
+  'mechanical-tap-1',
+  'mechanical-tap-2',
+  'mechanical-tap-3',
+  'mechanical-tap-4',
+  'pop-clean',
+  'success-chime',
 ];
 
 const ALLOWED_BACKDROPS: readonly BackdropVariant[] = [
@@ -340,17 +363,61 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
       return item;
     });
   } else {
-    // Synthesize biomechanical cursor keyframes if missing
-    candidate.cursorTrack = [
-      { frame: 0, x: 0.85, y: 0.85 },
-      { frame: 65, x: 0.70, y: 0.65, controlX: 0.78, controlY: 0.80, click: true },
-      { frame: 110, x: 0.30, y: 0.75 },
-      { frame: 150, x: 0.72, y: 0.34, controlX: 0.55, controlY: 0.42, click: true },
-      { frame: 200, x: 0.88, y: 0.85, controlX: 0.82, controlY: 0.60 },
-      { frame: 365, x: 0.50, y: 0.50, controlX: 0.65, controlY: 0.60, click: true },
-      { frame: 420, x: 0.90, y: 0.90 },
-      { frame: duration, x: 0.90, y: 0.90 },
-    ];
+    // Missing cursorTrack: synthesize scene-aware track based on candidate.scenes
+    const INTERACTIVE_TYPES = new Set([
+      'synthetic_hero_button',
+      'synthetic_prompt_box',
+      'synthetic_connect_pills',
+      'product_interaction_3d',
+    ]);
+    const rawScenes = Array.isArray(candidate.scenes) ? (candidate.scenes as Record<string, unknown>[]) : [];
+    const interactiveScenes = rawScenes.filter((s) => INTERACTIVE_TYPES.has(String(s.type)));
+
+    if (interactiveScenes.length === 0) {
+      candidate.cursorTrack = [
+        { frame: 0, x: 0.95, y: 0.95 },
+        { frame: duration, x: 0.95, y: 0.95 },
+      ];
+    } else {
+      const kfs: CursorKeyframe[] = [{ frame: 0, x: 0.95, y: 0.95 }];
+      for (const sc of interactiveScenes) {
+        const sStart = typeof sc.startFrame === 'number' ? sc.startFrame : 0;
+        const sDur = typeof sc.durationInFrames === 'number' ? sc.durationInFrames : 90;
+        const payload = (sc.payload as Record<string, unknown>) || {};
+
+        let targetX = 0.50;
+        let targetY = 0.50;
+        let clickFrame = sStart + Math.min(40, Math.floor(sDur / 2));
+
+        if (sc.type === 'synthetic_hero_button') {
+          targetX = 0.50;
+          targetY = 0.50;
+          if (typeof payload.clickFrame === 'number') {
+            clickFrame = Math.max(sStart, Math.min(sStart + sDur - 5, payload.clickFrame));
+          }
+        } else if (sc.type === 'synthetic_prompt_box') {
+          targetX = 0.50;
+          targetY = 0.55;
+          clickFrame = sStart + 25;
+        }
+
+        const moveStart = Math.max(0, clickFrame - 20);
+        const retreatEnd = Math.min(duration, clickFrame + 25);
+
+        kfs.push({ frame: moveStart, x: 0.95, y: 0.95 });
+        kfs.push({
+          frame: clickFrame,
+          x: targetX,
+          y: targetY,
+          controlX: 0.72,
+          controlY: 0.75,
+          click: true,
+        });
+        kfs.push({ frame: retreatEnd, x: 0.95, y: 0.95 });
+      }
+      kfs.push({ frame: duration, x: 0.95, y: 0.95 });
+      candidate.cursorTrack = kfs.sort((a, b) => a.frame - b.frame);
+    }
   }
 
   // 6. Audio Track (Support top-level audioTrack or nested audio.cues / audio.tracks)
@@ -389,20 +456,21 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
       })
       .filter(Boolean);
   } else {
-    // Default synchronized audio track
+    // Default synchronized cinematic audio track (Iman Gadzhi SaaS high-energy style)
     candidate.audioTrack = [
-      { id: 'cue-ambient-main', frame: 0, asset: 'ambient-beat', volume: 0.35, fadeInFrames: 15, fadeOutFrames: 45 },
-      { id: 'cue-keyboard-tap', frame: 10, asset: 'keyboard-tap', volume: 0.45 },
-      { id: 'cue-click-prompt', frame: 65, asset: 'mouse-click', volume: 0.85 },
-      { id: 'cue-whoosh-surface', frame: 90, asset: 'camera-whoosh', volume: 0.45 },
-      { id: 'cue-whoosh-focus', frame: 120, asset: 'camera-whoosh', volume: 0.40 },
-      { id: 'cue-click-action', frame: 150, asset: 'mouse-click', volume: 0.85 },
-      { id: 'cue-chime-action', frame: 190, asset: 'chime', volume: 0.75 },
-      { id: 'cue-whoosh-tree', frame: 240, asset: 'camera-whoosh', volume: 0.45 },
-      { id: 'cue-pop-nodes', frame: 260, asset: 'soft-pop', volume: 0.55 },
-      { id: 'cue-whoosh-hero', frame: 330, asset: 'camera-whoosh', volume: 0.45 },
-      { id: 'cue-click-hero', frame: 365, asset: 'mouse-click', volume: 0.85 },
-      { id: 'cue-chime-closing', frame: 400, asset: 'chime', volume: 0.70 },
+      { id: 'cue-ambient-main', frame: 0, asset: 'ambient-beat', volume: 0.28, fadeInFrames: 15, fadeOutFrames: 45 },
+      { id: 'cue-riser-1', frame: 55, asset: 'sound-riser', volume: 0.65 },
+      { id: 'cue-impact-1', frame: 88, asset: 'sub-bass-drop', volume: 0.82 },
+      { id: 'cue-trans-1', frame: 88, asset: 'transition-whoosh-heavy', volume: 0.72 },
+      { id: 'cue-pop-1', frame: 110, asset: 'pop-clean', volume: 0.65 },
+      { id: 'cue-pop-2', frame: 128, asset: 'pop-clean', volume: 0.62 },
+      { id: 'cue-pop-3', frame: 146, asset: 'pop-clean', volume: 0.60 },
+      { id: 'cue-trans-2', frame: 238, asset: 'transition-whoosh-heavy', volume: 0.68 },
+      { id: 'cue-riser-cta', frame: 250, asset: 'sound-riser', volume: 0.70 },
+      { id: 'cue-click-hero', frame: 280, asset: 'click-switch', volume: 0.88 },
+      { id: 'cue-success', frame: 295, asset: 'success-chime', volume: 0.82 },
+      { id: 'cue-trans-closing', frame: 338, asset: 'transition-whoosh-heavy', volume: 0.75 },
+      { id: 'cue-chime-end', frame: 410, asset: 'chime', volume: 0.70, fadeOutFrames: 30 },
     ];
   }
 
@@ -450,6 +518,17 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
             { value: '+85%', label: 'Mayor Eficiencia', trend: 'Medido en producción' },
             { value: '10x', label: 'Ahorro de Tiempo', trend: 'Automatización total' },
             { value: '99.9%', label: 'Disponibilidad', trend: 'SLA garantizado' },
+          ];
+        }
+      }
+      if (type === 'saas_feature_grid') {
+        if (!payload.headline) payload.headline = `${brief.productName} Features`;
+        if (!Array.isArray(payload.features) || payload.features.length < 2) {
+          payload.features = [
+            { icon: '⚡', name: 'Instant Setup', description: 'Live in under 5 minutes' },
+            { icon: '🔒', name: 'Enterprise Security', description: 'End-to-end encrypted' },
+            { icon: '📊', name: 'Real-time Analytics', description: 'Track every metric that matters' },
+            { icon: '🤖', name: 'AI Automation', description: 'Automate tasks intelligently' },
           ];
         }
       }

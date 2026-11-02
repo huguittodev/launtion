@@ -196,6 +196,18 @@ export const ConversationalMockupPayloadSchema = z.object({
   messages: z.array(ChatMessageItemSchema),
 });
 
+export const SaaSFeatureItemSchema = z.object({
+  icon: z.string().max(10),
+  name: z.string().max(40),
+  description: z.string().max(120),
+});
+
+export const SaaSFeatureGridPayloadSchema = z.object({
+  headline: z.string().max(80),
+  features: z.array(SaaSFeatureItemSchema).min(2).max(6),
+  staggerFrames: z.number().int().min(1).max(30).optional(),
+});
+
 const baseSceneFields = {
   id: z.string().min(1),
   startFrame: z.number().int().nonnegative(),
@@ -259,6 +271,11 @@ export const SceneNodeSchema = z.discriminatedUnion('type', [
     ...baseSceneFields,
     type: z.literal('conversational_mockup'),
     payload: ConversationalMockupPayloadSchema,
+  }),
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('saas_feature_grid'),
+    payload: SaaSFeatureGridPayloadSchema,
   }),
 ]);
 

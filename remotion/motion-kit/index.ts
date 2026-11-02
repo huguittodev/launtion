@@ -15,3 +15,4 @@ export * from './SyntheticUI/SyntheticCodeTree';
 export * from './MediaShowcase';
 export * from './MetricCardsShowcase';
 export * from './ConversationalMockup';
+export * from './SaaSFeatureGrid';

@@ -37,6 +37,7 @@ import {
   MediaShowcase,
   MetricCardsShowcase,
   ConversationalMockup,
+  SaaSFeatureGrid,
   type TreeNode,
 } from '../motion-kit';
 
@@ -1171,6 +1172,22 @@ export const SceneNodeRenderer: React.FC<SceneNodeRendererProps> = ({
           <ConversationalMockup
             headline={p.headline}
             messages={p.messages}
+            accentColor={artDirection.primaryAccent}
+            isDark={artDirection.surfaceTheme === 'dark'}
+            frame={seqFrame}
+          />
+        </div>
+      );
+    }
+
+    case 'saas_feature_grid': {
+      const p = node.payload;
+      return (
+        <div style={fullScreenCenterStyle}>
+          <SaaSFeatureGrid
+            headline={p.headline}
+            features={p.features}
+            staggerFrames={p.staggerFrames}
             accentColor={artDirection.primaryAccent}
             isDark={artDirection.surfaceTheme === 'dark'}
             frame={seqFrame}

@@ -196,6 +196,18 @@ export interface ConversationalMockupPayload {
   messages: ChatMessageItem[];
 }
 
+export interface SaaSFeatureItem {
+  icon: string;
+  name: string;
+  description: string;
+}
+
+export interface SaaSFeatureGridPayload {
+  headline: string;
+  features: SaaSFeatureItem[];
+  staggerFrames?: number;
+}
+
 /* Base Scene Node */
 export interface BaseSceneNode {
   id: string;
@@ -260,6 +272,11 @@ export interface ConversationalMockupSceneNode extends BaseSceneNode {
   payload: ConversationalMockupPayload;
 }
 
+export interface SaaSFeatureGridSceneNode extends BaseSceneNode {
+  type: 'saas_feature_grid';
+  payload: SaaSFeatureGridPayload;
+}
+
 /**
  * Discriminated union of all supported scene types.
  */
@@ -274,7 +291,8 @@ export type SceneNode =
   | BrandClosingCtaSceneNode
   | MediaShowcaseSceneNode
   | MetricCardsSceneNode
-  | ConversationalMockupSceneNode;
+  | ConversationalMockupSceneNode
+  | SaaSFeatureGridSceneNode;
 
 /**
  * Root SceneGraph contract driving Remotion composition rendering.
