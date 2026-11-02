@@ -4,6 +4,7 @@
  */
 
 import { clamp, clamp01, distanceNormalized } from '../interaction-map/CoordinateMapper';
+import { DEFAULT_ACCENT } from '../design/tokens';
 import type { InteractionEvent, InteractionMap } from '../interaction-map/types';
 import type {
   AudioCue,
@@ -598,7 +599,7 @@ export function interactionToSceneGraphAdapter(
     artDirection: {
       backdropVariant: options?.artDirection?.backdropVariant ?? 'dark-precision',
       surfaceTheme: options?.artDirection?.surfaceTheme ?? 'dark',
-      primaryAccent: options?.artDirection?.primaryAccent ?? '#FF5C35',
+      primaryAccent: options?.artDirection?.primaryAccent ?? DEFAULT_ACCENT,
     },
     cameraTrack,
     cursorTrack,

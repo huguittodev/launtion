@@ -9,6 +9,7 @@
 
 import { SceneGraphSchema } from '../scene-graph/schema';
 import type { MotionArchetype, SceneGraph } from '../scene-graph/types';
+import { neutral, sceneThemes, signal } from '../design/tokens';
 
 export interface SimpleTexts {
   hook: string;
@@ -40,7 +41,7 @@ export const STYLE_PRESETS: readonly StylePreset[] = [
     id: 'base44-studio',
     label: 'Base44 Studio',
     description: 'Crema cálido, UI flotante en 3D y tipografía bold.',
-    swatch: ['#F5F2EB', '#FF5C35'],
+    swatch: [sceneThemes.lightEditorial.background, sceneThemes.lightEditorial.accent],
     backdropVariant: 'light-editorial',
     surfaceTheme: 'light',
   },
@@ -48,7 +49,7 @@ export const STYLE_PRESETS: readonly StylePreset[] = [
     id: 'linear-dark',
     label: 'Linear Dark',
     description: 'Obsidiana con bordes de neón sutil y estilo ultra-limpio.',
-    swatch: ['#0D0D10', '#7C83FF'],
+    swatch: [sceneThemes.darkPrecision.background, signal.indigoBright],
     backdropVariant: 'dark-precision',
     surfaceTheme: 'dark',
   },
@@ -56,7 +57,7 @@ export const STYLE_PRESETS: readonly StylePreset[] = [
     id: 'bento-grid',
     label: 'Bento Grid',
     description: 'Retícula de funcionalidades que converge al centro.',
-    swatch: ['#EDEAE2', '#181716'],
+    swatch: [neutral.stone, neutral.ink],
     backdropVariant: 'solid',
     surfaceTheme: 'light',
   },
@@ -64,7 +65,7 @@ export const STYLE_PRESETS: readonly StylePreset[] = [
     id: 'kinetic-hook',
     label: 'Kinetic Hook',
     description: 'Palabras gigantes animadas antes de revelar la app.',
-    swatch: ['#16121F', '#FF5C35'],
+    swatch: [sceneThemes.playful.background, sceneThemes.playful.accent],
     backdropVariant: 'aurora-blur',
     surfaceTheme: 'dark',
   },

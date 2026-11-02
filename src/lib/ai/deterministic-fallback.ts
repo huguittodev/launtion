@@ -10,6 +10,7 @@
  */
 
 import { HexColorRegex, SceneGraphSchema } from '../scene-graph/schema';
+import { DEFAULT_ACCENT } from '../design/tokens';
 import type {
   AudioCue,
   BackdropVariant,
@@ -56,8 +57,8 @@ export function generateDeterministicSceneGraph(rawBrief: ProductBrief | Product
   }
 
   // Accent color resolution with strict regex check
-  const candidateAccent = brief.accentColor || brief.primaryColor || '#FF5C35';
-  const primaryAccent = HexColorRegex.test(candidateAccent) ? candidateAccent : '#FF5C35';
+  const candidateAccent = brief.accentColor || brief.primaryColor || DEFAULT_ACCENT;
+  const primaryAccent = HexColorRegex.test(candidateAccent) ? candidateAccent : DEFAULT_ACCENT;
 
   // 2. Synthesize Content Strings
   const productName = brief.productName.trim().slice(0, 50);

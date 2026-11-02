@@ -1,5 +1,6 @@
 import React from 'react';
 import { Easing, interpolate } from 'remotion';
+import { neutral } from '../../../src/lib/design/tokens';
 
 export interface TreeNode {
   label: string;
@@ -65,14 +66,14 @@ export const SyntheticCodeTree: React.FC<SyntheticCodeTreeProps> = ({
           transform: `translateX(${titleTranslateX}px)`,
           fontSize: 48,
           fontWeight: 650,
-          color: '#181716',
+          color: neutral.ink,
           letterSpacing: '-0.03em',
           display: 'flex',
           alignItems: 'center',
           gap: 12,
         }}
       >
-        <span style={{ color: '#88847C', fontSize: 36 }}>▾</span>
+        <span style={{ color: neutral.textFaint, fontSize: 36 }}>▾</span>
         <span>{title}</span>
       </div>
 
@@ -102,19 +103,19 @@ export const SyntheticCodeTree: React.FC<SyntheticCodeTreeProps> = ({
                 gap: 12,
                 fontSize: 34,
                 fontWeight: node.isFolder ? 600 : 450,
-                color: node.isFolder ? '#181716' : '#555148',
+                color: node.isFolder ? neutral.ink : neutral.textSecondary,
                 letterSpacing: '-0.02em',
               }}
             >
               {node.isFolder ? (
-                <span style={{ color: '#88847C', fontSize: 24 }}>▾</span>
+                <span style={{ color: neutral.textFaint, fontSize: 24 }}>▾</span>
               ) : (
                 <svg
                   width="22"
                   height="22"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#88847C"
+                  stroke={neutral.textFaint}
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"

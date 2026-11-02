@@ -1,6 +1,7 @@
 import React from 'react';
 import { interpolate } from 'remotion';
 import type { MotionArchetype } from '../../src/lib/scene-graph/types';
+import { neutral, sceneThemes } from '../../src/lib/design/tokens';
 
 export type { MotionArchetype };
 
@@ -56,7 +57,7 @@ export const DynamicBackdrop: React.FC<DynamicBackdropProps> = ({
   );
 
   if (variant === 'dark-precision' || archetype === 'linear-dark') {
-    const darkBg = backgroundColor ?? '#0D0D10';
+    const darkBg = backgroundColor ?? sceneThemes.darkPrecision.background;
     const glow = accentGlow ?? 'rgba(94, 106, 210, 0.16)';
     return (
       <div
@@ -98,7 +99,7 @@ export const DynamicBackdrop: React.FC<DynamicBackdropProps> = ({
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: backgroundColor ?? '#FAF8F4',
+          backgroundColor: backgroundColor ?? neutral.paper,
           overflow: 'hidden',
           zIndex: 0,
         }}
@@ -150,8 +151,8 @@ export const DynamicBackdrop: React.FC<DynamicBackdropProps> = ({
     );
   }
 
-  // 'light-editorial' o 'base44-studio' por defecto (Warm Cream #F5F2EB)
-  const creamBg = backgroundColor ?? '#F5F2EB';
+  // 'light-editorial' o 'base44-studio' por defecto (Warm Cream)
+  const creamBg = backgroundColor ?? sceneThemes.lightEditorial.background;
   return (
     <div
       style={{

@@ -1,13 +1,8 @@
 @import "tailwindcss";
-
-:root {
-  --background: #fbfbfa;
-  --foreground: #1a1a1a;
-}
+@import "./tokens.generated.css";
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--ui-background);
+  color: var(--ui-foreground);
+  font-family: var(--font-sans);
 }
-

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Easing, interpolate } from 'remotion';
+import { sceneThemes } from '../../src/lib/design/tokens';
 
 export interface KineticTypographyProps {
   frame: number;
@@ -39,9 +40,9 @@ export const KineticTypography: React.FC<KineticTypographyProps> = ({
 }) => {
   const isHookMode = mode === 'kinetic-hook';
   const {
-    textColor = '#141413',
-    accentColor = '#FF5C35',
-    symbolColor = '#A19E95',
+    textColor = sceneThemes.lightEditorial.textPrimary,
+    accentColor = sceneThemes.lightEditorial.accent,
+    symbolColor = sceneThemes.lightEditorial.textTertiary,
     fontSize = isHookMode ? 96 : 84,
     maxWidth = 1280,
   } = theme;

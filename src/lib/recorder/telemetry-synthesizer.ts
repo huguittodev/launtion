@@ -10,6 +10,7 @@
 
 import { CoordinateMapper } from '../interaction-map/CoordinateMapper';
 import { InteractionMapSchema } from '../interaction-map/schema';
+import { DEFAULT_ACCENT } from '../design/tokens';
 import type { InteractionEvent, InteractionMap } from '../interaction-map/types';
 import { interactionToSceneGraphAdapter } from '../scene-graph/adapter';
 import { SceneGraphSchema } from '../scene-graph/schema';
@@ -237,7 +238,7 @@ export function adaptObservedSessionToSceneGraph(
     artDirection: {
       backdropVariant: 'dark-precision',
       surfaceTheme: 'dark',
-      primaryAccent: '#FF5C35',
+      primaryAccent: DEFAULT_ACCENT,
     },
     camera: {
       overviewZoom: options?.overviewZoom ?? 1.0,

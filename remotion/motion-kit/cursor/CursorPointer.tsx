@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { neutral, sceneThemes } from '../../../src/lib/design/tokens';
 
 export interface CursorPointerProps {
   x: number; // Horizontal position (normalized 0-1 or percentage 0-100)
@@ -14,8 +15,8 @@ export interface CursorPointerProps {
   rippleRadius?: number; // Expanding shockwave radius in pixels
   rippleOpacity?: number; // Shockwave opacity [0, 1]
   size?: number; // Cursor size in pixels (default: 32)
-  color?: string; // Fill color (default: '#181716')
-  accentColor?: string; // Ripple and highlight accent (default: '#FF5C35')
+  color?: string; // Fill color (default: neutral.ink)
+  accentColor?: string; // Ripple and highlight accent (default: brand accent)
   showRipple?: boolean; // Whether ripple is enabled (default: true)
   showShadow?: boolean; // Whether drop shadows are rendered (default: true)
   style?: React.CSSProperties;
@@ -29,8 +30,8 @@ export const CursorPointer: React.FC<CursorPointerProps> = ({
   rippleRadius = 0,
   rippleOpacity = 0,
   size = 32,
-  color = '#181716',
-  accentColor = '#FF5C35',
+  color = neutral.ink,
+  accentColor = sceneThemes.lightEditorial.accent,
   showRipple = true,
   showShadow = true,
   style,
@@ -103,7 +104,7 @@ export const CursorPointer: React.FC<CursorPointerProps> = ({
           <path
             d="M0 0L7.5 19L10.8 11.8L18 8.5L0 0Z"
             fill={color}
-            stroke="#FFFFFF"
+            stroke={neutral.white}
             strokeWidth="1.8"
             strokeLinejoin="round"
             strokeLinecap="round"

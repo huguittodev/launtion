@@ -20,6 +20,7 @@ import type {
 } from '../scene-graph/types';
 import { type ProductBrief, type ProductBriefInput, ProductBriefSchema } from './brief-schema';
 import { generateDeterministicSceneGraph } from './deterministic-fallback';
+import { DEFAULT_ACCENT } from '../design/tokens';
 
 export const CREATIVE_DIRECTOR_SYSTEM_PROMPT = `You are the Executive Creative Director of Vidiaura, an automated video motion graphics studio.
 Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-quality SceneGraph JSON (v2.0) for Remotion.
@@ -32,7 +33,7 @@ Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-qual
 5. Allowed audio assets: "ambient-beat", "mouse-click", "camera-whoosh", "keyboard-tap", "soft-pop", "chime".
 6. Allowed backdrop variants: "dark-precision", "light-editorial", "aurora-blur", "solid".
 7. Allowed surface themes: "light", "dark".
-8. Primary accent must be a valid hex color code (e.g. "#FF5C35").
+8. Primary accent must be a valid hex color code (e.g. "${DEFAULT_ACCENT}").
 9. Zoom values must be between 0.8 and 3.5. Hero inspection zooms must be 1.8 to 2.4.
 10. String limits:
     - prompt textToType <= 200 chars
@@ -61,7 +62,7 @@ export function buildCreativeDirectorUserPrompt(brief: ProductBrief): string {
     targetAudience: brief.targetAudience ?? 'Modern Software Teams',
     goal: brief.goal ?? 'launch',
     tone: brief.tone ?? 'tech-precision',
-    primaryColor: brief.primaryColor || brief.accentColor || '#FF5C35',
+    primaryColor: brief.primaryColor || brief.accentColor || DEFAULT_ACCENT,
     features: brief.features ?? [],
     ctaText: brief.ctaText ?? 'Get Started Free',
     durationInFrames: 480,
@@ -142,9 +143,9 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
     surfaceTheme = 'dark';
   }
 
-  let primaryAccent = String(rawArt.primaryAccent || brief.accentColor || brief.primaryColor || '#FF5C35');
+  let primaryAccent = String(rawArt.primaryAccent || brief.accentColor || brief.primaryColor || DEFAULT_ACCENT);
   if (!HexColorRegex.test(primaryAccent)) {
-    primaryAccent = '#FF5C35';
+    primaryAccent = DEFAULT_ACCENT;
   }
 
   candidate.artDirection = {

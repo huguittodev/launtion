@@ -1,5 +1,6 @@
 import React from 'react';
 import { Easing, interpolate } from 'remotion';
+import { signal } from '../../src/lib/design/tokens';
 
 export interface IconGridMorphProps {
   frame: number;
@@ -21,8 +22,8 @@ export const IconGridMorph: React.FC<IconGridMorphProps> = ({
   rows = 4,
   cols = 7,
   startFrame = 0,
-  initialColor = '#EF4444',
-  targetColor = '#22C55E',
+  initialColor = signal.red,
+  targetColor = signal.green,
   waveStartFrame = 15,
 }) => {
   const currentElapsed = Math.max(0, frame - startFrame);

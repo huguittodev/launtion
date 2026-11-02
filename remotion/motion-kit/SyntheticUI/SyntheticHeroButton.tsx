@@ -1,5 +1,6 @@
 import React from 'react';
 import { Easing, interpolate } from 'remotion';
+import { alpha, neutral } from '../../../src/lib/design/tokens';
 
 export interface SyntheticHeroButtonProps {
   frame: number;
@@ -30,9 +31,9 @@ export const SyntheticHeroButton: React.FC<SyntheticHeroButtonProps> = ({
   icon,
 }) => {
   const {
-    backgroundColor = '#181716',
-    textColor = '#FFFFFF',
-    glowColor = 'rgba(255, 92, 53, 0.28)',
+    backgroundColor = neutral.ink,
+    textColor = neutral.white,
+    glowColor = alpha.accentGlow,
     borderRadius = 22,
     fontSize = 32,
   } = theme;

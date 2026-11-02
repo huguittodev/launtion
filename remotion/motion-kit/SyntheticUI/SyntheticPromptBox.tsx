@@ -1,5 +1,6 @@
 import React from 'react';
 import { Easing, interpolate } from 'remotion';
+import { neutral, sceneThemes } from '../../../src/lib/design/tokens';
 
 export interface SyntheticPromptBoxProps {
   frame: number;
@@ -29,10 +30,10 @@ export const SyntheticPromptBox: React.FC<SyntheticPromptBoxProps> = ({
   theme = {},
 }) => {
   const {
-    backgroundColor = '#FFFFFF',
-    borderColor = '#EBE7DE',
-    textColor = '#191816',
-    accentColor = '#FF5C35',
+    backgroundColor = sceneThemes.lightEditorial.surface,
+    borderColor = neutral.borderInput,
+    textColor = neutral.inkWarm,
+    accentColor = sceneThemes.lightEditorial.accent,
   } = theme;
 
   const currentElapsed = Math.max(0, frame - startFrame);
@@ -117,7 +118,7 @@ export const SyntheticPromptBox: React.FC<SyntheticPromptBoxProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderTop: '1px solid #F3EFE9',
+          borderTop: `1px solid ${neutral.divider}`,
           paddingTop: 16,
         }}
       >
@@ -127,11 +128,11 @@ export const SyntheticPromptBox: React.FC<SyntheticPromptBoxProps> = ({
             width: 38,
             height: 38,
             borderRadius: 12,
-            backgroundColor: '#F7F5F0',
+            backgroundColor: neutral.well,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#76726A',
+            color: neutral.textMuted,
             fontSize: 22,
             fontWeight: 400,
           }}
@@ -150,7 +151,7 @@ export const SyntheticPromptBox: React.FC<SyntheticPromptBoxProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#8A867E',
+              color: neutral.textSubtle,
             }}
           >
             <svg
@@ -175,11 +176,11 @@ export const SyntheticPromptBox: React.FC<SyntheticPromptBoxProps> = ({
               width: 44,
               height: 44,
               borderRadius: 14,
-              backgroundColor: isTypingComplete ? '#181716' : '#E6E2D9',
+              backgroundColor: isTypingComplete ? neutral.ink : neutral.disabled,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#FFFFFF',
+              color: neutral.white,
               transform: `scale(${buttonHighlight})`,
               transition: 'background-color 0.2s ease',
               boxShadow: isTypingComplete

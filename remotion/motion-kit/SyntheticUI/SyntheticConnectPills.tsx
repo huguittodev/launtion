@@ -1,5 +1,6 @@
 import React from 'react';
 import { Easing, interpolate } from 'remotion';
+import { neutral, sceneThemes } from '../../../src/lib/design/tokens';
 
 export interface SyntheticConnectPillsProps {
   frame: number;
@@ -25,9 +26,9 @@ export const SyntheticConnectPills: React.FC<SyntheticConnectPillsProps> = ({
   theme = {},
 }) => {
   const {
-    sourceColor = '#181716',
-    targetColor = '#FF5C35',
-    accentColor = '#FF5C35',
+    sourceColor = neutral.ink,
+    targetColor = sceneThemes.lightEditorial.accent,
+    accentColor = sceneThemes.lightEditorial.accent,
   } = theme;
 
   const currentElapsed = Math.max(0, frame - startFrame);
@@ -87,8 +88,8 @@ export const SyntheticConnectPills: React.FC<SyntheticConnectPillsProps> = ({
           transform: `translateX(${sourceSlideX}px)`,
           padding: '16px 36px',
           borderRadius: 9999,
-          border: '1.5px solid #181716',
-          backgroundColor: '#FFFFFF',
+          border: `1.5px solid ${neutral.ink}`,
+          backgroundColor: neutral.white,
           color: sourceColor,
           fontSize: 26,
           fontWeight: 600,
@@ -106,12 +107,12 @@ export const SyntheticConnectPills: React.FC<SyntheticConnectPillsProps> = ({
           width: 48,
           height: 48,
           borderRadius: '50%',
-          border: '1.5px solid #D6D2C7',
-          backgroundColor: '#FAF8F4',
+          border: `1.5px solid ${neutral.borderStrong}`,
+          backgroundColor: neutral.paper,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#555148',
+          color: neutral.textSecondary,
           boxShadow: `0 0 ${beamPulse * 28}px ${accentColor}`,
           transition: 'box-shadow 0.1s ease',
         }}
@@ -139,7 +140,7 @@ export const SyntheticConnectPills: React.FC<SyntheticConnectPillsProps> = ({
           padding: '16px 38px',
           borderRadius: 9999,
           border: `1.5px solid ${targetColor}`,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: neutral.white,
           color: targetColor,
           fontSize: 26,
           fontWeight: 650,

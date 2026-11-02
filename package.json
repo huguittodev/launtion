@@ -9,6 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "npx tsx --test tests/*.test.ts",
+    "tokens": "npx tsx scripts/generate-tokens-css.ts",
+    "tokens:verify": "npx tsx scripts/generate-tokens-css.ts --verify",
     "remotion": "remotion studio remotion/index.ts",
     "render": "remotion render remotion/index.ts InteractiveSurfaceDemo out/InteractionDemo.mp4",
     "render:showcase": "remotion render remotion/index.ts StudioShowcase out/StudioShowcase.mp4",

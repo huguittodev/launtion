@@ -1,0 +1,36 @@
+/*
+ * GENERATED FILE — do not edit.
+ * Source: src/lib/design/tokens.ts
+ * Regenerate: npm run tokens
+ */
+
+:root {
+  --brand-obsidian: #030303;
+  --brand-surface: #0a0a0c;
+  --brand-surface-raised: #121216;
+  --brand-border: rgba(255, 255, 255, 0.06);
+  --brand-purple: #7c3aed;
+  --brand-purple-glow: #a855f7;
+  --brand-purple-accent: #bf7afb;
+  --brand-success: #22c55e;
+  --brand-text: #ffffff;
+  --brand-text-secondary: #94a3b8;
+  --brand-text-muted: #64748b;
+  --ui-background: #fbfbfa;
+  --ui-foreground: #1a1a1a;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-xxl: 64px;
+  --motion-fps: 30;
+  --motion-beat-frames: 45;
+}

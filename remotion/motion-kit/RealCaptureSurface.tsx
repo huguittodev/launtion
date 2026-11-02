@@ -1,6 +1,7 @@
 import React from 'react';
 import { OffthreadVideo, Img } from 'remotion';
 import type { MotionArchetype } from '../../src/lib/scene-graph/types';
+import { neutral, sceneThemes, signal } from '../../src/lib/design/tokens';
 
 export type MediaType = 'video' | 'image' | null;
 
@@ -111,22 +112,32 @@ export const RealCaptureSurface: React.FC<RealCaptureSurfaceProps> = ({
   width = 1240,
   height = 'auto',
   archetype = 'base44-studio',
-  accentColor = '#FF5C35',
+  accentColor = sceneThemes.lightEditorial.accent,
   style,
 }) => {
   const targetUrl = mediaUrl || url;
   const resolvedType = mediaType || resolveMediaType(targetUrl);
 
   const isLinearDark = archetype === 'linear-dark';
-  const surfaceBg = isLinearDark ? '#121215' : '#FFFFFF';
-  const borderColor = isLinearDark ? 'rgba(255, 255, 255, 0.08)' : '#ECE7DE';
-  const glowColor = accentColor ?? '#5E6AD2';
+  const surfaceBg = isLinearDark
+    ? sceneThemes.darkPrecision.surface
+    : sceneThemes.lightEditorial.surface;
+  const borderColor = isLinearDark
+    ? sceneThemes.darkPrecision.border
+    : sceneThemes.lightEditorial.border;
+  const glowColor = accentColor ?? signal.indigo;
   const shadow = isLinearDark
     ? `0 0 0 1px ${glowColor}4D, 0 0 35px ${glowColor}2E, 0 32px 85px rgba(0, 0, 0, 0.85)`
     : '0 32px 85px -15px rgba(24, 23, 21, 0.14), 0 0 1px rgba(0, 0, 0, 0.12)';
-  const headerBg = isLinearDark ? '#141418' : '#FBF9F5';
-  const headerBorder = isLinearDark ? 'rgba(255, 255, 255, 0.06)' : '#EFEAE1';
-  const headerText = isLinearDark ? '#8A8F98' : '#8A867E';
+  const headerBg = isLinearDark
+    ? sceneThemes.darkPrecision.surfaceRaised
+    : sceneThemes.lightEditorial.surfaceRaised;
+  const headerBorder = isLinearDark
+    ? sceneThemes.darkPrecision.divider
+    : neutral.borderAlt;
+  const headerText = isLinearDark
+    ? sceneThemes.darkPrecision.textSecondary
+    : neutral.textSubtle;
 
   let content = children;
   if (targetUrl && resolvedType) {
@@ -194,7 +205,7 @@ export const RealCaptureSurface: React.FC<RealCaptureSurfaceProps> = ({
                 width: 11,
                 height: 11,
                 borderRadius: '50%',
-                backgroundColor: '#E75B4D',
+                backgroundColor: signal.trafficRed,
               }}
             />
             <div
@@ -202,7 +213,7 @@ export const RealCaptureSurface: React.FC<RealCaptureSurfaceProps> = ({
                 width: 11,
                 height: 11,
                 borderRadius: '50%',
-                backgroundColor: '#E7A93D',
+                backgroundColor: signal.trafficAmber,
               }}
             />
             <div
@@ -210,7 +221,7 @@ export const RealCaptureSurface: React.FC<RealCaptureSurfaceProps> = ({
                 width: 11,
                 height: 11,
                 borderRadius: '50%',
-                backgroundColor: '#4EBA5C',
+                backgroundColor: signal.trafficGreen,
               }}
             />
           </div>

@@ -12,6 +12,7 @@ import { Easing, interpolate } from 'remotion';
 import { interpolateCursorTrack, type Point2D } from './cursor/BezierPath';
 import { CursorPointer } from './cursor/CursorPointer';
 import type { CursorKeyframe } from '../../src/lib/scene-graph/types';
+import { neutral, sceneThemes } from '../../src/lib/design/tokens';
 
 export * from './cursor/BezierPath';
 export * from './cursor/CursorPointer';
@@ -48,8 +49,8 @@ export const SmartCursor: React.FC<SmartCursorProps> = ({
   endFrame = 30,
   clickFrame,
   size = 32,
-  color = '#181716',
-  accentColor = '#FF5C35',
+  color = neutral.ink,
+  accentColor = sceneThemes.lightEditorial.accent,
   showRipple = true,
 }) => {
   // Resolve keyframe track

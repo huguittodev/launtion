@@ -10,6 +10,7 @@
  */
 
 import { CoordinateMapper } from '../interaction-map/CoordinateMapper';
+import { DEFAULT_ACCENT } from '../design/tokens';
 import { InteractionMapSchema } from '../interaction-map/schema';
 import type { InteractionEvent, InteractionMap } from '../interaction-map/types';
 import { interactionToSceneGraphAdapter } from '../scene-graph/adapter';
@@ -284,7 +285,7 @@ export function adaptInferredInteractionToSceneGraph(
     artDirection: {
       backdropVariant: 'dark-precision',
       surfaceTheme: 'dark',
-      primaryAccent: '#FF5C35',
+      primaryAccent: DEFAULT_ACCENT,
     },
   });
 
