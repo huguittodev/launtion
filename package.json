@@ -14,6 +14,7 @@
     "remotion": "remotion studio remotion/index.ts",
     "render": "remotion render remotion/index.ts InteractiveSurfaceDemo out/InteractionDemo.mp4",
     "render:showcase": "remotion render remotion/index.ts StudioShowcase out/StudioShowcase.mp4",
+    "render:vidiaura": "remotion render remotion/index.ts VidiauraShowcase out/VidiauraShowcase.mp4",
     "render:legacy": "remotion render remotion/index.ts LaunchDemo out/LaunchDemo.mp4"
   },
   "dependencies": {

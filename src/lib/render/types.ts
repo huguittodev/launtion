@@ -37,7 +37,11 @@ export interface RenderSettings {
 }
 
 export interface RenderRequest {
-  compositionId: 'InteractiveSurfaceDemo' | 'StudioShowcase' | 'LaunchDemo';
+  compositionId:
+    | 'InteractiveSurfaceDemo'
+    | 'VidiauraShowcase'
+    | 'StudioShowcase'
+    | 'LaunchDemo';
   sceneGraph?: SceneGraph;
   settings?: Partial<RenderSettings>;
 }

@@ -8,6 +8,7 @@ import {
 } from './compositions/InteractiveSurfaceDemo';
 import { LaunchDemo } from './compositions/LaunchDemo';
 import { StudioShowcase } from './compositions/StudioShowcase';
+import { VidiauraShowcase } from './compositions/VidiauraShowcase';
 
 const calculateInteractiveSurfaceMetadata: CalculateMetadataFunction<InteractiveSurfaceDemoProps> = ({
   props,
@@ -66,8 +67,22 @@ export const Root: React.FC = () => {
         calculateMetadata={calculateVerticalMetadata}
       />
 
-      {/* Composición Publicitaria Estudio v2 — Motion Kit (Nivel Base44) */}
+      {/* Reference film (M3): 11 shots placed by the deterministic layout engine */}
       <Composition
+        id="VidiauraShowcase"
+        component={VidiauraShowcase}
+        durationInFrames={480}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{
+          productName: 'Vidiaura',
+          tagline: 'Motion graphics, on brief.',
+          website: 'vidiaura.com',
+        }}
+      />
+
+      {/* Composición Publicitaria Estudio v2 — Motion Kit (Nivel Base44) */}      <Composition
         id="StudioShowcase"
         component={StudioShowcase}
         durationInFrames={480} // 16 segundos a 30 FPS

@@ -57,7 +57,12 @@ export const RenderSettingsSchema = z.object({
 
 export const RenderRequestSchema = z.object({
   compositionId: z
-    .enum(['InteractiveSurfaceDemo', 'StudioShowcase', 'LaunchDemo'])
+    .enum([
+      'InteractiveSurfaceDemo',
+      'VidiauraShowcase',
+      'StudioShowcase',
+      'LaunchDemo',
+    ])
     .default('InteractiveSurfaceDemo'),
   sceneGraph: SceneGraphSchema.optional(),
   settings: RenderSettingsSchema.partial().default({}),

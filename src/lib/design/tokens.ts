@@ -82,6 +82,9 @@ export const alpha = {
   white12: 'rgba(255, 255, 255, 0.12)',
   accentGlow: 'rgba(255, 92, 53, 0.28)',
   purpleGlow: 'rgba(168, 85, 247, 0.22)',
+  purpleHalo: 'rgba(124, 58, 237, 0.45)',
+  shadowSoft: 'rgba(0, 0, 0, 0.28)',
+  shadowStrong: 'rgba(0, 0, 0, 0.55)',
 } as const;
 
 /** Current app chrome. Flips to `brand.obsidian` / `brand.text` in the repaint. */
