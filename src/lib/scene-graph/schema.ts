@@ -163,6 +163,39 @@ export const BrandClosingCtaPayloadSchema = z.object({
   buttonText: z.string().max(30).optional(),
 });
 
+export const MediaShowcasePayloadSchema = z.object({
+  mediaUrl: z.string().optional(),
+  mediaType: z.enum(['image', 'video']).optional(),
+  headline: z.string().max(80).optional(),
+  tagline: z.string().max(100).optional(),
+  zoomScale: z.number().min(1.0).max(2.5).optional(),
+  panDirection: z.enum(['none', 'left', 'right', 'up', 'down']).optional(),
+});
+
+export const MetricCardItemSchema = z.object({
+  value: z.string().min(1).max(20),
+  label: z.string().min(1).max(60),
+  trend: z.string().max(40).optional(),
+  badge: z.string().max(30).optional(),
+});
+
+export const MetricCardsPayloadSchema = z.object({
+  headline: z.string().max(80).optional(),
+  subheadline: z.string().max(120).optional(),
+  metrics: z.array(MetricCardItemSchema),
+});
+
+export const ChatMessageItemSchema = z.object({
+  sender: z.enum(['user', 'assistant']),
+  text: z.string().min(1).max(250),
+  time: z.string().max(10).optional(),
+});
+
+export const ConversationalMockupPayloadSchema = z.object({
+  headline: z.string().max(80).optional(),
+  messages: z.array(ChatMessageItemSchema),
+});
+
 const baseSceneFields = {
   id: z.string().min(1),
   startFrame: z.number().int().nonnegative(),
@@ -211,6 +244,21 @@ export const SceneNodeSchema = z.discriminatedUnion('type', [
     ...baseSceneFields,
     type: z.literal('brand_closing_cta'),
     payload: BrandClosingCtaPayloadSchema,
+  }),
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('media_showcase'),
+    payload: MediaShowcasePayloadSchema,
+  }),
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('metric_cards'),
+    payload: MetricCardsPayloadSchema,
+  }),
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('conversational_mockup'),
+    payload: ConversationalMockupPayloadSchema,
   }),
 ]);
 

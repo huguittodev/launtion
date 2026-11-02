@@ -77,6 +77,8 @@ export default function SimpleEditor() {
     for (const scene of copy.scenes) {
       if (scene.type === 'product_interaction_3d' && scene.payload.url === media.previewUrl) {
         scene.payload.url = media.dataUri;
+      } else if (scene.type === 'media_showcase' && scene.payload.mediaUrl === media.previewUrl) {
+        scene.payload.mediaUrl = media.dataUri;
       }
     }
     return copy;
@@ -94,8 +96,22 @@ export default function SimpleEditor() {
       </header>
 
       {aiNotice && (
-        <div role="status" className="mx-6 mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          {aiNotice}
+        <div
+          role="alert"
+          className="mx-6 mb-6 rounded-2xl border-2 border-red-400 bg-red-50 p-4 shadow-sm flex items-start gap-3 text-red-900"
+        >
+          <div className="text-xl leading-none">⚠️</div>
+          <div className="flex-1">
+            <h3 className="font-bold text-sm tracking-tight">
+              Aviso: Fallo de conexión con la IA (Modo de Respaldo Activado)
+            </h3>
+            <p className="text-xs text-red-800 mt-1 leading-relaxed">
+              {aiNotice}
+            </p>
+            <p className="text-[11px] text-red-600 font-mono mt-2">
+              Consejo: Verifica tu GEMINI_API_KEY en .env.local o la cuota en Google AI Studio.
+            </p>
+          </div>
         </div>
       )}
 

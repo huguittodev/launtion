@@ -34,6 +34,9 @@ import {
   SyntheticConnectPills,
   SyntheticHeroButton,
   SyntheticPromptBox,
+  MediaShowcase,
+  MetricCardsShowcase,
+  ConversationalMockup,
   type TreeNode,
 } from '../motion-kit';
 
@@ -88,7 +91,9 @@ export const FloatingParallaxFragments: React.FC<{
   frame: number;
   accent: string;
   isDark: boolean;
-}> = ({ frame, accent, isDark }) => {
+  brandTitle?: string;
+  tagline?: string;
+}> = ({ frame, accent, isDark, brandTitle = 'SaaS Studio', tagline = 'High Performance' }) => {
   const float1 = Math.sin((frame / 26) * Math.PI) * 7;
   const float2 = Math.cos((frame / 30) * Math.PI) * 6;
   const float3 = Math.sin((frame / 34) * Math.PI) * 5;
@@ -102,7 +107,7 @@ export const FloatingParallaxFragments: React.FC<{
         transformStyle: 'preserve-3d',
       }}
     >
-      {/* Fragment 1: Floating Code Snippet Card (Left, Z=80px) */}
+      {/* Fragment 1: Floating Feature Card (Left, Z=80px) */}
       <div
         style={{
           position: 'absolute',
@@ -114,16 +119,16 @@ export const FloatingParallaxFragments: React.FC<{
           backgroundColor: isDark ? '#1C1B19' : '#FFFFFF',
           border: isDark ? '1px solid #33312C' : '1.5px solid #ECE7DE',
           boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
-          fontFamily: 'monospace',
-          fontSize: 12,
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontSize: 13,
           color: isDark ? '#E5E2DC' : '#181716',
           zIndex: 10,
         }}
       >
         <div style={{ color: accent, fontWeight: 700, marginBottom: 4 }}>
-          ▸ routes/telemetry.ts
+          ✦ {brandTitle}
         </div>
-        <div style={{ color: '#8A867E' }}>export const stream = true;</div>
+        <div style={{ color: '#8A867E', fontSize: 12 }}>{tagline}</div>
       </div>
 
       {/* Fragment 2: Floating Live Status Badge (Right, Z=100px) */}
@@ -155,7 +160,7 @@ export const FloatingParallaxFragments: React.FC<{
             backgroundColor: '#10B981',
           }}
         />
-        <span>Edge CDN • #US-EAST Active</span>
+        <span>{brandTitle} • Live</span>
       </div>
 
       {/* Fragment 3: Floating Micro Metric Pill (Bottom Left, Z=60px) */}
@@ -175,7 +180,7 @@ export const FloatingParallaxFragments: React.FC<{
           zIndex: 10,
         }}
       >
-        <span>Latency: 12ms • 99.99% SLA</span>
+        <span>99.9% Uptime • Instant Setup</span>
       </div>
     </div>
   );
@@ -358,16 +363,24 @@ export const InteractiveProductSurface: React.FC<{
     sceneGraph.scenes[0]?.payload) as (ProductInteraction3DPayload & Record<string, unknown>) | undefined;
 
   const defaultPrompt =
-    'I want to build a bike renting app with real-time terrain tracking';
+    'Build and scale with real-time telemetry and automated sync.';
   const promptText =
     activePayload?.textToType ?? activePayload?.promptText ?? defaultPrompt;
-  const buttonText = activePayload?.buttonText ?? 'Publish';
-  const brandTitle = activePayload?.productName ? `${activePayload.productName} Studio` : 'Base44 Studio';
-  const headerHeadline = activePayload?.headline ?? 'Fleet Operations & Dynamic Surface';
-  const codeTitle = activePayload?.title ?? 'Service Integrations & Routing';
+  const buttonText = activePayload?.buttonText ?? 'Get Started';
+  const brandTitle = activePayload?.productName ? `${activePayload.productName}` : 'Vidiaura';
+  const headerHeadline = activePayload?.headline ?? `${brandTitle} • Dynamic Operations`;
+  const codeTitle = activePayload?.title ?? 'Architecture & Routing';
   const footerCrest = activePayload?.tagline
-    ? `${activePayload.productName ?? 'Base44'} • ${activePayload.tagline}`
-    : 'Base44 Motion Engine • Deterministic SceneGraph';
+    ? `${brandTitle} • ${activePayload.tagline}`
+    : `${brandTitle} Engine • Deterministic SceneGraph`;
+
+  // Dynamic sidebar items from features or architecture tree
+  const treeFiles = (sceneGraph.scenes.find((s) => s.type === 'synthetic_code_tree')?.payload as unknown as Record<string, unknown>)?.files as string[] | undefined;
+  const navItems = activePayload?.features && Array.isArray(activePayload.features) && activePayload.features.length > 0
+    ? (activePayload.features as string[]).slice(0, 4)
+    : treeFiles && treeFiles.length > 0
+      ? treeFiles.slice(0, 4).map(f => f.replace(/^(services|pipeline|telemetry|routes|api)\//, '').replace(/\.(ts|js|py)$/, '').replace(/[-_]/g, ' '))
+      : ['Workflows', 'Real-Time Telemetry', 'Cloud Sync', 'Settings'];
 
   // Determine dynamic element states purely from cursorTrack / cameraTrack events
   const clickKeyframes = sceneGraph.cursorTrack.filter((kf) => kf.click);
@@ -482,10 +495,11 @@ export const InteractiveProductSurface: React.FC<{
           >
             Dashboard
           </div>
-          <div style={{ padding: '8px 14px', color: '#8A867E' }}>Fleet Rentals</div>
-          <div style={{ padding: '8px 14px', color: '#8A867E' }}>Route Planning</div>
-          <div style={{ padding: '8px 14px', color: '#8A867E' }}>Telemetry & Geo</div>
-          <div style={{ padding: '8px 14px', color: '#8A867E' }}>Settings</div>
+          {navItems.map((item, idx) => (
+            <div key={idx} style={{ padding: '8px 14px', color: '#8A867E' }}>
+              {item}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -523,7 +537,7 @@ export const InteractiveProductSurface: React.FC<{
               {headerHeadline}
             </h2>
             <span style={{ fontSize: 13, color: '#8A867E' }}>
-              Real-time telemetry • January 2026 • Base44 Engine v2.0
+              {brandTitle} • Real-time telemetry • Dynamic Surface
             </span>
           </div>
 
@@ -670,7 +684,7 @@ export const InteractiveProductSurface: React.FC<{
                   gap: 8,
                 }}
               >
-                <span>Calendar • Sync Engine</span>
+                <span>{codeTitle || `${brandTitle} • Sync Engine`}</span>
               </div>
             </div>
 
@@ -685,17 +699,35 @@ export const InteractiveProductSurface: React.FC<{
                 color: isDark ? '#A19E95' : '#555148',
               }}
             >
-              <div
-                id="code-tree-leaf-routes"
-                style={{
-                  color: isDark ? '#FFFFFF' : '#181716',
-                  fontWeight: 600,
-                }}
-              >
-                ▸ routes/fleet.ts
-              </div>
-              <div>▸ sync/calendar.ts</div>
-              <div>▸ telemetry/geo.ts</div>
+              {treeFiles && treeFiles.length > 0 ? (
+                treeFiles.slice(0, 3).map((f, idx) => (
+                  <div
+                    key={idx}
+                    id={idx === 0 ? 'code-tree-leaf-routes' : undefined}
+                    style={
+                      idx === 0
+                        ? { color: isDark ? '#FFFFFF' : '#181716', fontWeight: 600 }
+                        : undefined
+                    }
+                  >
+                    ▸ {f}
+                  </div>
+                ))
+              ) : (
+                <>
+                  <div
+                    id="code-tree-leaf-routes"
+                    style={{
+                      color: isDark ? '#FFFFFF' : '#181716',
+                      fontWeight: 600,
+                    }}
+                  >
+                    ▸ services/core.ts
+                  </div>
+                  <div>▸ pipeline/ingest.ts</div>
+                  <div>▸ telemetry/metrics.ts</div>
+                </>
+              )}
             </div>
           </div>
 
@@ -1097,6 +1129,56 @@ export const SceneNodeRenderer: React.FC<SceneNodeRendererProps> = ({
       );
     }
 
+    case 'media_showcase': {
+      const p = node.payload;
+      return (
+        <div style={fullScreenCenterStyle}>
+          <MediaShowcase
+            mediaUrl={p.mediaUrl || ''}
+            mediaType={p.mediaType}
+            headline={p.headline}
+            tagline={p.tagline}
+            zoomScale={p.zoomScale}
+            panDirection={p.panDirection}
+            accentColor={artDirection.primaryAccent}
+            isDark={artDirection.surfaceTheme === 'dark'}
+            frame={seqFrame}
+          />
+        </div>
+      );
+    }
+
+    case 'metric_cards': {
+      const p = node.payload;
+      return (
+        <div style={fullScreenCenterStyle}>
+          <MetricCardsShowcase
+            headline={p.headline}
+            subheadline={p.subheadline}
+            metrics={p.metrics}
+            accentColor={artDirection.primaryAccent}
+            isDark={artDirection.surfaceTheme === 'dark'}
+            frame={seqFrame}
+          />
+        </div>
+      );
+    }
+
+    case 'conversational_mockup': {
+      const p = node.payload;
+      return (
+        <div style={fullScreenCenterStyle}>
+          <ConversationalMockup
+            headline={p.headline}
+            messages={p.messages}
+            accentColor={artDirection.primaryAccent}
+            isDark={artDirection.surfaceTheme === 'dark'}
+            frame={seqFrame}
+          />
+        </div>
+      );
+    }
+
     default: {
       void node;
       return null;
@@ -1167,6 +1249,15 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
             frame={frame}
             accent={accent}
             isDark={isDark}
+            brandTitle={
+              (sceneGraph.scenes.find((s) => s.type === 'brand_closing_cta')?.payload as { productName?: string })?.productName ||
+              (sceneGraph.scenes.find((s) => s.type === 'product_interaction_3d')?.payload as { productName?: string })?.productName ||
+              'SaaS Studio'
+            }
+            tagline={
+              (sceneGraph.scenes.find((s) => s.type === 'brand_closing_cta')?.payload as { tagline?: string })?.tagline ||
+              'All-in-one Platform'
+            }
           />
         )}
 

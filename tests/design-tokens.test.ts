@@ -36,7 +36,7 @@ const ENFORCED_ALLOWLIST = new Set([normalize('src/lib/design/tokens.ts')]);
 
 /** Literal colours still living in legacy surfaces. Only ever decrease. */
 const LEGACY_LITERAL_COUNTS: Record<string, number> = {
-  'remotion/compositions/InteractiveSurfaceDemo.tsx': 124,
+  'remotion/compositions/InteractiveSurfaceDemo.tsx': 123,
   'remotion/compositions/LaunchDemo.tsx': 27,
   'remotion/compositions/StudioShowcase.tsx': 40,
   'src/app/editor/SimpleEditor.tsx': 19,

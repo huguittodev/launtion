@@ -12,3 +12,6 @@ export * from './SyntheticUI/SyntheticPromptBox';
 export * from './SyntheticUI/SyntheticHeroButton';
 export * from './SyntheticUI/SyntheticConnectPills';
 export * from './SyntheticUI/SyntheticCodeTree';
+export * from './MediaShowcase';
+export * from './MetricCardsShowcase';
+export * from './ConversationalMockup';

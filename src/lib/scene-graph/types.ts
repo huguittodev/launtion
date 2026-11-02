@@ -163,6 +163,39 @@ export interface BrandClosingCtaPayload {
   buttonText?: string;
 }
 
+export interface MediaShowcasePayload {
+  mediaUrl?: string;
+  mediaType?: 'image' | 'video';
+  headline?: string;
+  tagline?: string;
+  zoomScale?: number;
+  panDirection?: 'none' | 'left' | 'right' | 'up' | 'down';
+}
+
+export interface MetricCardItem {
+  value: string;
+  label: string;
+  trend?: string;
+  badge?: string;
+}
+
+export interface MetricCardsPayload {
+  headline?: string;
+  subheadline?: string;
+  metrics: MetricCardItem[];
+}
+
+export interface ChatMessageItem {
+  sender: 'user' | 'assistant';
+  text: string;
+  time?: string;
+}
+
+export interface ConversationalMockupPayload {
+  headline?: string;
+  messages: ChatMessageItem[];
+}
+
 /* Base Scene Node */
 export interface BaseSceneNode {
   id: string;
@@ -212,6 +245,21 @@ export interface BrandClosingCtaSceneNode extends BaseSceneNode {
   payload: BrandClosingCtaPayload;
 }
 
+export interface MediaShowcaseSceneNode extends BaseSceneNode {
+  type: 'media_showcase';
+  payload: MediaShowcasePayload;
+}
+
+export interface MetricCardsSceneNode extends BaseSceneNode {
+  type: 'metric_cards';
+  payload: MetricCardsPayload;
+}
+
+export interface ConversationalMockupSceneNode extends BaseSceneNode {
+  type: 'conversational_mockup';
+  payload: ConversationalMockupPayload;
+}
+
 /**
  * Discriminated union of all supported scene types.
  */
@@ -223,7 +271,10 @@ export type SceneNode =
   | SyntheticHeroButtonSceneNode
   | SyntheticConnectPillsSceneNode
   | SyntheticCodeTreeSceneNode
-  | BrandClosingCtaSceneNode;
+  | BrandClosingCtaSceneNode
+  | MediaShowcaseSceneNode
+  | MetricCardsSceneNode
+  | ConversationalMockupSceneNode;
 
 /**
  * Root SceneGraph contract driving Remotion composition rendering.

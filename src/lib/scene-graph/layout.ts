@@ -79,6 +79,9 @@ export const SCENE_LAYOUT_PRESETS: Record<SceneNode['type'], LayoutPresetId> = {
   synthetic_connect_pills: 'pair',
   synthetic_code_tree: 'split',
   brand_closing_cta: 'lower-third',
+  media_showcase: 'stage',
+  metric_cards: 'bento',
+  conversational_mockup: 'pair',
 };
 
 /**

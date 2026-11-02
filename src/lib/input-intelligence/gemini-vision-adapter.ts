@@ -304,7 +304,8 @@ export async function analyzeMediaWithGeminiVision(
       }>;
     };
 
-    const rawOutputText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const parts = data.candidates?.[0]?.content?.parts;
+    const rawOutputText = parts?.find((p) => typeof p.text === 'string' && p.text.trim().length > 0)?.text ?? parts?.[0]?.text;
     if (!rawOutputText) {
       return generateDeterministicVisualFallback({
         reason: 'EMPTY_GEMINI_OUTPUT',

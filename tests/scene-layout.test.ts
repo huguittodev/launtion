@@ -200,8 +200,11 @@ describe('stage layout', () => {
   test('8. every SceneGraph scene type has a registered preset', () => {
     assert.deepEqual(Object.keys(SCENE_LAYOUT_PRESETS).sort(), [
       'brand_closing_cta',
+      'conversational_mockup',
       'icon_grid_morph',
       'kinetic_typography',
+      'media_showcase',
+      'metric_cards',
       'product_interaction_3d',
       'synthetic_code_tree',
       'synthetic_connect_pills',

@@ -229,7 +229,7 @@ export function applyAspect(graph: SceneGraph, format: AspectFormat): EditResult
   return validate(candidate, graph);
 }
 
-/** Sets the user's real recording/screenshot on every product_interaction_3d scene. */
+/** Sets the user's real recording/screenshot on every product_interaction_3d or media_showcase scene. */
 export function applyUserMedia(
   graph: SceneGraph,
   mediaUrl: string | null,
@@ -243,8 +243,36 @@ export function applyUserMedia(
       scene.payload.url = mediaUrl;
       if (mediaAspect) scene.payload.mediaAspect = mediaAspect;
       touched = true;
+    } else if (scene.type === 'media_showcase') {
+      scene.payload.mediaUrl = mediaUrl;
+      scene.payload.zoomScale = 1.15;
+      scene.payload.mediaType = mediaUrl.includes('video') || mediaUrl.endsWith('.mp4') || mediaUrl.endsWith('.webm') ? 'video' : 'image';
+      touched = true;
     }
   }
+
+  // If no dedicated media scene exists, convert the central scene to media_showcase
+  if (!touched && candidate.scenes.length >= 2) {
+    const targetIdx = Math.min(1, candidate.scenes.length - 2);
+    const existing = candidate.scenes[targetIdx];
+    const prevPayload = existing.payload as Record<string, unknown>;
+    candidate.scenes[targetIdx] = {
+      id: `media-showcase-${existing.id}`,
+      type: 'media_showcase',
+      startFrame: existing.startFrame,
+      fromFrame: existing.startFrame,
+      durationInFrames: existing.durationInFrames,
+      payload: {
+        mediaUrl,
+        mediaType: mediaUrl.includes('video') || mediaUrl.endsWith('.mp4') || mediaUrl.endsWith('.webm') ? 'video' : 'image',
+        headline: (typeof prevPayload.headline === 'string' && prevPayload.headline) || (typeof prevPayload.productName === 'string' && prevPayload.productName) || 'Product Interface',
+        tagline: typeof prevPayload.tagline === 'string' ? prevPayload.tagline : 'Live Demonstration',
+        zoomScale: 1.15,
+      },
+    };
+    touched = true;
+  }
+
   if (!touched) return { graph, ok: true };
   return validate(candidate, graph);
 }
