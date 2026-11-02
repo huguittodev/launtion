@@ -24,147 +24,90 @@ import { generateDeterministicSceneGraph } from './deterministic-fallback';
 import { DEFAULT_ACCENT } from '../design/tokens';
 
 export const CREATIVE_DIRECTOR_SYSTEM_PROMPT = `You are the Executive Creative Director of Vidiaura, an automated video motion graphics studio.
-Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-quality SceneGraph JSON (v2.0) for Remotion.
+Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-quality, UNIQUE and PROCEDURAL SceneGraph JSON (v2.0) for Remotion.
 
 ### INVIOLABLE RULES:
-1. OUTPUT JSON ONLY. No markdown code fences (no \`\`\`json), no explanations, no HTML/JS code.
-2. Structure must match the exact SceneGraph v2.0 schema below:
+1. OUTPUT JSON ONLY. No markdown code fences, no explanations, no HTML/JS code.
+2. Structure must match the SceneGraph v2.0 schema:
 {
   "version": "2.0",
   "canvas": { "width": 1920, "height": 1080, "fps": 30, "durationInFrames": 480 },
   "artDirection": {
-    "backdropVariant": "dark-precision",
-    "surfaceTheme": "dark",
+    "backdropVariant": "dark-precision" | "light-editorial" | "aurora-blur" | "solid",
+    "surfaceTheme": "dark" | "light",
     "primaryAccent": "${DEFAULT_ACCENT}",
-    "archetype": "base44-studio"
+    "archetype": "base44-studio" | "linear-dark" | "bento-grid" | "kinetic-hook"
   },
   "cameraTrack": [
-    { "frame": 0, "x": 0.5, "y": 0.5, "zoom": 1.0, "rotateX": 6.0, "rotateY": -4.0, "rotateZ": 0, "easing": "ease-in-out" },
-    { "frame": 80, "x": 0.5, "y": 0.5, "zoom": 1.0, "rotateX": 0.0, "rotateY": 0.0, "rotateZ": 0, "easing": "ease-in-out" },
-    { "frame": 120, "x": 0.50, "y": 0.62, "zoom": 2.1, "rotateX": 3.0, "rotateY": -2.0, "rotateZ": 0, "easing": "ease-in-out" },
-    { "frame": 155, "x": 0.72, "y": 0.34, "zoom": 2.3, "rotateX": -2.0, "rotateY": 2.0, "rotateZ": 0, "easing": "ease-in-out" },
-    { "frame": 210, "x": 0.5, "y": 0.5, "zoom": 1.05, "rotateX": 4.0, "rotateY": -3.0, "rotateZ": 0, "easing": "ease-in-out" },
-    { "frame": 240, "x": 0.5, "y": 0.5, "zoom": 1.0, "rotateX": 0.0, "rotateY": 0.0, "rotateZ": 0, "easing": "ease-in-out" },
-    { "frame": 330, "x": 0.5, "y": 0.5, "zoom": 1.15, "rotateX": 0.0, "rotateY": 0.0, "rotateZ": 0, "easing": "ease-in-out" },
-    { "frame": 400, "x": 0.5, "y": 0.5, "zoom": 1.0, "rotateX": 0.0, "rotateY": 0.0, "rotateZ": 0, "easing": "ease-in-out" },
-    { "frame": 480, "x": 0.5, "y": 0.5, "zoom": 1.0, "rotateX": 0.0, "rotateY": 0.0, "rotateZ": 0, "easing": "ease-in-out" }
+    // Array of keyframes matching YOUR chosen scene transitions and focal points:
+    // { "frame": number, "x": number (0-1), "y": number (0-1), "zoom": number (0.8-3.0), "rotateX": number, "rotateY": number, "rotateZ": number, "easing": "ease-in-out" }
   ],
   "cursorTrack": [
-    { "frame": 0, "x": 0.95, "y": 0.95 },
-    { "frame": 240, "x": 0.95, "y": 0.95 },
-    { "frame": 265, "x": 0.50, "y": 0.55, "controlX": 0.75, "controlY": 0.80 },
-    { "frame": 280, "x": 0.50, "y": 0.50, "click": true },
-    { "frame": 310, "x": 0.95, "y": 0.95 },
-    { "frame": 480, "x": 0.95, "y": 0.95 }
+    // Array of keyframes matching YOUR interactive scenes (park at 0.95, 0.95 during non-interactive scenes):
+    // { "frame": number, "x": number (0-1), "y": number (0-1), "controlX"?: number, "controlY"?: number, "click"?: boolean }
   ],
   "audioTrack": [
-    { "id": "cue-ambient", "frame": 0, "asset": "ambient-beat", "volume": 0.28, "fadeInFrames": 15, "fadeOutFrames": 30 },
-    { "id": "cue-riser-1", "frame": 55, "asset": "sound-riser", "volume": 0.65 },
-    { "id": "cue-impact-1", "frame": 88, "asset": "sub-bass-drop", "volume": 0.82 },
-    { "id": "cue-trans-1", "frame": 88, "asset": "transition-whoosh-heavy", "volume": 0.72 },
-    { "id": "cue-pop-1", "frame": 110, "asset": "pop-clean", "volume": 0.65 },
-    { "id": "cue-pop-2", "frame": 128, "asset": "pop-clean", "volume": 0.62 },
-    { "id": "cue-pop-3", "frame": 146, "asset": "pop-clean", "volume": 0.60 },
-    { "id": "cue-trans-2", "frame": 238, "asset": "transition-whoosh-heavy", "volume": 0.68 },
-    { "id": "cue-riser-cta", "frame": 250, "asset": "sound-riser", "volume": 0.70 },
-    { "id": "cue-click-hero", "frame": 280, "asset": "click-switch", "volume": 0.88 },
-    { "id": "cue-success", "frame": 295, "asset": "success-chime", "volume": 0.82 },
-    { "id": "cue-trans-closing", "frame": 338, "asset": "transition-whoosh-heavy", "volume": 0.75 },
-    { "id": "cue-chime-end", "frame": 410, "asset": "chime", "volume": 0.70, "fadeOutFrames": 30 }
+    // Array of synchronized audio cues matching YOUR scenes and beats:
+    // { "id": string, "frame": number, "asset": AudioAsset, "volume": number (0-1), "fadeInFrames"?: number, "fadeOutFrames"?: number }
   ],
   "scenes": [
-    {
-      "id": "scene-1-hook",
-      "type": "kinetic_typography",
-      "startFrame": 0,
-      "fromFrame": 0,
-      "durationInFrames": 90,
-      "payload": {
-        "words": ["Scale", "Your", "SaaS", "Instantly"],
-        "accentWordIndex": 2,
-        "staggerFrames": 10
-      }
-    },
-    {
-      "id": "scene-2-features",
-      "type": "metric_cards",
-      "startFrame": 90,
-      "fromFrame": 90,
-      "durationInFrames": 150,
-      "payload": {
-        "headline": "Measurable Results in Production",
-        "subheadline": "Built for modern high-performance teams",
-        "metrics": [
-          { "value": "+85%", "label": "Growth Rate", "trend": "+12% this month" },
-          { "value": "10x", "label": "Faster Workflow", "trend": "Instant sync" },
-          { "value": "99.9%", "label": "Guaranteed SLA", "trend": "Zero downtime" }
-        ]
-      }
-    },
-    {
-      "id": "scene-3-hero-cta",
-      "type": "synthetic_hero_button",
-      "startFrame": 240,
-      "fromFrame": 240,
-      "durationInFrames": 100,
-      "payload": {
-        "buttonText": "Start Free Trial",
-        "variant": "glow-primary",
-        "clickFrame": 280
-      }
-    },
-    {
-      "id": "scene-4-brand-closing",
-      "type": "brand_closing_cta",
-      "startFrame": 340,
-      "fromFrame": 340,
-      "durationInFrames": 140,
-      "payload": {
-        "productName": "Product Name",
-        "tagline": "Product memorable closing tagline",
-        "showLogo": true,
-        "buttonText": "Get Started Free"
-      }
-    }
+    // 3 to 5 sequential scenes spanning exactly 0 to 480 frames with no gaps.
   ]
 }
-3. Supported scene types:
-    - "kinetic_typography": Punchy words hook.
-    - "metric_cards": KPI results cards (metrics: array of {value, label, trend}).
-    - "saas_feature_grid": 2×2 or 3-column SaaS feature grid with emoji icons (headline, features: array of {icon, name, description}).
-    - "conversational_mockup": WhatsApp/Chat demo (messages: array of {sender: 'user'|'assistant', text, time}).
-    - "media_showcase": User image/video screenshot with cinematic zoom (headline, tagline, zoomScale).
-    - "synthetic_prompt_box": AI prompt command box (textToType, typingSpeed).
-    - "synthetic_hero_button": Glowing action button with click (buttonText, clickFrame).
-    - "brand_closing_cta": Final logo & brand punchline.
-4. Procedural Variety Rule:
-    - If the product is about WhatsApp, appointments, bookings, chat, or support -> use conversational_mockup.
-    - If it's about metrics, growth, finance, performance, or sales -> use metric_cards.
-    - If it highlights key features, capabilities, or tools -> use saas_feature_grid.
-    - NEVER use synthetic_code_tree for non-developer products!
-5. All keyframes, cues, and scene start frames MUST be <= 480.
-6. Allowed audio assets & cinematic sound design:
-    - Bed: "ambient-beat" (nominal volume 0.25-0.35 throughout).
-    - Transitions: "transition-whoosh-heavy" (major scene cuts), "transition-whoosh-fast" (quick cuts), "camera-whoosh" (camera pans).
-    - Tension build: "sound-riser" (2-3 seconds build up before hero CTA or key reveal).
-    - Impacts: "sub-bass-drop" (cinematic deep impact on the first major reveal/hook payoff), "pop-clean" / "soft-pop" (cards/tiles popping in).
-    - Actions: "click-switch" (punchy button click), "click-soft" / "mouse-click" (UI clicks), "keyboard-tap", "mechanical-tap-1" through "mechanical-tap-4" (typing).
-    - Payoff: "success-chime" (after CTA button press), "chime" (brand closing).
-    - Cinematics Rule: ALWAYS pair sub-bass-drop with transition-whoosh-heavy at the first major reveal. ALWAYS play sound-riser before the CTA click. ALWAYS trigger success-chime after the CTA button is clicked!
-7. Allowed backdrop variants: "dark-precision", "light-editorial", "aurora-blur", "solid".
-8. Allowed surface themes: "light", "dark".
-9. Primary accent must be a valid hex color code (e.g. "${DEFAULT_ACCENT}").
-10. String limits:
+
+3. PROCEDURAL SCENE COMPOSITION (Choose 3 to 5 scenes that best tell the product's story):
+    - "kinetic_typography": High-energy kinetic hook with punchy words (words: string[], accentWordIndex: number, staggerFrames: number). Best for scene 1 (frame 0 to ~80-100).
+    - "metric_cards": 3 KPI performance/growth cards with trends (headline, subheadline, metrics: array of {value, label, trend}). Perfect for analytics, ROI, conversion, or finance.
+    - "saas_feature_grid": 2x2 or 3-column feature grid with emojis (headline, features: array of {icon, name, description}). Perfect for all-in-one platforms, tool suites, or productivity apps.
+    - "conversational_mockup": Realistic chat bubbles mockup (headline, messages: array of {sender: 'user'|'assistant', text, time}). Perfect for AI assistants, WhatsApp/support automation, bots, or booking apps.
+    - "media_showcase": Cinematic screenshot zoom & pan (headline, tagline, zoomScale: 1.1-1.8, panDirection: 'none'|'left'|'right'|'up'|'down'). Perfect for visual SaaS dashboards.
+    - "synthetic_prompt_box": AI prompt bar with typing simulation (textToType, typingSpeed).
+    - "synthetic_hero_button": Glowing action button with click event (buttonText, clickFrame, variant). Place right before the closing scene.
+    - "brand_closing_cta": Final logo, punchline & CTA (productName, tagline, showLogo: true, buttonText). ALWAYS use as the final scene (e.g. frame ~340-480).
+
+4. PROCEDURAL CAMERA DIRECTION RULES (Vary camera dynamically to fit YOUR chosen scenes!):
+    - DO NOT use the same camera coordinates for every video! Direct the camera like a real cinematic director.
+    - For Scene 1 (Kinetic Hook): Start centered (x: 0.5, y: 0.5) with slow drift or slight 3D angle (zoom: 1.0 to 1.05, rotateX: 3 to 8, rotateY: -4 to 4).
+    - For Scene Transitions: Return to zoom 1.0 at scene boundaries (e.g. at the exact startFrame of each scene).
+    - For Metric Cards / Feature Grid: Execute a subtle, elegant push-in (zoom: 1.08 to 1.20) or slight pan toward top-left or top-right.
+    - For Conversational Mockup: Steady focal hold centered at (x: 0.5, y: 0.52, zoom: 1.05 to 1.15).
+    - For Hero Button: Punchy zoom-in focusing directly on the button center (x: 0.50, y: 0.50, zoom: 1.15 to 1.35) during its clickFrame!
+    - For Brand Closing: Heroic wide lock at (x: 0.5, y: 0.5, zoom: 1.0, rotateX: 0, rotateY: 0).
+    - Always include keyframe at frame 0 and frame 480.
+
+5. PROCEDURAL AUDIO DESIGN RULES (Iman Gadzhi / High-Energy SaaS Style):
+    - DO NOT hardcode fixed frame numbers for audio! Place cues dynamically to match the exact startFrame and key events of YOUR scenes.
+    - Background Bed: ALWAYS start "ambient-beat" at frame 0 (volume: 0.25 to 0.35, fadeInFrames: 15, fadeOutFrames: 45).
+    - Scene Cuts: Place "transition-whoosh-heavy" (for major scene changes) or "transition-whoosh-fast" (for rapid changes) at the boundary (startFrame) of each scene!
+    - First Major Reveal: Place "sub-bass-drop" (volume: 0.80 to 0.90) at the start of Scene 2 to give massive cinematic weight to the value proposition.
+    - Card/Tile Entrances: Place "pop-clean" or "soft-pop" (volume: 0.55-0.65) where cards or items animate in (e.g. startFrame + 15, + 30).
+    - Tension Buildup: Place "sound-riser" (volume: 0.65 to 0.75) 20-30 frames BEFORE the hero button click!
+    - Button Click: Place "click-switch" or "mouse-click" (volume: 0.85 to 0.95) at the EXACT clickFrame of the button.
+    - Payoff: Place "success-chime" (volume: 0.80) 10-15 frames AFTER the button click.
+    - Final Scene: Place "chime" (volume: 0.70) during brand_closing_cta.
+
+6. CURSOR INTERACTION RULES:
+    - Park the cursor at (0.95, 0.95) with NO clicks during non-interactive scenes (kinetic_typography, metric_cards, saas_feature_grid, conversational_mockup, media_showcase, brand_closing_cta).
+    - ONLY move and click the cursor during interactive scenes (synthetic_hero_button, synthetic_prompt_box).
+    - Move cursor from (0.95, 0.95) to (0.50, 0.50) 15-20 frames before clickFrame, set click: true at clickFrame, and retreat to (0.95, 0.95).
+
+7. Allowed audio assets:
+    "ambient-beat", "sound-riser", "sub-bass-drop", "transition-whoosh-heavy", "transition-whoosh-fast",
+    "camera-whoosh", "click-switch", "click-soft", "mouse-click", "keyboard-tap", "mechanical-tap-1",
+    "mechanical-tap-2", "mechanical-tap-3", "mechanical-tap-4", "pop-clean", "soft-pop", "success-chime", "chime".
+
+8. Allowed backdrop variants: "dark-precision", "light-editorial", "aurora-blur", "solid".
+9. Allowed surface themes: "light", "dark".
+10. Primary accent must be a valid hex color code (e.g. "${DEFAULT_ACCENT}").
+11. String limits:
     - prompt textToType <= 200 chars
     - buttonText <= 30 chars
     - productName <= 50 chars
     - tagline <= 100 chars
     - headline <= 60 chars
     - title <= 50 chars
-11. Cursor interaction rules:
-    - Park the cursor at (0.95, 0.95) with NO clicks during visual scenes (kinetic_typography, metric_cards, saas_feature_grid, media_showcase, brand_closing_cta).
-    - ONLY move and click the cursor during interactive scenes (synthetic_hero_button, synthetic_prompt_box). Target coordinates must be (0.50, 0.50) and click frame must match the scene's clickFrame!
-12. Tailor all headlines, descriptions, button texts and scene copy specifically to the user's SaaS brief!`;
+12. All keyframes, cues, and scene start frames MUST be <= 480.
+13. TAILOR EVERYTHING TO THE SPECIFIC SAAS PRODUCT: Choose scenes, headlines, copy, camera motion, and audio pacing uniquely for each product!`;
 
 /**
  * Builds the user prompt describing the SaaS product brief.
@@ -483,16 +426,30 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
       const rawDur = typeof sc.durationInFrames === 'number' ? sc.durationInFrames : 90;
       const durationInFrames = Math.max(1, Math.min(duration - startFrame, rawDur));
 
-      // Map content -> payload if payload is missing
-      const rawPayload = (sc.payload as Record<string, unknown>) || (sc.content as Record<string, unknown>) || {};
+      // Map props/content/data -> payload if payload is missing or empty
+      const rawPayload =
+        (sc.payload as Record<string, unknown>) ||
+        (sc.props as Record<string, unknown>) ||
+        (sc.properties as Record<string, unknown>) ||
+        (sc.content as Record<string, unknown>) ||
+        (sc.data as Record<string, unknown>) ||
+        {};
       const payload: Record<string, unknown> = { ...rawPayload };
+
+      // Fallback for fields placed directly on sc node instead of inside payload
+      const rootPayloadKeys = ['messages', 'metrics', 'features', 'words', 'headline', 'buttonText', 'tagline', 'productName', 'textToType', 'title'];
+      for (const key of rootPayloadKeys) {
+        if (payload[key] === undefined && sc[key] !== undefined) {
+          payload[key] = sc[key];
+        }
+      }
 
       // Ensure string limits
       if (typeof payload.textToType === 'string') payload.textToType = payload.textToType.slice(0, 200);
       if (typeof payload.buttonText === 'string') payload.buttonText = payload.buttonText.slice(0, 30);
       if (typeof payload.productName === 'string') payload.productName = payload.productName.slice(0, 50);
       if (typeof payload.tagline === 'string') payload.tagline = payload.tagline.slice(0, 100);
-      if (typeof payload.headline === 'string') payload.headline = payload.headline.slice(0, 60);
+      if (typeof payload.headline === 'string') payload.headline = payload.headline.slice(0, 80);
       if (typeof payload.title === 'string') payload.title = payload.title.slice(0, 50);
 
       // Supply required fields based on scene type if missing
@@ -505,8 +462,24 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
         if (!payload.headline) payload.headline = (brief.features?.[0] || 'Core Workflow').slice(0, 60);
         if (!payload.buttonText) payload.buttonText = (brief.ctaText || 'Get Started').slice(0, 30);
       }
-      if (type === 'synthetic_hero_button' && !payload.buttonText) {
-        payload.buttonText = (brief.ctaText || 'Get Started Free').slice(0, 30);
+      if (type === 'kinetic_typography') {
+        if (typeof payload.words === 'string') {
+          payload.words = (payload.words as string).trim().split(/\s+/).filter(Boolean);
+        } else if (!Array.isArray(payload.words) || (payload.words as unknown[]).length === 0) {
+          const rawText = (typeof payload.text === 'string' ? payload.text : '') ||
+                          (typeof payload.headline === 'string' ? payload.headline : '') ||
+                          (brief.tagline || brief.productName);
+          const splitWords = rawText.trim().split(/\s+/).filter(Boolean);
+          payload.words = splitWords.length > 0 ? splitWords : ['NEXT-GEN', brief.productName.toUpperCase(), 'LIVE'];
+        }
+      }
+      if (type === 'synthetic_hero_button') {
+        if (!payload.buttonText) {
+          payload.buttonText = (brief.ctaText || 'Get Started Free').slice(0, 30);
+        }
+        if (payload.variant && !['glow-primary', 'outline', 'minimal'].includes(payload.variant as string)) {
+          payload.variant = 'glow-primary';
+        }
       }
       if (type === 'brand_closing_cta') {
         if (!payload.productName) payload.productName = brief.productName.slice(0, 50);
@@ -519,6 +492,16 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
             { value: '10x', label: 'Ahorro de Tiempo', trend: 'Automatización total' },
             { value: '99.9%', label: 'Disponibilidad', trend: 'SLA garantizado' },
           ];
+        } else {
+          payload.metrics = payload.metrics.map((m: unknown, mIdx: number) => {
+            const item = (m as Record<string, unknown>) || {};
+            return {
+              value: typeof item.value === 'string' && item.value.trim().length > 0 ? item.value.slice(0, 20) : `+${(mIdx + 1) * 25}%`,
+              label: typeof item.label === 'string' && item.label.trim().length > 0 ? item.label.slice(0, 60) : 'Performance',
+              ...(typeof item.trend === 'string' ? { trend: item.trend.slice(0, 40) } : {}),
+              ...(typeof item.badge === 'string' ? { badge: item.badge.slice(0, 30) } : {}),
+            };
+          });
         }
       }
       if (type === 'saas_feature_grid') {
@@ -530,6 +513,15 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
             { icon: '📊', name: 'Real-time Analytics', description: 'Track every metric that matters' },
             { icon: '🤖', name: 'AI Automation', description: 'Automate tasks intelligently' },
           ];
+        } else {
+          payload.features = payload.features.slice(0, 6).map((f: unknown, fIdx: number) => {
+            const item = (f as Record<string, unknown>) || {};
+            return {
+              icon: typeof item.icon === 'string' && item.icon.trim().length > 0 ? item.icon.slice(0, 10) : '✨',
+              name: typeof item.name === 'string' && item.name.trim().length > 0 ? item.name.slice(0, 40) : `Feature ${fIdx + 1}`,
+              description: typeof item.description === 'string' && item.description.trim().length > 0 ? item.description.slice(0, 120) : 'Streamlined workflow',
+            };
+          });
         }
       }
       if (type === 'conversational_mockup') {
@@ -538,6 +530,19 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
             { sender: 'user', text: `¿Cómo funciona ${brief.productName}?`, time: '10:00' },
             { sender: 'assistant', text: `¡Hola! ${brief.productName} automatiza todo en segundos.`, time: '10:00' },
           ];
+        } else {
+          payload.messages = payload.messages.map((m: unknown, mIdx: number) => {
+            const msg = (m as Record<string, unknown>) || {};
+            const sender = msg.sender === 'user' ? 'user' : 'assistant';
+            const text = typeof msg.text === 'string' && msg.text.trim().length > 0
+              ? msg.text.slice(0, 250)
+              : (mIdx % 2 === 0 ? 'How does it work?' : 'Everything is automated.');
+            return {
+              sender,
+              text,
+              ...(typeof msg.time === 'string' ? { time: msg.time.slice(0, 10) } : {}),
+            };
+          });
         }
       }
       if (type === 'media_showcase') {
@@ -599,7 +604,7 @@ export async function generateCreativeDirectorSceneGraph(
   const startTime = Date.now();
   const brief = ProductBriefSchema.parse(rawBrief);
   const apiKey = options?.apiKey ?? process.env.GEMINI_API_KEY;
-  const model = options?.model ?? process.env.GEMINI_TEXT_MODEL ?? 'gemini-3.5-flash';
+  const model = options?.model ?? process.env.GEMINI_TEXT_MODEL ?? 'gemini-3-flash-preview';
   const timeoutMs = options?.timeoutMs ?? 30000;
   const fetchFn = options?.fetchFn ?? globalThis.fetch;
 
@@ -635,7 +640,7 @@ export async function generateCreativeDirectorSceneGraph(
           parts: [{ text: CREATIVE_DIRECTOR_SYSTEM_PROMPT }],
         },
         generationConfig: {
-          temperature: 0.25,
+          temperature: 0.70,
           topP: 0.85,
           responseMimeType: 'application/json',
         },
