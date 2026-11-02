@@ -23,6 +23,8 @@ export interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   sceneGraph: SceneGraph;
+  /** Starts the render job as soon as the modal mounts (used by the minimalist editor). */
+  autoStart?: boolean;
 }
 
 interface PollResponse {
@@ -42,6 +44,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   isOpen,
   onClose,
   sceneGraph,
+  autoStart = false,
 }) => {
   const [modalState, setModalState] = useState<
     'idle' | 'queued' | 'rendering' | 'completed' | 'failed'
@@ -192,6 +195,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       setErrorCode('ENQUEUE_ERROR');
     }
   };
+
+  // Auto-start once (minimalist editor mounts a fresh modal per download click)
+  const autoStartedRef = useRef(false);
+  useEffect(() => {
+    if (autoStart && isOpen && !autoStartedRef.current) {
+      autoStartedRef.current = true;
+      void handleStartRender();
+    }
+    // handleStartRender is intentionally excluded: it must run only once per mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, isOpen]);
 
   // Cancel rendering job
   const handleCancelRender = async () => {

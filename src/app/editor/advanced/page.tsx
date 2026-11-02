@@ -25,17 +25,17 @@ import {
   ProjectSelectorModal,
   RemotionPlayerPreview,
   TimelineControl,
-} from '../../components/editor';
+} from '../../../components/editor';
 import {
   editorActions,
   editorReducer,
   createInitialEditorState,
-} from '../../lib/editor/editor-state';
+} from '../../../lib/editor/editor-state';
 import type {
   BackdropVariant,
   SceneGraph,
   SurfaceTheme,
-} from '../../lib/scene-graph/types';
+} from '../../../lib/scene-graph/types';
 
 export default function EditorPage() {
   const [state, dispatch] = useReducer(editorReducer, undefined, createInitialEditorState);
