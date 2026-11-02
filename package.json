@@ -15,8 +15,12 @@
     "render:legacy": "remotion render remotion/index.ts LaunchDemo out/LaunchDemo.mp4"
   },
   "dependencies": {
+    "@remotion/bundler": "4.0.539",
     "@remotion/cli": "4.0.539",
     "@remotion/player": "4.0.539",
+    "@remotion/renderer": "4.0.539",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.1",
     "next": "16.4.3",
     "react": "19.3.0",
     "react-dom": "19.3.0",

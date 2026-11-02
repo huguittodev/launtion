@@ -12,3 +12,8 @@ export * from './ThemeCustomizer';
 export * from './CameraFocalPicker';
 export * from './TimelineControl';
 export * from './ExportModal';
+export * from './CreativeDirectorModal';
+export * from './AssetIntelligenceModal';
+export * from './ScreenRecorderModal';
+export * from './ProjectSelectorModal';
+

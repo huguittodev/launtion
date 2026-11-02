@@ -111,6 +111,13 @@ export type EditorAction =
       };
     }
   | {
+      type: 'LOAD_SCENE_GRAPH';
+      payload: {
+        sceneGraph: SceneGraph;
+        description?: string;
+      };
+    }
+  | {
       type: 'UNDO';
     }
   | {
@@ -426,6 +433,33 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       };
     }
 
+    case 'LOAD_SCENE_GRAPH': {
+      const candidate = action.payload.sceneGraph;
+      const validation = SceneGraphSchema.safeParse(candidate);
+
+      if (validation.success) {
+        return {
+          ...state,
+          sceneGraph: validation.data,
+          activeKeyframeIndex: 0,
+          selectedSceneId: validation.data.scenes[0]?.id ?? null,
+          currentFrame: 0,
+          validationNotice: null,
+          isDirty: true,
+          history: {
+            past: [state.sceneGraph, ...state.history.past.slice(0, 49)],
+            future: [],
+          },
+        };
+      } else {
+        return {
+          ...state,
+          validationNotice:
+            validation.error.issues[0]?.message ?? 'SceneGraph generado inválido',
+        };
+      }
+    }
+
     case 'UNDO': {
       if (state.history.past.length === 0) return state;
       const previous = state.history.past[0];
@@ -514,6 +548,10 @@ export const editorActions = {
   resetSceneGraph: (preset?: 'default' | 'multi-scene'): EditorAction => ({
     type: 'RESET_SCENE_GRAPH',
     payload: { preset },
+  }),
+  loadSceneGraph: (sceneGraph: SceneGraph, description?: string): EditorAction => ({
+    type: 'LOAD_SCENE_GRAPH',
+    payload: { sceneGraph, description },
   }),
   undo: (): EditorAction => ({
     type: 'UNDO',

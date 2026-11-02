@@ -1157,29 +1157,29 @@ Medir no solo impresiones y likes, sino:
 
 El desarrollo sigue un orden estricto de 8 fases para garantizar calidad visual excepcional antes de añadir capas de backend y persistencia:
 
-### Fase 1 — Motion Kit + Dirección de Arte en Remotion
+### Fase 1 — Motion Kit + Dirección de Arte en Remotion [COMPLETADO - Gate PASS]
 Construir las primitivas de estudio en Remotion: `<CameraRig3D>`, `<SmartCursor>`, `<SyntheticUI>`, `<KineticTypography>`, `<IconGridMorph>`, fondos dinámicos y `<AudioEngine>` con sincronización al fotograma.
 *Criterio de salida:* Composición de demostración interactiva en Remotion Studio inspirada en las técnicas publicitarias del vídeo de Base44 con calidad visual sobresaliente.
 
-### Fase 2 — InteractionMap
+### Fase 2 — InteractionMap [COMPLETADO - Gate PASS]
 Especificación y utilidades del formato `InteractionMap`: registro de coordenadas normalizadas `(x, y)`, tiempo `t`, trayectorias de cursor, disparadores de clics y zonas de foco para guiar la cámara 3D y los efectos de sonido.
 
-### Fase 3 — Scene Graph Schema (Zod) + Preview y Personalización Visual
+### Fase 3 — Scene Graph Schema (Zod) + Preview y Personalización Visual [COMPLETADO - Gate PASS]
 Definición formal del esquema Zod del Scene Graph. Montar en Next.js la interfaz con `@remotion/player` y panel contextual que permita editar textos, colores, iconos y mover puntos de zoom `(x, y)` directamente sobre el preview en tiempo real sin errores de compilación.
 
-### Fase 4 — Creative Director Agent (Gemini)
+### Fase 4 — Creative Director Agent (Gemini) [COMPLETADO - Gate PASS]
 Endpoint de servidor con el agente Creative Director: recibe datos del SaaS y recursos, y genera un Scene Graph balanceado (gancho, demo de producto 3D, escenas sintéticas y CTA) con ritmo y cortes musicales.
 
-### Fase 5 — Input Intelligence (Análisis Multimodal)
+### Fase 5 — Input Intelligence (Análisis Multimodal) [COMPLETADO - Gate PASS]
 Integración de Gemini Multimodal para analizar capturas o clips de vídeo subidos por el usuario, detectando acciones y sugiriendo el `InteractionMap` inicial editable.
 
-### Fase 6 — Grabador propio integrado
+### Fase 6 — Grabador propio integrado [COMPLETADO - Gate PASS]
 Herramienta de grabación directa de pantalla en el navegador que registre el vídeo limpio y el stream exacto de eventos del ratón (coordenadas, clics y metadatos básicos del DOM).
 
-### Fase 7 — Render Worker en segundo plano
+### Fase 7 — Render Worker en segundo plano [COMPLETADO - Gate PASS]
 Worker Node independiente con cola de trabajos, aislamiento de procesos, control de recursos (Chromium + `@remotion/renderer`) y exportación MP4 H.264.
 
-### Fase 8 — Capa SaaS
+### Fase 8 — Capa SaaS [COMPLETADO - Gate PASS]
 Autenticación y RLS con Supabase, almacenamiento privado de proyectos y exportaciones, límites de uso y pasarela de pago.
 
 ---

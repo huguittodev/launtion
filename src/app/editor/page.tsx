@@ -19,6 +19,10 @@ import {
   EditorSidebar,
   type EditorTab,
   ExportModal,
+  CreativeDirectorModal,
+  AssetIntelligenceModal,
+  ScreenRecorderModal,
+  ProjectSelectorModal,
   RemotionPlayerPreview,
   TimelineControl,
 } from '../../components/editor';
@@ -29,6 +33,7 @@ import {
 } from '../../lib/editor/editor-state';
 import type {
   BackdropVariant,
+  SceneGraph,
   SurfaceTheme,
 } from '../../lib/scene-graph/types';
 
@@ -36,8 +41,17 @@ export default function EditorPage() {
   const [state, dispatch] = useReducer(editorReducer, undefined, createInitialEditorState);
   const playerRef = useRef<PlayerRef | null>(null);
 
+  // Cloud project persistence state
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState<string>('Interactive Surface Demo');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isProjectSelectorOpen, setIsProjectSelectorOpen] = useState(false);
+
   const [activeTab, setActiveTab] = useState<EditorTab>('camera');
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [isInputModalOpen, setIsInputModalOpen] = useState(false);
+  const [isRecorderOpen, setIsRecorderOpen] = useState(false);
   const [showFocalOverlay, setShowFocalOverlay] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
 
@@ -94,6 +108,91 @@ export default function EditorPage() {
     handleSeek(frame);
   }, [handleSeek]);
 
+  const handleLoadAiSceneGraph = useCallback((newGraph: SceneGraph) => {
+    dispatch(editorActions.loadSceneGraph(newGraph));
+    playerRef.current?.seekTo(0);
+  }, []);
+
+  const handleLoadInputSceneGraph = useCallback((newGraph: SceneGraph) => {
+    dispatch(editorActions.loadSceneGraph(newGraph));
+    playerRef.current?.seekTo(0);
+  }, []);
+
+  const handleLoadRecordedSceneGraph = useCallback((newGraph: SceneGraph) => {
+    dispatch(editorActions.loadSceneGraph(newGraph));
+    playerRef.current?.seekTo(0);
+  }, []);
+
+  // Check URL query parameters for ?project=<id> on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const initialProjectId = params.get('project');
+    if (initialProjectId) {
+      fetch(`/api/projects/${initialProjectId}`)
+        .then((res) => {
+          if (!res.ok) throw new Error('Project not found');
+          return res.json();
+        })
+        .then((data) => {
+          if (data.project) {
+            setProjectId(data.project.id);
+            setProjectName(data.project.name);
+            dispatch(editorActions.loadSceneGraph(data.project.scene_graph));
+            playerRef.current?.seekTo(0);
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to load project from query param:', err);
+        });
+    }
+  }, []);
+
+  const handleSaveProject = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      const url = projectId ? `/api/projects/${projectId}` : '/api/projects';
+      const method = projectId ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: projectName,
+          sceneGraph: state.sceneGraph,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.project) {
+        setProjectId(data.project.id);
+        setProjectName(data.project.name);
+        window.history.replaceState({}, '', `/editor?project=${data.project.id}`);
+      }
+    } catch (err) {
+      console.error('Error saving project:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [projectId, projectName, state.sceneGraph]);
+
+  const handleSelectProject = useCallback(
+    (project: { id: string; name: string; scene_graph: SceneGraph }) => {
+      setProjectId(project.id);
+      setProjectName(project.name);
+      dispatch(editorActions.loadSceneGraph(project.scene_graph));
+      playerRef.current?.seekTo(0);
+      window.history.replaceState({}, '', `/editor?project=${project.id}`);
+    },
+    []
+  );
+
+  const handleNewProject = useCallback(() => {
+    setProjectId(null);
+    setProjectName('Interactive Surface Demo');
+    dispatch(editorActions.resetSceneGraph('default'));
+    playerRef.current?.seekTo(0);
+    window.history.replaceState({}, '', '/editor');
+  }, []);
+
   // Fullscreen support
   const handleToggleFullscreen = useCallback(() => {
     if (!editorContainerRef.current) return;
@@ -149,6 +248,12 @@ export default function EditorPage() {
     >
       {/* 1. Top Header */}
       <EditorHeader
+        title={projectName}
+        projectName={projectName}
+        isSaving={isSaving}
+        onSaveProject={handleSaveProject}
+        onOpenProjectSelector={() => setIsProjectSelectorOpen(true)}
+        onUpdateProjectName={setProjectName}
         durationInFrames={state.sceneGraph.canvas.durationInFrames}
         fps={state.sceneGraph.canvas.fps}
         currentFrame={state.currentFrame}
@@ -165,6 +270,9 @@ export default function EditorPage() {
         onUndo={() => dispatch(editorActions.undo())}
         onRedo={() => dispatch(editorActions.redo())}
         onToggleFocalOverlay={() => setShowFocalOverlay((prev) => !prev)}
+        onOpenAiModal={() => setIsAiModalOpen(true)}
+        onOpenInputIntelligenceModal={() => setIsInputModalOpen(true)}
+        onOpenScreenRecorderModal={() => setIsRecorderOpen(true)}
       />
 
       {/* 2. Main Workspace (Preview + Timeline / Sidebar) */}
@@ -223,6 +331,36 @@ export default function EditorPage() {
         isOpen={isExportOpen}
         onClose={() => setIsExportOpen(false)}
         sceneGraph={state.sceneGraph}
+      />
+
+      {/* 4. Creative Director AI Modal */}
+      <CreativeDirectorModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        onGenerated={handleLoadAiSceneGraph}
+      />
+
+      {/* 5. Input Intelligence Multimodal Modal */}
+      <AssetIntelligenceModal
+        isOpen={isInputModalOpen}
+        onClose={() => setIsInputModalOpen(false)}
+        onApplySceneGraph={handleLoadInputSceneGraph}
+      />
+
+      {/* 6. Screen Recorder Modal */}
+      <ScreenRecorderModal
+        isOpen={isRecorderOpen}
+        onClose={() => setIsRecorderOpen(false)}
+        onApplySceneGraph={handleLoadRecordedSceneGraph}
+      />
+
+      {/* 7. Project Selector Modal */}
+      <ProjectSelectorModal
+        isOpen={isProjectSelectorOpen}
+        onClose={() => setIsProjectSelectorOpen(false)}
+        currentProjectId={projectId}
+        onSelectProject={handleSelectProject}
+        onNewProject={handleNewProject}
       />
     </div>
   );
